@@ -39,7 +39,7 @@ final _testItem = Item(
   id: ItemId.parse('24010001'),
   name: 'テスト商品',
   category: const Category(id: 'cat001', name: 'テストカテゴリ'),
-  registeredAt: DateTime(2024, 1, 1),
+  registeredAt: DateTime(2024),
   features: [
     Feature(
       code: FeatureCode.parse('240100010101'),
@@ -58,9 +58,7 @@ Widget _buildPage({required String itemId}) => ProviderScope(
       (_) => _StubItemRepository(item: _testItem),
     ),
   ],
-  child: const MaterialApp(
-    home: ItemDetailPage(itemId: '24010001'),
-  ),
+  child: const MaterialApp(home: ItemDetailPage(itemId: '24010001')),
 );
 
 void main() {

@@ -1,9 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../presentation/pages/category/category_browser_page.dart';
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/item/item_detail_page.dart';
 import '../presentation/pages/item/item_search_page.dart';
-import '../presentation/pages/category/category_browser_page.dart';
 import '../presentation/pages/scanner/barcode_scanner_page.dart';
 import '../presentation/pages/settings/server_settings_page.dart';
 import '../presentation/pages/shelf/shelf_view_page.dart';

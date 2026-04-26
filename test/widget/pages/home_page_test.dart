@@ -27,9 +27,7 @@ GoRouter _buildRouter() => GoRouter(
 
 Widget _buildApp(ApiMode apiMode) => ProviderScope(
   overrides: [
-    serverConfigNotifierProvider.overrideWith(
-      () => _TestServerConfig(apiMode),
-    ),
+    serverConfigNotifierProvider.overrideWith(() => _TestServerConfig(apiMode)),
   ],
   child: MaterialApp.router(routerConfig: _buildRouter()),
 );

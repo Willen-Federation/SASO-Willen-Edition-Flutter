@@ -5,7 +5,7 @@ import 'package:saso_willen_edition/presentation/providers/server_config_provide
 
 class _MockModeConfig extends ServerConfigNotifier {
   @override
-  ServerConfig build() => const ServerConfig(apiMode: ApiMode.mock);
+  ServerConfig build() => const ServerConfig();
 }
 
 /// Pumps the full app in mock mode for integration tests.

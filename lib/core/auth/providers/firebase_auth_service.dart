@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../auth_service.dart';
-import '../../storage/secure_storage.dart';
+
 import '../../constants/app_constants.dart';
+import '../../storage/secure_storage.dart';
+import '../auth_service.dart';
 
 /// Firebase Authentication service.
 /// Active when ff_auth_firebase = true.

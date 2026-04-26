@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
-import '../auth_service.dart';
-import '../../storage/secure_storage.dart';
+
 import '../../constants/app_constants.dart';
+import '../../storage/secure_storage.dart';
+import '../auth_service.dart';
 
 /// Session-cookie based auth for SASO legacy endpoints.
 /// Used when ff_auth_oidc and ff_auth_firebase are both OFF.

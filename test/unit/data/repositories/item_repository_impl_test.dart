@@ -10,7 +10,7 @@ class _FakeApiClient implements SasoApiClient {
   int fetchCallCount = 0;
   int searchCallCount = 0;
 
-  static final _item = ItemModel(
+  static const _item = ItemModel(
     id: '24010001',
     name: 'Test Item',
     categoryId: 'cat001',

@@ -21,7 +21,7 @@ class FcmPushService implements PushNotificationService {
     FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
 
     // Keep token fresh — backend should be notified on each refresh
-    _messaging.onTokenRefresh.listen((_token) {
+    _messaging.onTokenRefresh.listen((token) {
       // Token updates are forwarded to backend by the calling layer
     });
   }

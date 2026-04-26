@@ -10,9 +10,7 @@ final class FeatureCode {
   factory FeatureCode.parse(String raw) {
     final trimmed = raw.trim();
     if (trimmed.length != 12 || !RegExp(r'^\d{12}$').hasMatch(trimmed)) {
-      throw ArgumentError(
-        'FeatureCode must be exactly 12 digits, got: "$raw"',
-      );
+      throw ArgumentError('FeatureCode must be exactly 12 digits, got: "$raw"');
     }
     return FeatureCode._(trimmed);
   }
