@@ -1,0 +1,44 @@
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+# Allow gh-pages branch to be written by this workflow
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build and deploy MkDocs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history required for git-revision-date-localized plugin (if added later)
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: pip
+
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force --clean --verbose
+        env:
+          # Ensures git config is set for the deploy commit
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com

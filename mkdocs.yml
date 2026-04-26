@@ -1,0 +1,84 @@
+site_name: SASO Willen Edition
+site_description: SASO倉庫在庫管理システム向けモバイルターミナル（Flutter）
+site_author: Willen Federation
+site_url: https://willen-federation.github.io/saso-willen-edition-flutter/
+
+repo_name: willen-federation/saso-willen-edition-flutter
+repo_url: https://github.com/willen-federation/saso-willen-edition-flutter
+
+copyright: Copyright &copy; 2024 Willen Federation — GPL-3.0 License
+
+theme:
+  name: material
+  language: ja
+  palette:
+    - scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: ダークモードに切り替え
+    - scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: ライトモードに切り替え
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - ホーム: index.md
+  - セットアップ:
+    - Firebase（FCM・Auth）: setup/firebase.md
+    - AWS Amplify Pinpoint: setup/amplify.md
+    - iOS デプロイ: setup/ios.md
+    - Android デプロイ: setup/android.md
+  - 機能ガイド:
+    - バーコードスキャン: features/barcode.md
+    - アイテム検索: features/search.md
+    - プッシュ通知: features/push.md
+    - オフラインモード: features/offline.md
+  - API 接続:
+    - モックモード（サーバー不要）: api/mock.md
+    - レガシー API 接続: api/legacy.md
+  - コントリビューション: contributing.md
+  - 変更履歴: changelog.md
+
+plugins:
+  - search:
+      lang: ja
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/willen-federation/saso-willen-edition-flutter
+      name: GitHub
