@@ -1,7 +1,7 @@
 site_name: SASO Willen Edition
 site_description: SASO倉庫在庫管理システム向けモバイルターミナル（Flutter） / Mobile terminal for SASO warehouse inventory (Flutter)
 site_author: Willen Federation
-site_url: https://willen-federation.github.io/saso-willen-edition-flutter/
+site_url: https://saso-willen-flutter.netlify.app/
 
 repo_name: willen-federation/saso-willen-edition-flutter
 repo_url: https://github.com/willen-federation/saso-willen-edition-flutter
