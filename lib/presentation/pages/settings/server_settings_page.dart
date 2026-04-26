@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
+import '../../../core/network/connection_tester.dart';
 import '../../providers/server_config_provider.dart';
 
 class ServerSettingsPage extends ConsumerStatefulWidget {
@@ -19,6 +20,9 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
   late ApiMode _selectedMode;
   final _localFlags = LocalFlagProvider();
   final Map<String, bool> _flagOverrides = {};
+  final ConnectionTester _connectionTester = ConnectionTester();
+  bool _testing = false;
+  ConnectionTestResult? _lastTestResult;
 
   @override
   void initState() {
@@ -52,6 +56,35 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     ).showSnackBar(const SnackBar(content: Text('設定を保存しました')));
     context.pop();
   }
+
+  Future<void> _testConnection() async {
+    setState(() {
+      _testing = true;
+      _lastTestResult = null;
+    });
+    final config = ref
+        .read(serverConfigNotifierProvider)
+        .copyWith(baseUrl: _urlController.text.trim(), apiMode: _selectedMode);
+    final result = await _connectionTester.test(config);
+    if (!mounted) return;
+    setState(() {
+      _testing = false;
+      _lastTestResult = result;
+    });
+  }
+
+  String _resultLabel(ConnectionTestResult result) => switch (result) {
+    ConnectionTestSuccess(:final latency, :final statusCode) =>
+      '接続成功 (HTTP $statusCode, ${latency.inMilliseconds}ms)',
+    ConnectionTestFailure(:final message) => message,
+    ConnectionTestTimeout(:final timeout) => 'タイムアウト (${timeout.inSeconds}秒)',
+  };
+
+  Color _resultColor(ConnectionTestResult result) => switch (result) {
+    ConnectionTestSuccess() => Colors.green,
+    ConnectionTestFailure() => Colors.red,
+    ConnectionTestTimeout() => Colors.orange,
+  };
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -108,6 +141,36 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                       labelText: 'サーバーURL',
                     ),
                     keyboardType: TextInputType.url,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      OutlinedButton.icon(
+                        key: const Key('test_connection_button'),
+                        onPressed: _testing ? null : _testConnection,
+                        icon:
+                            _testing
+                                ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Icon(Icons.network_check),
+                        label: const Text('接続テスト'),
+                      ),
+                      const SizedBox(width: 12),
+                      if (_lastTestResult != null)
+                        Expanded(
+                          child: Text(
+                            _resultLabel(_lastTestResult!),
+                            style: TextStyle(
+                              color: _resultColor(_lastTestResult!),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
