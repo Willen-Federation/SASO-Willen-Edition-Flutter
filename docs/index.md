@@ -92,3 +92,15 @@ Data          (Mock / Legacy API / REST v1 アダプター + SQLite キャッシ
 ## ライセンス
 
 GPL-3.0 — 詳しくは [LICENSE](https://github.com/willen-federation/saso-willen-edition-flutter/blob/main/LICENSE) を参照してください。
+GPL-3.0 は [OSI 承認のオープンソースライセンス](https://opensource.org/licenses/GPL-3.0) です。
+
+行動規範については [行動規範ページ](code-of-conduct.md) を、変更履歴は [変更履歴](changelog.md) をご覧ください。
+
+---
+
+## ホスティング / Hosting
+
+このサイトは [Netlify](https://www.netlify.com) によってホスティングされています。
+This site is hosted by [Netlify](https://www.netlify.com).
+
+[![Deploys by Netlify](https://www.netlify.com/img/global/badges/netlify-color-accent.svg)](https://www.netlify.com)
