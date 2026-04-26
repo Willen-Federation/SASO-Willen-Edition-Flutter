@@ -104,3 +104,9 @@ Firebase機能（FCM・Firebase Auth・Remote Config）を使用するには、�
 ## ライセンス
 
 GPL-3.0 — 詳細は [LICENSE](LICENSE) を参照してください。
+
+
+[![Deploys by Netlify](https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg)](https://www.netlify.com)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
