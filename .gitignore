@@ -115,6 +115,15 @@ coverage/
 # Symbols
 app.*.symbols
 
+# MkDocs build output
+/site/
+
+# Python build artifacts (mkdocs build dependencies)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
 # Firebase configuration (never commit real credentials)
 **/ios/Runner/GoogleService-Info.plist
 **/android/app/google-services.json
