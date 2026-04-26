@@ -123,7 +123,10 @@ void main() {
     });
 
     test('fromString returns unknown for unrecognized domain', () {
-      expect(SasoErrorDomain.fromString('UNKNOWN_DOMAIN'), SasoErrorDomain.unknown);
+      expect(
+        SasoErrorDomain.fromString('UNKNOWN_DOMAIN'),
+        SasoErrorDomain.unknown,
+      );
       expect(SasoErrorDomain.fromString(''), SasoErrorDomain.unknown);
     });
   });

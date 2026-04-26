@@ -30,7 +30,10 @@ void main() {
       });
 
       test('different values are not equal', () {
-        expect(ItemId.parse('24010001'), isNot(equals(ItemId.parse('24010002'))));
+        expect(
+          ItemId.parse('24010001'),
+          isNot(equals(ItemId.parse('24010002'))),
+        );
       });
     });
 

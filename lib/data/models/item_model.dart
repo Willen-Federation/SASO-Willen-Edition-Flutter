@@ -1,9 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/entities/item.dart';
+
 import '../../domain/entities/category.dart';
 import '../../domain/entities/feature.dart';
-import '../../domain/value_objects/item_id.dart';
+import '../../domain/entities/item.dart';
 import '../../domain/value_objects/feature_code.dart';
+import '../../domain/value_objects/item_id.dart';
 
 part 'item_model.freezed.dart';
 part 'item_model.g.dart';

@@ -17,7 +17,6 @@ class SasoApp extends ConsumerWidget {
         title: 'SASO Willen',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
         routerConfig: router,
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,

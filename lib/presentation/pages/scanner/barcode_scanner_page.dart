@@ -93,11 +93,11 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         ),
         if (_processing)
           const Center(child: CircularProgressIndicator(color: Colors.white)),
-        Positioned(
+        const Positioned(
           bottom: 48,
           left: 0,
           right: 0,
-          child: const Text(
+          child: Text(
             'バーコードをフレーム内に合わせてください',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white, fontSize: 14),

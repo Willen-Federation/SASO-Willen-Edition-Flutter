@@ -1,7 +1,8 @@
 import 'package:flutter_appauth/flutter_appauth.dart';
-import '../auth_service.dart';
-import '../../storage/secure_storage.dart';
+
 import '../../constants/app_constants.dart';
+import '../../storage/secure_storage.dart';
+import '../auth_service.dart';
 
 /// OIDC / OAuth2 auth service using flutter_appauth.
 /// Active when ff_auth_oidc = true (M3 REST API support).
