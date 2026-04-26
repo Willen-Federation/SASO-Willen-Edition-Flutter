@@ -1,0 +1,63 @@
+{
+  "@@locale": "ja",
+  "appTitle": "SASO Willen",
+  "@appTitle": { "description": "Application title" },
+
+  "home": "ホーム",
+  "items": "アイテム",
+  "categories": "カテゴリ",
+  "scanner": "スキャン",
+  "shelf": "棚",
+  "settings": "設定",
+
+  "search": "検索",
+  "searchItems": "アイテムを検索",
+  "searchHint": "アイテムIDまたは名前を入力",
+
+  "itemId": "アイテムID",
+  "itemName": "アイテム名",
+  "itemFeatures": "バリエーション",
+  "itemRegisteredAt": "登録日",
+
+  "categoryName": "カテゴリ名",
+  "noChildren": "サブカテゴリなし",
+
+  "shelfId": "棚ID",
+  "shelfItems": "棚のアイテム",
+
+  "serverUrl": "サーバーURL",
+  "serverUrlHint": "例: https://saso.example.com",
+  "apiMode": "APIモード",
+  "apiModeMock": "モック（サーバー不要）",
+  "apiModeLegacy": "レガシー（互換モード）",
+  "apiModeRest": "REST v1",
+  "testConnection": "接続テスト",
+  "connectionSuccess": "接続成功",
+  "connectionFailed": "接続失敗",
+  "save": "保存",
+  "cancel": "キャンセル",
+
+  "scanBarcode": "バーコードをスキャン",
+  "scanResult": "スキャン結果",
+
+  "loading": "読み込み中...",
+  "noData": "データがありません",
+  "error": "エラー",
+  "retry": "再試行",
+
+  "login": "ログイン",
+  "logout": "ログアウト",
+  "username": "ユーザー名",
+  "password": "パスワード",
+  "loginFailed": "ログインに失敗しました",
+
+  "featureFlags": "機能フラグ",
+  "flagRestApi": "REST API v1",
+  "flagPushFcm": "FCMプッシュ通知",
+  "flagPushSns": "Amazon SNSプッシュ通知",
+  "flagAuthOidc": "OIDC認証",
+  "flagAuthFirebase": "Firebase認証",
+  "flagOfflineMode": "オフラインモード",
+  "flagBarcodeScanner": "バーコードスキャン",
+  "flagLabelPrint": "ラベル印刷"
+}

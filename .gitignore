@@ -7,6 +7,11 @@
 .buildlog/
 .history
 
+# IDE
+.idea/
+*.iml
+.metadata
+
 
 
 # Flutter repo-specific
@@ -109,6 +114,16 @@ coverage/
 
 # Symbols
 app.*.symbols
+
+# Firebase configuration (never commit real credentials)
+**/ios/Runner/GoogleService-Info.plist
+**/android/app/google-services.json
+
+# AWS Amplify configuration
+# lib/amplifyconfiguration.dart is tracked as a stub (contains no real credentials).
+# If you replace it with a real config, add it to your LOCAL .gitignore:
+#   echo 'lib/amplifyconfiguration.dart' >> .git/info/exclude
+**/android/app/src/main/res/raw/amplifyconfiguration.json
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3

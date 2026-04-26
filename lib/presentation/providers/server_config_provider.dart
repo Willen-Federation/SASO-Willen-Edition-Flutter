@@ -1,0 +1,47 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/constants/app_constants.dart';
+
+part 'server_config_provider.freezed.dart';
+part 'server_config_provider.g.dart';
+
+enum ApiMode { mock, legacy, rest }
+
+@freezed
+abstract class ServerConfig with _$ServerConfig {
+  const factory ServerConfig({
+    @Default('') String baseUrl,
+    @Default(ApiMode.mock) ApiMode apiMode,
+    String? sessionCookie,
+    String? jwtToken,
+  }) = _ServerConfig;
+}
+
+@riverpod
+class ServerConfigNotifier extends _$ServerConfigNotifier {
+  @override
+  ServerConfig build() => const ServerConfig();
+
+  Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final url = prefs.getString(AppConstants.serverUrlKey) ?? '';
+    final modeIndex = prefs.getInt(AppConstants.apiModeKey) ?? 0;
+    state = ServerConfig(baseUrl: url, apiMode: ApiMode.values[modeIndex]);
+  }
+
+  Future<void> save({required String url, required ApiMode mode}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConstants.serverUrlKey, url);
+    await prefs.setInt(AppConstants.apiModeKey, mode.index);
+    state = state.copyWith(baseUrl: url, apiMode: mode);
+  }
+
+  void updateToken(String token) {
+    state = state.copyWith(jwtToken: token);
+  }
+
+  void updateSessionCookie(String cookie) {
+    state = state.copyWith(sessionCookie: cookie);
+  }
+}
