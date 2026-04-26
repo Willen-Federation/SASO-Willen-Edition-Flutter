@@ -3,9 +3,9 @@
 [![Flutter CI](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/actions/workflows/flutter_ci.yml)
 [![License: GPL-3.0 (OSI approved)](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
-[![Deploys by Netlify](https://api.netlify.com/api/v1/badges/placeholder/deploy-status)](https://www.netlify.com)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/7fa8d640-91b1-499b-8ef0-c05d8a0f538d/deploy-status)](https://app.netlify.com/projects/saso-willen-flutter/deploys)
 
-📚 **ドキュメント / Documentation**: [日本語](https://saso-willen-edition.netlify.app/) | [English](https://saso-willen-edition.netlify.app/en/)
+📚 **ドキュメント / Documentation**: [日本語](https://saso-willen-flutter.netlify.app/) | [English](https://saso-willen-flutter.netlify.app/en/)
 
 ---
 
