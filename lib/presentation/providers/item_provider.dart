@@ -7,7 +7,7 @@ part 'item_provider.g.dart';
 
 @riverpod
 Future<Item> itemById(ItemByIdRef ref, String id) async {
-  final repo = ref.watch(itemRepositoryProvider);
+  final repo = await ref.watch(itemRepositoryProvider.future);
   final itemId = ItemId.parse(id);
   return repo.fetchById(itemId);
 }
@@ -19,6 +19,6 @@ Future<List<Item>> itemSearch(
   String? categoryId,
 }) async {
   if ((query == null || query.isEmpty) && categoryId == null) return [];
-  final repo = ref.watch(itemRepositoryProvider);
+  final repo = await ref.watch(itemRepositoryProvider.future);
   return repo.search(query: query, categoryId: categoryId);
 }

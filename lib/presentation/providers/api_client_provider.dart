@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../core/storage/database_helper.dart';
+import '../../data/datasources/local/item_local_cache.dart';
 import '../../data/datasources/mock/mock_api_client.dart';
 import '../../data/datasources/remote/legacy/legacy_api_client.dart';
 import '../../data/datasources/remote/saso_api_client.dart';
@@ -26,7 +28,8 @@ SasoApiClient sasoApiClient(SasoApiClientRef ref) {
 }
 
 @riverpod
-ItemRepository itemRepository(ItemRepositoryRef ref) {
+Future<ItemRepository> itemRepository(ItemRepositoryRef ref) async {
   final client = ref.watch(sasoApiClientProvider);
-  return ItemRepositoryImpl(client);
+  final dbHelper = await ref.watch(databaseHelperProvider.future);
+  return ItemRepositoryImpl(client, cache: SqliteItemLocalCache(dbHelper.db));
 }
