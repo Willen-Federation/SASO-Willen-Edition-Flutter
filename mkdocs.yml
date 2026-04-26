@@ -52,12 +52,15 @@ nav:
   - API 接続:
     - モックモード（サーバー不要）: api/mock.md
     - レガシー API 接続: api/legacy.md
+    - REST API v1 リファレンス: api/reference.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
 
 plugins:
   - search:
       lang: ja
+  - render_swagger:
+      allow_arbitrary_locations: true
 
 markdown_extensions:
   - admonition

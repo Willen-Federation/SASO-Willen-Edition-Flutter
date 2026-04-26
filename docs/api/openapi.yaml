@@ -1,0 +1,341 @@
+openapi: 3.0.3
+info:
+  title: SASO REST API v1
+  version: "1.0.0"
+  description: |
+    SASO Willen Edition Flutter モバイルターミナルが利用する REST API v1 仕様。
+
+    M3 リリースで提供される `/api/v1/*` エンドポイントを定義します。
+    Flutter アプリでは `ff_rest_api_v1` フィーチャーフラグが ON のときに使用されます。
+
+    **認証**: Bearer JWT (RS256, 15 分有効)
+    **エラー形式**: [RFC 7807 Problem Details](https://datatracker.ietf.org/doc/html/rfc7807) — ドメインコード `SASO-DOMAIN-NNNN` を含みます。
+  license:
+    name: GPL-3.0
+    url: https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/blob/main/LICENSE
+  contact:
+    name: Willen Federation
+    url: https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter
+
+servers:
+  - url: https://api.example.com
+    description: 本番 (placeholder)
+  - url: https://staging.api.example.com
+    description: ステージング (placeholder)
+
+tags:
+  - name: items
+    description: アイテム (商品) 関連エンドポイント
+  - name: categories
+    description: カテゴリ階層
+  - name: shelves
+    description: 棚 (倉庫ロケーション)
+
+paths:
+  /api/v1/items/{itemId}:
+    get:
+      tags: [items]
+      summary: アイテム詳細を取得
+      operationId: getItem
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+      responses:
+        '200':
+          description: アイテムが見つかった
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/items:
+    get:
+      tags: [items]
+      summary: アイテム検索
+      operationId: searchItems
+      parameters:
+        - name: q
+          in: query
+          description: 検索クエリ (商品名・ID 部分一致)
+          schema:
+            type: string
+          example: "ジャケット"
+        - name: category_id
+          in: query
+          description: カテゴリでの絞り込み
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: 取得件数上限 (既定 20)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 検索結果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  /api/v1/categories:
+    get:
+      tags: [categories]
+      summary: カテゴリ一覧 (ネスト階層)
+      operationId: listCategories
+      responses:
+        '200':
+          description: カテゴリツリー (root から順)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/shelves/{shelfId}:
+    get:
+      tags: [shelves]
+      summary: 棚詳細を取得
+      operationId: getShelf
+      parameters:
+        - $ref: '#/components/parameters/ShelfId'
+      responses:
+        '200':
+          description: 棚情報 (含む itemIds)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shelf'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/shelves/{shelfId}/items:
+    get:
+      tags: [shelves]
+      summary: 棚に紐づくアイテム一覧
+      operationId: getShelfItems
+      parameters:
+        - $ref: '#/components/parameters/ShelfId'
+      responses:
+        '200':
+          description: 棚に登録されているアイテム
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerJwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        RS256 署名 JWT。15 分で失効。
+        失効時はリフレッシュトークンエンドポイントで再取得 (本仕様書外)。
+
+  parameters:
+    ItemId:
+      name: itemId
+      in: path
+      required: true
+      description: 内部アイテム ID
+      schema:
+        type: string
+      example: "ITEM-001"
+    ShelfId:
+      name: shelfId
+      in: path
+      required: true
+      description: 棚 ID
+      schema:
+        type: string
+      example: "SHELF-A-12"
+
+  schemas:
+    Item:
+      type: object
+      required: [id, name, categoryId, registeredAt]
+      properties:
+        id:
+          type: string
+          example: "ITEM-001"
+        name:
+          type: string
+          example: "メンズジャケット (ネイビー)"
+        description:
+          type: string
+          nullable: true
+        categoryId:
+          type: string
+          example: "CAT-OUTERWEAR"
+        categoryName:
+          type: string
+          nullable: true
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        registeredAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    Feature:
+      type: object
+      description: アイテムの色×サイズバリエーション
+      required: [code, colorCode, sizeCode]
+      properties:
+        code:
+          type: string
+          description: 色サイズコード (例 "BLU-M")
+          example: "BLU-M"
+        colorCode:
+          type: string
+          example: "BLU"
+        sizeCode:
+          type: string
+          example: "M"
+        colorLabel:
+          type: string
+          nullable: true
+          example: "ネイビー"
+        sizeLabel:
+          type: string
+          nullable: true
+          example: "M (中)"
+        stockCount:
+          type: integer
+          minimum: 0
+          default: 0
+        shelfId:
+          type: string
+          nullable: true
+
+    Category:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        depth:
+          type: integer
+          minimum: 0
+          default: 0
+
+    Shelf:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        itemIds:
+          type: array
+          items:
+            type: string
+
+    ItemListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+
+    CategoryListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+
+    ProblemDetails:
+      type: object
+      description: RFC 7807 Problem Details (SASO ドメインコード付き)
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: 問題のタイプを識別する URI
+          example: "https://saso.example.com/errors/item-not-found"
+        title:
+          type: string
+          example: "Item not found"
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          format: uri
+          nullable: true
+        code:
+          type: string
+          description: SASO ドメインコード (SASO-DOMAIN-NNNN 形式)
+          example: "SASO-DOMAIN-1042"
+
+  responses:
+    Unauthorized:
+      description: 認証失敗 (JWT 無効・失効)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    NotFound:
+      description: 指定 ID のリソースが存在しない
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    ServerError:
+      description: サーバー側エラー
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+
+security:
+  - BearerJwt: []
