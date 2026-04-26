@@ -1,0 +1,90 @@
+name: saso_willen_edition
+description: >
+  SASO Willen Edition — Mobile terminal app for SASO inventory management.
+  Handheld scanner/viewer for warehouse workers.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management (Riverpod)
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  hooks_riverpod: ^2.6.1
+  flutter_hooks: ^0.20.5
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # Immutable models + JSON serialisation
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # HTTP client (BSD-3 — GPL compatible)
+  http: ^1.3.0
+
+  # Local persistence
+  sqflite: ^2.4.2
+  shared_preferences: ^2.3.4
+  flutter_secure_storage: ^9.2.4
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Barcode scanning (AVFoundation on iOS 26)
+  mobile_scanner: ^6.0.0
+
+  # Firebase (Apache 2.0 — GPL compatible)
+  firebase_core: ^3.12.1
+  firebase_messaging: ^15.2.4
+  firebase_auth: ^5.5.1
+  firebase_remote_config: ^5.4.0
+
+  # AWS Amplify / SNS Pinpoint (Apache 2.0 — GPL compatible) [ff_push_sns]
+  amplify_flutter: ^2.0.0
+  amplify_push_notifications_pinpoint: ^2.0.0
+
+  # OIDC / OAuth2 [ff_auth_oidc]
+  flutter_appauth: ^9.0.0
+
+  # UI
+  cupertino_icons: ^1.0.8
+  cached_network_image: ^3.4.1
+
+  # Internationalisation
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  # Code generation
+  build_runner: ^2.4.14
+  freezed: ^3.0.4
+  json_serializable: ^6.9.2
+  riverpod_generator: ^2.6.5
+
+  # Linting
+  flutter_lints: ^5.0.0
+  custom_lint: ^0.7.5
+  riverpod_lint: ^2.6.5
+
+  # Testing
+  mocktail: ^1.0.4
+  fake_async: ^1.3.2
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/l10n/

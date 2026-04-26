@@ -1,0 +1,7 @@
+tags:
+  unit:
+    timeout: 30s
+  widget:
+    timeout: 60s
+  integration:
+    timeout: 300s
