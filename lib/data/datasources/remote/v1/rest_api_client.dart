@@ -9,6 +9,7 @@ import '../../../models/config_bundle_model.dart';
 import '../../../models/device_token_model.dart';
 import '../../../models/feature_flag_model.dart';
 import '../../../models/item_model.dart';
+import '../../../models/pairing_code_model.dart';
 import '../../../models/shelf_model.dart';
 import '../../../models/token_pair_model.dart';
 import '../saso_api_client.dart';
@@ -121,16 +122,19 @@ class RestV1ApiClient implements SasoApiClient {
   // ---------------------------------------------------------------------------
 
   /// Generate a short-lived QR pairing code (10 min).
-  /// The server returns a payload that the app encodes as a QR:
-  ///   SASO1:<base64url_token>|<server_url>
-  Future<String> createPairingCode() async {
+  ///
+  /// The returned [PairingCodeModel.qrPayload] is the SASO1: string to encode
+  /// as a QR code. [PairingCodeModel.qrDataUri] is a ready-to-display
+  /// data URI image (data:image/png;base64,...).
+  Future<PairingCodeModel> createPairingCode() async {
     final uri = Uri.parse('$serverUrl/api/v1/mobile/pairing-codes');
     final response = await _http
         .post(uri, headers: _headers)
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    return body['payload'] as String;
+    return PairingCodeModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 
   /// Exchange a QR pairing token for an access+refresh token pair.

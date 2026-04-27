@@ -14,8 +14,8 @@ class ConfigBundleModel {
   factory ConfigBundleModel.fromJson(Map<String, dynamic> json) =>
       ConfigBundleModel(
         version: json['version'] as String,
-        generatedAt: DateTime.parse(json['generated_at'] as String),
-        featureFlags: (json['feature_flags'] as List<dynamic>)
+        generatedAt: DateTime.parse(json['generatedAt'] as String),
+        featureFlags: (json['featureFlags'] as List<dynamic>)
             .cast<Map<String, dynamic>>()
             .map(FeatureFlagModel.fromJson)
             .toList(),
