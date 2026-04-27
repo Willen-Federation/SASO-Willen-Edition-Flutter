@@ -10,9 +10,7 @@ final class ShelfId {
   factory ShelfId.parse(String raw) {
     final upper = raw.trim().toUpperCase();
     if (upper.isEmpty || upper.length > 15) {
-      throw ArgumentError(
-        'ShelfId must be 1–15 characters, got: "$raw"',
-      );
+      throw ArgumentError('ShelfId must be 1–15 characters, got: "$raw"');
     }
     if (!RegExp(r'^[A-Z0-9\-]+$').hasMatch(upper)) {
       throw ArgumentError(

@@ -1,11 +1,17 @@
-# SASO Willen Edition — Flutter モバイルターミナル
+# SASO Willen Edition — Flutter モバイルターミナル / Mobile Terminal
 
 [![Flutter CI](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/actions/workflows/flutter_ci.yml)
-[![Deploys by Netlify](https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg)](https://www.netlify.com)
+[![License: GPL-3.0 (OSI approved)](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/7fa8d640-91b1-499b-8ef0-c05d8a0f538d/deploy-status)](https://app.netlify.com/projects/saso-willen-flutter/deploys)
+
+📚 **ドキュメント / Documentation**: [日本語](https://saso-willen-flutter.netlify.app/) | [English](https://saso-willen-flutter.netlify.app/en/)
+
+---
 
 [SASO Willen Edition](https://github.com/Willen-Federation/SASO-Willen-Edition) PHP在庫管理システムのスマートフォン向けハンディターミナルアプリです。倉庫作業者がバーコードスキャン・在庫確認・棚管理をモバイルで行えます。
+
+A Flutter mobile handheld-terminal companion to the [SASO Willen Edition](https://github.com/Willen-Federation/SASO-Willen-Edition) PHP inventory management system. Warehouse workers run barcode scans, stock lookups, and shelf management from a smartphone.
 
 ---
 
@@ -103,6 +109,33 @@ Firebase機能（FCM・Firebase Auth・Remote Config）を使用するには、�
 
 [CONTRIBUTING.md](CONTRIBUTING.md) をご参照ください。
 
-## ライセンス
+## コントリビューション / Contributing
 
-GPL-3.0 — 詳細は [LICENSE](LICENSE) を参照してください。
+[CONTRIBUTING.md](CONTRIBUTING.md) をご参照ください。
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+このプロジェクトは [Contributor Covenant v2.1](CODE_OF_CONDUCT.md) を行動規範として採用しています。
+This project adopts the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md) as its code of conduct.
+
+---
+
+## ライセンス / License
+
+[GPL-3.0](LICENSE) — [OSI 承認 / OSI-approved open source license](https://opensource.org/licenses/GPL-3.0)
+
+このプロジェクトはコミュニティが運営する非営利のオープンソースプロジェクトです (商用サポート・商用ホスティング提供なし)。
+This is a non-commercial, community-run open source project (no commercial support or hosting offered).
+
+---
+
+## ホスティング / Hosting
+
+ドキュメントサイトは [Netlify](https://www.netlify.com) によってホスティングされています。
+The documentation site is hosted by [Netlify](https://www.netlify.com).
+
+[![Deploys by Netlify](https://www.netlify.com/img/global/badges/netlify-color-accent.svg)](https://www.netlify.com)
+
+This site is powered by Netlify — Netlify は本プロジェクトの [Open Source Plan](https://www.netlify.com/legal/open-source-policy/) でホスティングされています。
+
+
+

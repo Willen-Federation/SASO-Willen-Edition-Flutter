@@ -1,12 +1,16 @@
 site_name: SASO Willen Edition
-site_description: SASO倉庫在庫管理システム向けモバイルターミナル（Flutter）
+site_description: SASO倉庫在庫管理システム向けモバイルターミナル（Flutter） / Mobile terminal for SASO warehouse inventory (Flutter)
 site_author: Willen Federation
-site_url: https://willen-federation.github.io/saso-willen-edition-flutter/
+site_url: https://saso-willen-flutter.netlify.app/
 
 repo_name: willen-federation/saso-willen-edition-flutter
 repo_url: https://github.com/willen-federation/saso-willen-edition-flutter
 
-copyright: Copyright &copy; 2024 Willen Federation — GPL-3.0 License
+copyright: |
+  Copyright &copy; 2024 Willen Federation — GPL-3.0 License<br>
+  <a href="https://www.netlify.com" target="_blank" rel="noopener">
+    This site is powered by Netlify
+  </a>
 
 theme:
   name: material
@@ -17,19 +21,19 @@ theme:
       accent: cyan
       toggle:
         icon: material/brightness-7
-        name: ダークモードに切り替え
+        name: ダークモードに切り替え / Switch to dark mode
     - scheme: slate
       primary: blue
       accent: cyan
       toggle:
         icon: material/brightness-4
-        name: ライトモードに切り替え
+        name: ライトモードに切り替え / Switch to light mode
   features:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
-    - navigation.expand
     - navigation.top
+    - navigation.footer
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -37,27 +41,43 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
-nav:
-  - ホーム: index.md
-  - セットアップ:
-    - Firebase（FCM・Auth）: setup/firebase.md
-    - AWS Amplify Pinpoint: setup/amplify.md
-    - iOS デプロイ: setup/ios.md
-    - Android デプロイ: setup/android.md
-  - 機能ガイド:
-    - バーコードスキャン: features/barcode.md
-    - アイテム検索: features/search.md
-    - プッシュ通知: features/push.md
-    - オフラインモード: features/offline.md
-  - API 接続:
-    - モックモード（サーバー不要）: api/mock.md
-    - レガシー API 接続: api/legacy.md
-  - コントリビューション: contributing.md
-  - 変更履歴: changelog.md
-
 plugins:
   - search:
-      lang: ja
+      lang:
+        - ja
+        - en
+  - i18n:
+      docs_structure: suffix
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: ja
+          default: true
+          name: 日本語
+          build: true
+        - locale: en
+          name: English
+          build: true
+          nav_translations:
+            ホーム: Home
+            セットアップ: Setup
+            Firebase（FCM・Auth）: Firebase (FCM & Auth)
+            AWS Amplify Pinpoint: AWS Amplify Pinpoint
+            iOS デプロイ: iOS deployment
+            Android デプロイ: Android deployment
+            機能ガイド: Feature guides
+            バーコードスキャン: Barcode scanning
+            アイテム検索: Item search
+            プッシュ通知: Push notifications
+            オフラインモード: Offline mode
+            API 接続: API connection
+            モックモード（サーバー不要）: Mock mode (no server)
+            レガシー API 接続: Legacy API
+            REST API v1 リファレンス: REST API v1 reference
+            Flutter 必要 API 要件定義: Flutter API Requirements
+            行動規範: Code of Conduct
+            コントリビューション: Contributing
+            変更履歴: Changelog
 
 markdown_extensions:
   - admonition
@@ -77,8 +97,32 @@ markdown_extensions:
   - toc:
       permalink: true
 
+nav:
+  - ホーム: index.md
+  - セットアップ:
+    - Firebase（FCM・Auth）: setup/firebase.md
+    - AWS Amplify Pinpoint: setup/amplify.md
+    - iOS デプロイ: setup/ios.md
+    - Android デプロイ: setup/android.md
+  - 機能ガイド:
+    - バーコードスキャン: features/barcode.md
+    - アイテム検索: features/search.md
+    - プッシュ通知: features/push.md
+    - オフラインモード: features/offline.md
+  - API 接続:
+    - モックモード（サーバー不要）: api/mock.md
+    - レガシー API 接続: api/legacy.md
+    - REST API v1 リファレンス: api/reference.md
+    - Flutter 必要 API 要件定義: api/flutter-requirements.md
+  - 行動規範: code-of-conduct.md
+  - コントリビューション: contributing.md
+  - 変更履歴: changelog.md
+
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/willen-federation/saso-willen-edition-flutter
       name: GitHub
+    - icon: simple/netlify
+      link: https://www.netlify.com
+      name: Powered by Netlify
