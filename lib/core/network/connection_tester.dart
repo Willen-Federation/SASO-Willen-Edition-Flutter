@@ -82,7 +82,7 @@ class ConnectionTester {
     return switch (config.apiMode) {
       ApiMode.mock => base,
       ApiMode.legacy => base.replace(path: '/category/list.json'),
-      ApiMode.rest => base.replace(path: '/api/v1/categories'),
+      ApiMode.rest => base.replace(path: '/api/v1/health'),
     };
   }
 
@@ -92,10 +92,6 @@ class ConnectionTester {
       'Accept': 'application/json, text/html',
       if (config.sessionCookie != null) 'Cookie': config.sessionCookie!,
     },
-    ApiMode.rest => {
-      'Accept': 'application/json',
-      if (config.jwtToken != null && config.jwtToken!.isNotEmpty)
-        'Authorization': 'Bearer ${config.jwtToken}',
-    },
+    ApiMode.rest => const {'Accept': 'application/json'},
   };
 }
