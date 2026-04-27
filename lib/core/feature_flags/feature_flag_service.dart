@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../data/models/config_bundle_model.dart';
 import '../constants/app_constants.dart';
 import 'providers/debug_flag_provider.dart';
 import 'providers/remote_flag_provider.dart';
@@ -35,6 +36,10 @@ class FeatureFlagService {
   late FlagProvider _provider;
   bool _initialized = false;
 
+  /// Flags received from the server's /api/v1/mobile/config bundle.
+  /// Takes precedence over Firebase / debug defaults when present.
+  Map<String, bool> _serverBundleFlags = {};
+
   Future<void> initialize() async {
     if (_initialized) return;
 
@@ -49,8 +54,22 @@ class FeatureFlagService {
 
   bool getBool(String key) {
     assert(_initialized, 'FeatureFlagService not initialized');
+    if (_serverBundleFlags.containsKey(key)) return _serverBundleFlags[key]!;
     final defaultVal = FeatureFlags.defaults[key] ?? false;
     return _provider.resolveBool(key, defaultVal).value;
+  }
+
+  /// Apply feature flags from the server's /api/v1/mobile/config bundle.
+  /// Server-managed flags override Firebase Remote Config and debug defaults,
+  /// but local on-device overrides (QA) still take precedence.
+  void applyServerConfigBundle(ConfigBundleModel bundle) {
+    _serverBundleFlags = {
+      for (final flag in bundle.featureFlags) flag.key: flag.enabled,
+    };
+    debugPrint(
+      '[FeatureFlags] Server config bundle v${bundle.version} applied'
+      ' (${_serverBundleFlags.length} flags)',
+    );
   }
 
   String getString(String key, String defaultValue) {

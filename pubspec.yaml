@@ -40,6 +40,9 @@ dependencies:
   # Barcode scanning (AVFoundation on iOS 26)
   mobile_scanner: ^6.0.0
 
+  # Image capture & photo library access
+  image_picker: ^1.1.2
+
   # Firebase (Apache 2.0 — GPL compatible)
   firebase_core: ^3.12.1
   firebase_messaging: ^15.2.4

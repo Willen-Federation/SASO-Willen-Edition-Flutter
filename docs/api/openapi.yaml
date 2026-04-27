@@ -8,7 +8,7 @@ info:
     M3 リリースで提供される `/api/v1/*` エンドポイントを定義します。
     Flutter アプリでは `ff_rest_api_v1` フィーチャーフラグが ON のときに使用されます。
 
-    **認証**: Bearer JWT (RS256, 15 分有効)
+    **認証**: Bearer JWT (HS256, 1 時間有効) + 長期リフレッシュトークン (~1 年、呼び出しごとにローテーション)
     **エラー形式**: [RFC 7807 Problem Details](https://datatracker.ietf.org/doc/html/rfc7807) — ドメインコード `SASO-DOMAIN-NNNN` を含みます。
   license:
     name: GPL-3.0
@@ -24,14 +24,54 @@ servers:
     description: ステージング (placeholder)
 
 tags:
+  - name: meta
+    description: ヘルスチェック・仕様書取得
   - name: items
     description: アイテム (商品) 関連エンドポイント
   - name: categories
     description: カテゴリ階層
   - name: shelves
     description: 棚 (倉庫ロケーション)
+  - name: mobile
+    description: モバイル QR ペアリング・トークン管理・設定バンドル
+  - name: feature-flags
+    description: サーバー管理フィーチャーフラグ CRUD
 
 paths:
+  # ---------------------------------------------------------------------------
+  # Meta
+  # ---------------------------------------------------------------------------
+  /api/v1/health:
+    get:
+      tags: [meta]
+      summary: ヘルスチェック (認証不要)
+      operationId: healthCheck
+      security: []
+      responses:
+        '200':
+          description: サービス稼働中
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/v1/openapi.yaml:
+    get:
+      tags: [meta]
+      summary: OpenAPI 仕様書取得
+      operationId: getOpenApiSpec
+      security: []
+      responses:
+        '200':
+          description: OpenAPI YAML
+
+  # ---------------------------------------------------------------------------
+  # Items
+  # ---------------------------------------------------------------------------
   /api/v1/items/{itemId}:
     get:
       tags: [items]
@@ -90,6 +130,9 @@ paths:
         '5XX':
           $ref: '#/components/responses/ServerError'
 
+  # ---------------------------------------------------------------------------
+  # Categories
+  # ---------------------------------------------------------------------------
   /api/v1/categories:
     get:
       tags: [categories]
@@ -105,6 +148,9 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  # ---------------------------------------------------------------------------
+  # Shelves
+  # ---------------------------------------------------------------------------
   /api/v1/shelves/{shelfId}:
     get:
       tags: [shelves]
@@ -143,6 +189,249 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  # ---------------------------------------------------------------------------
+  # Mobile — QR pairing & token management
+  # ---------------------------------------------------------------------------
+  /api/v1/mobile/pairing-codes:
+    post:
+      tags: [mobile]
+      summary: QR ペアリングコード生成 (10 分有効)
+      operationId: createPairingCode
+      responses:
+        '201':
+          description: QR ペイロード文字列 (`SASO1:<base64url_token>|<server_url>`)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [payload, expires_at]
+                properties:
+                  payload:
+                    type: string
+                    description: QR コードに埋め込む文字列
+                    example: "SASO1:dGVzdHRva2Vu|https://saso.example.com"
+                  expires_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/mobile/connect:
+    post:
+      tags: [mobile]
+      summary: QR トークン → JWT ペア交換 (初回ペアリング)
+      operationId: mobileConnect
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pairing_token, device_name]
+              properties:
+                pairing_token:
+                  type: string
+                  description: QR ペイロードから抽出した base64url トークン
+                device_name:
+                  type: string
+                  maxLength: 100
+                  example: "iPhone 15 Pro"
+      responses:
+        '200':
+          description: アクセス + リフレッシュトークンペア
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/mobile/token/refresh:
+    post:
+      tags: [mobile]
+      summary: アクセストークンのリフレッシュ (トークンローテーション)
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: 新しいアクセス + リフレッシュトークンペア (旧リフレッシュトークンは無効化)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/mobile/config:
+    get:
+      tags: [mobile]
+      summary: オフライン設定バンドル取得 (フィーチャーフラグ含む)
+      operationId: getMobileConfig
+      responses:
+        '200':
+          description: 設定バンドル
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigBundle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/mobile/tokens:
+    get:
+      tags: [mobile]
+      summary: 登録デバイストークン一覧
+      operationId: listDeviceTokens
+      responses:
+        '200':
+          description: デバイストークン一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeviceToken'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/mobile/tokens/{id}:
+    delete:
+      tags: [mobile]
+      summary: デバイストークン無効化 (リモートログアウト)
+      operationId: revokeDeviceToken
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 無効化成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------------------
+  # Feature flags
+  # ---------------------------------------------------------------------------
+  /api/v1/feature-flags:
+    get:
+      tags: [feature-flags]
+      summary: フィーチャーフラグ一覧
+      operationId: listFeatureFlags
+      responses:
+        '200':
+          description: フラグ一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FeatureFlag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [feature-flags]
+      summary: フィーチャーフラグ作成
+      operationId: createFeatureFlag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureFlagWrite'
+      responses:
+        '201':
+          description: 作成されたフラグ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/feature-flags/{key}:
+    get:
+      tags: [feature-flags]
+      summary: フィーチャーフラグ取得
+      operationId: getFeatureFlag
+      parameters:
+        - $ref: '#/components/parameters/FeatureFlagKey'
+      responses:
+        '200':
+          description: フラグ詳細
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [feature-flags]
+      summary: フィーチャーフラグ部分更新
+      operationId: updateFeatureFlag
+      parameters:
+        - $ref: '#/components/parameters/FeatureFlagKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureFlagPatch'
+      responses:
+        '200':
+          description: 更新後のフラグ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlag'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [feature-flags]
+      summary: フィーチャーフラグ削除
+      operationId: deleteFeatureFlag
+      parameters:
+        - $ref: '#/components/parameters/FeatureFlagKey'
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     BearerJwt:
@@ -150,8 +439,9 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: |
-        RS256 署名 JWT。15 分で失効。
-        失効時はリフレッシュトークンエンドポイントで再取得 (本仕様書外)。
+        HS256 署名 JWT。1 時間で失効。
+        失効時は `POST /api/v1/mobile/token/refresh` でリフレッシュトークンを使って再取得。
+        リフレッシュトークンは呼び出しごとにローテーションされる (~1 年有効)。
 
   parameters:
     ItemId:
@@ -170,8 +460,20 @@ components:
       schema:
         type: string
       example: "SHELF-A-12"
+    FeatureFlagKey:
+      name: key
+      in: path
+      required: true
+      description: フィーチャーフラグキー
+      schema:
+        type: string
+        pattern: '^[a-z0-9][a-z0-9._]{0,119}$'
+      example: "ff_rest_api_v1"
 
   schemas:
+    # -------------------------------------------------------------------------
+    # Inventory
+    # -------------------------------------------------------------------------
     Item:
       type: object
       required: [id, name, categoryId, registeredAt]
@@ -289,6 +591,133 @@ components:
           items:
             $ref: '#/components/schemas/Category'
 
+    # -------------------------------------------------------------------------
+    # Mobile auth
+    # -------------------------------------------------------------------------
+    TokenPair:
+      type: object
+      required: [access_token, token_type, expires_in, refresh_token, device_id, device_name, expires_at]
+      properties:
+        access_token:
+          type: string
+          description: HS256 JWT (1 時間有効)
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          description: アクセストークンの有効秒数
+          example: 3600
+        refresh_token:
+          type: string
+          description: 長期リフレッシュトークン (~1 年、ローテーション式)
+        device_id:
+          type: integer
+        device_name:
+          type: string
+          example: "iPhone 15 Pro"
+        expires_at:
+          type: string
+          format: date-time
+          description: リフレッシュトークンの失効日時 (RFC 3339)
+
+    DeviceToken:
+      type: object
+      required: [id, device_name, expires_at, created_at]
+      properties:
+        id:
+          type: integer
+        device_name:
+          type: string
+          example: "iPhone 15 Pro"
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    # -------------------------------------------------------------------------
+    # Config bundle
+    # -------------------------------------------------------------------------
+    ConfigBundle:
+      type: object
+      required: [version, generated_at, feature_flags]
+      properties:
+        version:
+          type: string
+          description: バンドル内容の SHA-256 ハッシュ (キャッシュ比較用)
+          example: "a3f2c1..."
+        generated_at:
+          type: string
+          format: date-time
+        feature_flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureFlag'
+
+    # -------------------------------------------------------------------------
+    # Feature flags
+    # -------------------------------------------------------------------------
+    FeatureFlag:
+      type: object
+      required: [key, description, enabled, rollout_percent]
+      properties:
+        key:
+          type: string
+          pattern: '^[a-z0-9][a-z0-9._]{0,119}$'
+          example: "ff_rest_api_v1"
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+          default: false
+        rollout_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
+        conditions:
+          type: object
+          additionalProperties: true
+          description: オフライン評価用の追加条件 (任意)
+
+    FeatureFlagWrite:
+      type: object
+      required: [key, description]
+      properties:
+        key:
+          type: string
+          pattern: '^[a-z0-9][a-z0-9._]{0,119}$'
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+          default: false
+        rollout_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
+
+    FeatureFlagPatch:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+        rollout_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    # -------------------------------------------------------------------------
+    # Errors
+    # -------------------------------------------------------------------------
     ProblemDetails:
       type: object
       description: RFC 7807 Problem Details (SASO ドメインコード付き)
@@ -316,6 +745,10 @@ components:
           type: string
           description: SASO ドメインコード (SASO-DOMAIN-NNNN 形式)
           example: "SASO-DOMAIN-1042"
+        traceId:
+          type: string
+          format: uuid
+          description: ログ追跡用 UUIDv4
 
   responses:
     Unauthorized:
@@ -326,6 +759,12 @@ components:
             $ref: '#/components/schemas/ProblemDetails'
     NotFound:
       description: 指定 ID のリソースが存在しない
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    BadRequest:
+      description: リクエストボディが不正
       content:
         application/problem+json:
           schema:

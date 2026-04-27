@@ -5,16 +5,20 @@ import 'package:http/http.dart' as http;
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/problem_details.dart';
 import '../../../models/category_model.dart';
+import '../../../models/config_bundle_model.dart';
+import '../../../models/device_token_model.dart';
+import '../../../models/feature_flag_model.dart';
 import '../../../models/item_model.dart';
+import '../../../models/pairing_code_model.dart';
 import '../../../models/shelf_model.dart';
+import '../../../models/token_pair_model.dart';
 import '../saso_api_client.dart';
 
-/// SASO M3 OpenAPI 3.1 REST API client.
-/// Stub — not functional until M3 ships.
+/// SASO M3 REST API v1 client.
 /// Activated when ff_rest_api_v1 = true.
 ///
 /// All endpoints: /api/v1/*
-/// Auth: Bearer JWT RS256 (15 min expiry)
+/// Auth: Bearer JWT HS256 (1h expiry) + opaque refresh token (~1yr, rotated)
 /// Errors: RFC 7807 Problem Details (SASO-DOMAIN-NNNN)
 class RestV1ApiClient implements SasoApiClient {
   RestV1ApiClient({
@@ -35,6 +39,10 @@ class RestV1ApiClient implements SasoApiClient {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
+  // ---------------------------------------------------------------------------
+  // Existing inventory endpoints
+  // ---------------------------------------------------------------------------
 
   @override
   Future<ItemModel> fetchItem(String itemId) async {
@@ -108,6 +116,195 @@ class RestV1ApiClient implements SasoApiClient {
     final data = body['data'] as List<dynamic>;
     return data.cast<Map<String, dynamic>>().map(ItemModel.fromJson).toList();
   }
+
+  // ---------------------------------------------------------------------------
+  // Mobile QR pairing & token management
+  // ---------------------------------------------------------------------------
+
+  /// Generate a short-lived QR pairing code (10 min).
+  ///
+  /// The returned [PairingCodeModel.qrPayload] is the SASO1: string to encode
+  /// as a QR code. [PairingCodeModel.qrDataUri] is a ready-to-display
+  /// data URI image (data:image/png;base64,...).
+  Future<PairingCodeModel> createPairingCode() async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/pairing-codes');
+    final response = await _http
+        .post(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return PairingCodeModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Exchange a QR pairing token for an access+refresh token pair.
+  /// [pairingToken] is the raw token from the QR payload (without the SASO1: prefix).
+  Future<TokenPairModel> connect({
+    required String pairingToken,
+    required String deviceName,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
+    final response = await _http
+        .post(
+          uri,
+          headers: _headers,
+          body: jsonEncode({
+            'pairing_token': pairingToken,
+            'device_name': deviceName,
+          }),
+        )
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return TokenPairModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Rotate the access token using a refresh token.
+  /// The old refresh token is invalidated; store the new one.
+  Future<TokenPairModel> refreshAccessToken(String refreshToken) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/token/refresh');
+    final response = await _http
+        .post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({'refresh_token': refreshToken}),
+        )
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return TokenPairModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Fetch the offline config bundle — contains server-managed feature flags.
+  Future<ConfigBundleModel> fetchConfigBundle() async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/config');
+    final response = await _http
+        .get(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return ConfigBundleModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// List all device tokens registered for the current account.
+  Future<List<DeviceTokenModel>> fetchDeviceTokens() async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens');
+    final response = await _http
+        .get(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List<dynamic>;
+    return data
+        .cast<Map<String, dynamic>>()
+        .map(DeviceTokenModel.fromJson)
+        .toList();
+  }
+
+  /// Revoke a device token by its ID (remote logout for a specific device).
+  Future<void> revokeDeviceToken(int tokenId) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens/$tokenId');
+    final response = await _http
+        .delete(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Feature flags (admin / debug)
+  // ---------------------------------------------------------------------------
+
+  /// List all feature flags defined on the server.
+  Future<List<FeatureFlagModel>> fetchFeatureFlags() async {
+    final uri = Uri.parse('$serverUrl/api/v1/feature-flags');
+    final response = await _http
+        .get(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List<dynamic>;
+    return data
+        .cast<Map<String, dynamic>>()
+        .map(FeatureFlagModel.fromJson)
+        .toList();
+  }
+
+  /// Create a new feature flag.
+  Future<FeatureFlagModel> createFeatureFlag(FeatureFlagModel flag) async {
+    final uri = Uri.parse('$serverUrl/api/v1/feature-flags');
+    final response = await _http
+        .post(uri, headers: _headers, body: jsonEncode(flag.toJson()))
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return FeatureFlagModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Fetch a single feature flag by key.
+  Future<FeatureFlagModel> fetchFeatureFlag(String key) async {
+    final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
+    final response = await _http
+        .get(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return FeatureFlagModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Partially update a feature flag (PATCH).
+  Future<FeatureFlagModel> updateFeatureFlag(
+    String key,
+    Map<String, dynamic> patch,
+  ) async {
+    final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
+    final request = http.Request('PATCH', uri);
+    request.headers.addAll(_headers);
+    request.body = jsonEncode(patch);
+    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final response = await http.Response.fromStream(streamed);
+    _handleErrors(response);
+    return FeatureFlagModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Delete a feature flag by key.
+  Future<void> deleteFeatureFlag(String key) async {
+    final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
+    final response = await _http
+        .delete(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Meta
+  // ---------------------------------------------------------------------------
+
+  /// Lightweight health probe — no auth required.
+  Future<bool> checkHealth() async {
+    final uri = Uri.parse('$serverUrl/api/v1/health');
+    try {
+      final response = await _http
+          .get(uri, headers: {'Accept': 'application/json'})
+          .timeout(AppConstants.httpTimeout);
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Internal
+  // ---------------------------------------------------------------------------
 
   void _handleErrors(http.Response response) {
     if (response.statusCode < 400) return;

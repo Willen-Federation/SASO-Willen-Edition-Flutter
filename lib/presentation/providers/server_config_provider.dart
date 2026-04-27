@@ -15,6 +15,8 @@ abstract class ServerConfig with _$ServerConfig {
     @Default(ApiMode.mock) ApiMode apiMode,
     String? sessionCookie,
     String? jwtToken,
+    String? refreshToken,
+    int? deviceId,
   }) = _ServerConfig;
 }
 
@@ -27,7 +29,14 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final prefs = await SharedPreferences.getInstance();
     final url = prefs.getString(AppConstants.serverUrlKey) ?? '';
     final modeIndex = prefs.getInt(AppConstants.apiModeKey) ?? 0;
-    state = ServerConfig(baseUrl: url, apiMode: ApiMode.values[modeIndex]);
+    final refreshToken = prefs.getString(AppConstants.refreshTokenKey);
+    final deviceId = prefs.getInt(AppConstants.deviceIdKey);
+    state = ServerConfig(
+      baseUrl: url,
+      apiMode: ApiMode.values[modeIndex],
+      refreshToken: refreshToken,
+      deviceId: deviceId,
+    );
   }
 
   Future<void> save({required String url, required ApiMode mode}) async {
@@ -43,5 +52,31 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
 
   void updateSessionCookie(String cookie) {
     state = state.copyWith(sessionCookie: cookie);
+  }
+
+  Future<void> updateTokenPair({
+    required String accessToken,
+    required String refreshToken,
+    required int deviceId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConstants.refreshTokenKey, refreshToken);
+    await prefs.setInt(AppConstants.deviceIdKey, deviceId);
+    state = state.copyWith(
+      jwtToken: accessToken,
+      refreshToken: refreshToken,
+      deviceId: deviceId,
+    );
+  }
+
+  Future<void> clearTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(AppConstants.refreshTokenKey);
+    await prefs.remove(AppConstants.deviceIdKey);
+    state = state.copyWith(
+      jwtToken: null,
+      refreshToken: null,
+      deviceId: null,
+    );
   }
 }

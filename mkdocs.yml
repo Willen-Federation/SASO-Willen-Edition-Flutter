@@ -74,6 +74,7 @@ plugins:
             モックモード（サーバー不要）: Mock mode (no server)
             レガシー API 接続: Legacy API
             REST API v1 リファレンス: REST API v1 reference
+            Flutter 必要 API 要件定義: Flutter API Requirements
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -112,6 +113,7 @@ nav:
     - モックモード（サーバー不要）: api/mock.md
     - レガシー API 接続: api/legacy.md
     - REST API v1 リファレンス: api/reference.md
+    - Flutter 必要 API 要件定義: api/flutter-requirements.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md

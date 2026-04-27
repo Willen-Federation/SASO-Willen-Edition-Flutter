@@ -63,6 +63,18 @@ class HomePage extends ConsumerWidget {
                   onTap: () => context.push('/scanner'),
                 ),
                 _MenuCard(
+                  icon: Icons.add_box_outlined,
+                  label: 'アイテム登録',
+                  color: Colors.teal,
+                  onTap: () => context.push('/items/register'),
+                ),
+                _MenuCard(
+                  icon: Icons.warehouse_outlined,
+                  label: '場所管理',
+                  color: Colors.indigo,
+                  onTap: () => context.push('/locations'),
+                ),
+                _MenuCard(
                   icon: Icons.category_outlined,
                   label: 'カテゴリ',
                   color: Colors.orange,
