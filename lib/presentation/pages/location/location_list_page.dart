@@ -75,7 +75,11 @@ class _LocationTile extends StatelessWidget {
         ),
       ),
       title: Text(location.name),
-      subtitle: Text(location.code),
+      subtitle: Text(
+        location.operationalStatus != null
+            ? '${location.code}  ·  ${location.operationalStatus}'
+            : location.code,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

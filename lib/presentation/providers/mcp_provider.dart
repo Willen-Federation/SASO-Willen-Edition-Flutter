@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/datasources/remote/mcp/mcp_client.dart';
+import '../../data/models/mcp_category_model.dart';
 import '../../data/models/mcp_item_model.dart';
 import '../../data/models/storage_location_model.dart';
 import 'server_config_provider.dart';
@@ -44,8 +45,10 @@ final mcpItemByIdProvider = FutureProvider.family<McpItemModel?, int>(
     final client = ref.watch(mcpClientProvider);
     if (client == null) return null;
     final result = await client.callTool('get_item', {'id': id});
-    if (result.isEmpty) return null;
-    return McpItemModel.fromJson(result);
+    if (result['found'] != true) return null;
+    final item = result['item'] as Map<String, dynamic>?;
+    if (item == null) return null;
+    return McpItemModel.fromJson(item);
   },
 );
 
@@ -68,6 +71,23 @@ final storageLocationsProvider =
             .toList();
       },
     );
+
+// ---------------------------------------------------------------------------
+// Categories via MCP
+// ---------------------------------------------------------------------------
+
+final mcpCategoriesProvider = FutureProvider<List<McpCategoryModel>>(
+  (ref) async {
+    final client = ref.watch(mcpClientProvider);
+    if (client == null) return [];
+    final result = await client.callTool('list_categories', {'format': 'flat'});
+    final categories = result['categories'] as List<dynamic>? ?? [];
+    return categories
+        .cast<Map<String, dynamic>>()
+        .map(McpCategoryModel.fromJson)
+        .toList();
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Item registration via MCP

@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../data/models/mcp_category_model.dart';
 import '../../../data/models/mcp_item_model.dart';
-import '../../../data/models/storage_location_model.dart';
 import '../../providers/mcp_provider.dart';
 
 class ItemRegisterPage extends ConsumerStatefulWidget {
@@ -27,7 +27,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   final _priceController = TextEditingController(text: '0');
   final _stockController = TextEditingController(text: '0');
 
-  StorageLocationModel? _selectedCategory;
+  McpCategoryModel? _selectedCategory;
   XFile? _capturedImage;
   bool _saving = false;
   String? _errorMessage;
@@ -158,7 +158,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
             // Category picker
             _CategoryPickerTile(
               selected: _selectedCategory,
-              onSelected: (loc) => setState(() => _selectedCategory = loc),
+              onSelected: (cat) => setState(() => _selectedCategory = cat),
             ),
             const SizedBox(height: 12),
 
@@ -299,7 +299,7 @@ class _ImageCaptureTile extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Category picker (flat list from MCP locations)
+// Category picker (flat list from MCP list_categories)
 // ---------------------------------------------------------------------------
 
 class _CategoryPickerTile extends ConsumerWidget {
@@ -308,29 +308,33 @@ class _CategoryPickerTile extends ConsumerWidget {
     required this.onSelected,
   });
 
-  final StorageLocationModel? selected;
-  final ValueChanged<StorageLocationModel> onSelected;
+  final McpCategoryModel? selected;
+  final ValueChanged<McpCategoryModel> onSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locationsAsync = ref.watch(storageLocationsProvider(null));
+    final categoriesAsync = ref.watch(mcpCategoriesProvider);
 
-    return locationsAsync.when(
+    return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
-      error: (e, _) => Text('カテゴリ取得失敗: $e',
-          style: TextStyle(color: Theme.of(context).colorScheme.error)),
-      data: (locations) => DropdownButtonFormField<StorageLocationModel>(
+      error: (e, _) => Text(
+        'カテゴリ取得失敗: $e',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+      data: (categories) => DropdownButtonFormField<McpCategoryModel>(
         decoration: const InputDecoration(
           labelText: 'カテゴリ *',
           border: OutlineInputBorder(),
         ),
         value: selected,
         hint: const Text('カテゴリを選択'),
-        items: locations
+        items: categories
             .map(
-              (loc) => DropdownMenuItem(
-                value: loc,
-                child: Text('${'　' * loc.depth}${loc.name} (${loc.code})'),
+              (cat) => DropdownMenuItem(
+                value: cat,
+                child: Text(
+                  '${'　' * cat.depth}${cat.displayName} (${cat.code})',
+                ),
               ),
             )
             .toList(),
