@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../domain/value_objects/feature_code.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../domain/value_objects/shelf_id.dart';
@@ -61,6 +62,14 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
     final shelfId = ShelfId.tryParse(raw);
     if (shelfId != null) {
       context.pushReplacement('/shelves/${shelfId.value}');
+      return;
+    }
+
+    // ISBN detected — route directly to registration with auto-fill.
+    if (IsbnLookupService.isIsbn(raw)) {
+      context.pushReplacement(
+        '/items/register?janCode=${Uri.encodeComponent(raw)}',
+      );
       return;
     }
 

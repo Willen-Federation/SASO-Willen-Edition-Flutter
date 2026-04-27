@@ -1,14 +1,21 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/storage/database_helper.dart';
+import '../../../data/datasources/local/price_history_dao.dart';
+import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
+import '../../../data/models/book_info_model.dart';
 import '../../../data/models/mcp_category_model.dart';
 import '../../../data/models/mcp_item_model.dart';
+import '../../../data/models/price_history_entry.dart';
 import '../../providers/mcp_provider.dart';
+import '../../widgets/price_history_chart.dart';
 
 class ItemRegisterPage extends ConsumerStatefulWidget {
   const ItemRegisterPage({super.key, this.prefillJanCode});
@@ -33,21 +40,103 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   String? _errorMessage;
   McpItemModel? _savedItem;
 
+  BookInfoModel? _bookInfo;
+  bool _fetchingIsbn = false;
+
   @override
   void initState() {
     super.initState();
     if (widget.prefillJanCode != null) {
       _janController.text = widget.prefillJanCode!;
     }
+    _janController.addListener(_onJanChanged);
+
+    // Auto-fetch when a JAN/ISBN code is pre-filled (e.g., from scanner).
+    if (widget.prefillJanCode != null &&
+        IsbnLookupService.isIsbn(widget.prefillJanCode!)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _fetchIsbnInfo());
+    }
   }
 
   @override
   void dispose() {
+    _janController.removeListener(_onJanChanged);
     _nameController.dispose();
     _janController.dispose();
     _priceController.dispose();
     _stockController.dispose();
     super.dispose();
+  }
+
+  void _onJanChanged() => setState(() {});
+
+  bool get _janIsIsbn => IsbnLookupService.isIsbn(_janController.text.trim());
+
+  Future<void> _fetchIsbnInfo() async {
+    final isbn = _janController.text.trim();
+    if (!IsbnLookupService.isIsbn(isbn)) return;
+    setState(() {
+      _fetchingIsbn = true;
+      _bookInfo = null;
+    });
+    try {
+      final service = ref.read(isbnLookupServiceProvider);
+      final info = await service.lookup(isbn);
+      if (!mounted) return;
+      if (info == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('書籍情報が見つかりませんでした')),
+        );
+        return;
+      }
+      setState(() {
+        _bookInfo = info;
+        // Auto-fill name only when still blank.
+        if (_nameController.text.isEmpty) {
+          _nameController.text = info.title;
+        }
+        // Auto-fill price only when still zero.
+        if (info.price != null &&
+            (int.tryParse(_priceController.text) ?? 0) == 0) {
+          _priceController.text = info.price.toString();
+        }
+      });
+      await _storePriceHistory(info);
+    } finally {
+      if (mounted) setState(() => _fetchingIsbn = false);
+    }
+  }
+
+  Future<void> _storePriceHistory(BookInfoModel info) async {
+    if (info.price == null) return;
+    final db = await ref.read(databaseHelperProvider.future);
+    final dao = PriceHistoryDao(db.db);
+    await dao.insertIfChanged(
+      PriceHistoryEntry(
+        isbn: info.isbn,
+        price: info.price!,
+        source: info.source,
+        fetchedAt: DateTime.now(),
+      ),
+    );
+  }
+
+  void _showPriceHistory(String isbn) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollController) =>
+            _PriceHistorySheet(isbn: isbn, scrollController: scrollController),
+      ),
+    );
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -133,27 +222,43 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
             ),
             const SizedBox(height: 12),
 
-            // JAN code
+            // JAN / ISBN code
             TextFormField(
               controller: _janController,
               decoration: InputDecoration(
-                labelText: 'JAN / バーコード',
-                hintText: '例: 4901234567890',
+                labelText: 'JAN / バーコード / ISBN',
+                hintText: '例: 9784101092058',
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'スキャンして入力',
-                  onPressed: () => context
-                      .push('/scanner/jan')
-                      .then((code) {
-                        if (code is String) _janController.text = code;
-                      }),
+                  onPressed: () => context.push('/scanner/jan').then((code) {
+                    if (code is String) _janController.text = code;
+                  }),
                 ),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+
+            // ── ISBN auto-fill banner ──────────────────────────────────────
+            if (_janIsIsbn && _bookInfo == null)
+              _IsbnFetchBanner(
+                fetching: _fetchingIsbn,
+                onFetch: _fetchIsbnInfo,
+              ),
+
+            // ── Book info card ──────────────────────────────────────────────
+            if (_bookInfo != null) ...[
+              _BookInfoCard(
+                book: _bookInfo!,
+                onViewHistory: () => _showPriceHistory(_bookInfo!.isbn),
+              ),
+              const SizedBox(height: 4),
+            ],
+
+            const SizedBox(height: 4),
 
             // Category picker
             _CategoryPickerTile(
@@ -198,9 +303,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
                   _errorMessage!,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
 
@@ -218,6 +321,215 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ISBN fetch banner
+// ---------------------------------------------------------------------------
+
+class _IsbnFetchBanner extends StatelessWidget {
+  const _IsbnFetchBanner({required this.fetching, required this.onFetch});
+
+  final bool fetching;
+  final VoidCallback onFetch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: const Icon(Icons.menu_book_outlined),
+        title: const Text('ISBNを検出しました'),
+        subtitle: const Text('書籍情報を自動取得できます'),
+        trailing: fetching
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : FilledButton.tonal(
+                onPressed: onFetch,
+                child: const Text('取得'),
+              ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Book info card
+// ---------------------------------------------------------------------------
+
+class _BookInfoCard extends StatelessWidget {
+  const _BookInfoCard({required this.book, required this.onViewHistory});
+
+  final BookInfoModel book;
+  final VoidCallback onViewHistory;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Cover image
+            if (book.coverUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: CachedNetworkImage(
+                  imageUrl: book.coverUrl!,
+                  width: 60,
+                  height: 80,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(
+                    width: 60,
+                    height: 80,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.book_outlined, size: 28),
+                  ),
+                  errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
+                ),
+              )
+            else
+              Container(
+                width: 60,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Icon(Icons.book_outlined, size: 28),
+              ),
+            const SizedBox(width: 12),
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    book.title,
+                    style: Theme.of(context).textTheme.titleSmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (book.author != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      book.author!,
+                      style: Theme.of(context).textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (book.publisher != null)
+                    Text(
+                      book.publisher!,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  if (book.price != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '定価: ¥${book.price}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 6),
+                  OutlinedButton.icon(
+                    onPressed: onViewHistory,
+                    icon: const Icon(Icons.show_chart, size: 16),
+                    label: const Text('価格履歴'),
+                    style: OutlinedButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Price history bottom sheet
+// ---------------------------------------------------------------------------
+
+class _PriceHistorySheet extends ConsumerWidget {
+  const _PriceHistorySheet({
+    required this.isbn,
+    required this.scrollController,
+  });
+
+  final String isbn;
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final historyAsync = ref.watch(priceHistoryProvider(isbn));
+
+    return Column(
+      children: [
+        // Drag handle
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Text(
+                '価格履歴  ISBN: $isbn',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: historyAsync.when(
+            loading: () =>
+                const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('取得失敗: $e')),
+            data: (entries) => ListView(
+              controller: scrollController,
+              children: [PriceHistoryChart(entries: entries)],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -287,9 +599,10 @@ class _ImageCaptureTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '※ 画像アップロードはサーバー対応後に有効になります',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: Colors.grey),
             ),
           ],
         ),
@@ -364,8 +677,11 @@ class _SuccessView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle_outline,
-                  size: 72, color: Colors.green),
+              const Icon(
+                Icons.check_circle_outline,
+                size: 72,
+                color: Colors.green,
+              ),
               const SizedBox(height: 16),
               Text(
                 item.name,

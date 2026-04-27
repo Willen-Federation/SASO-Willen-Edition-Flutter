@@ -13,13 +13,18 @@ Future<DatabaseHelper> databaseHelper(DatabaseHelperRef ref) async {
 
 class DatabaseHelper {
   static const _dbName = 'saso.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _db;
 
   Future<void> initialize() async {
     final path = join(await getDatabasesPath(), _dbName);
-    _db = await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
+    _db = await openDatabase(
+      path,
+      version: _dbVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   Database get db {
@@ -66,6 +71,27 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_items_category ON items(category_id)');
     await db.execute(
       'CREATE INDEX idx_categories_parent ON categories(parent_id)',
+    );
+    await _createPriceHistoryTable(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) await _createPriceHistoryTable(db);
+  }
+
+  Future<void> _createPriceHistoryTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS price_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        isbn TEXT NOT NULL,
+        price INTEGER NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'JPY',
+        source TEXT NOT NULL,
+        fetched_at TEXT NOT NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_price_history_isbn ON price_history(isbn)',
     );
   }
 
