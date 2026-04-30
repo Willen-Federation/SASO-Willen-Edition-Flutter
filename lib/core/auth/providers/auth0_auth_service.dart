@@ -51,9 +51,7 @@ class Auth0AuthService implements AuthService {
       // because Auth0 manages the login form natively.
       _credentials = await _auth0
           .webAuthentication(scheme: _redirectScheme)
-          .login(
-            parameters: const {'prompt': 'login'},
-          );
+          .login(parameters: const {'prompt': 'login'});
 
       final token = _credentials!.accessToken;
       await _secureStorage.write(AppConstants.jwtTokenKey, token);

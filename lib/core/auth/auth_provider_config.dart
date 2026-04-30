@@ -57,14 +57,10 @@ sealed class AuthProviderConfig with _$AuthProviderConfig {
         issuer: cfg['issuer'] as String,
         clientId: cfg['clientId'] as String? ?? 'saso-mobile',
         extraScopes:
-            (cfg['extraScopes'] as List<dynamic>?)
-                ?.cast<String>()
-                .toList() ??
+            (cfg['extraScopes'] as List<dynamic>?)?.cast<String>().toList() ??
             const [],
       ),
-      'saml' => AuthProviderConfig.saml(
-        loginUrl: cfg['loginUrl'] as String,
-      ),
+      'saml' => AuthProviderConfig.saml(loginUrl: cfg['loginUrl'] as String),
       'firebase' => AuthProviderConfig.firebase(
         projectId: cfg['projectId'] as String,
       ),

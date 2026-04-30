@@ -38,7 +38,10 @@ void main() {
         'config': {'loginUrl': 'https://idp.example.com/saml/sso'},
       });
       expect(result, isA<SamlAuthConfig>());
-      expect((result as SamlAuthConfig).loginUrl, 'https://idp.example.com/saml/sso');
+      expect(
+        (result as SamlAuthConfig).loginUrl,
+        'https://idp.example.com/saml/sso',
+      );
     });
 
     test('parses firebase provider', () {

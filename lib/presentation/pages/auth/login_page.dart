@@ -49,10 +49,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, __) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, __) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -66,10 +67,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, __) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, __) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -97,10 +99,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, __) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, __) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -119,9 +122,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     // Mark as authenticated — token validity is verified on first API call.
     ref.read(authStateNotifierProvider.notifier);
-    await ref
-        .read(authStateNotifierProvider.notifier)
-        .loadStoredCredentials();
+    await ref.read(authStateNotifierProvider.notifier).loadStoredCredentials();
     if (!mounted) return;
     context.go('/home');
   }
@@ -141,112 +142,116 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                // Server URL display
-                if (config.baseUrl.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Text(
-                      config.baseUrl,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                // Provider badge
-                Center(child: _ProviderBadge(providerConfig)),
-                const SizedBox(height: 32),
-
-                // Error message
-                if (_errorMessage != null)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
+      body:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  // Server URL display
+                  if (config.baseUrl.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        config.baseUrl,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
 
-                // Adaptive login UI
-                switch (providerConfig) {
-                  LegacyAuthConfig() || FirebaseAuthConfig() =>
-                    _CredentialForm(
+                  // Provider badge
+                  Center(child: _ProviderBadge(providerConfig)),
+                  const SizedBox(height: 32),
+
+                  // Error message
+                  if (_errorMessage != null)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ),
+
+                  // Adaptive login UI
+                  switch (providerConfig) {
+                    LegacyAuthConfig() ||
+                    FirebaseAuthConfig() => _CredentialForm(
                       usernameController: _usernameController,
                       passwordController: _passwordController,
                       obscurePassword: _obscurePassword,
-                      onTogglePassword: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
+                      onTogglePassword:
+                          () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
                       onSubmit: _loginWithCredentials,
                     ),
-                  OidcAuthConfig() || Auth0AuthConfig() || CognitoAuthConfig() =>
-                    _BrowserLoginButton(
+                    OidcAuthConfig() ||
+                    Auth0AuthConfig() ||
+                    CognitoAuthConfig() => _BrowserLoginButton(
                       label: 'ブラウザでログイン',
                       onPressed: _loginWithBrowser,
                     ),
-                  SamlAuthConfig() => _BrowserLoginButton(
-                    label: 'SSOでログイン',
-                    onPressed: _loginWithSaml,
-                  ),
-                },
-
-                const SizedBox(height: 24),
-                const Divider(),
-                const SizedBox(height: 8),
-
-                // QR pairing link
-                OutlinedButton.icon(
-                  key: const Key('qr_pairing_button'),
-                  onPressed: () => context.push('/auth/qr'),
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('QRコードでペアリング'),
-                ),
-
-                const SizedBox(height: 8),
-
-                // Manual token entry (collapsible)
-                TextButton(
-                  key: const Key('manual_token_toggle'),
-                  onPressed: () =>
-                      setState(() => _showManualToken = !_showManualToken),
-                  child: Text(
-                    _showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力',
-                  ),
-                ),
-
-                if (_showManualToken) ...[
-                  const SizedBox(height: 8),
-                  TextField(
-                    key: const Key('manual_token_field'),
-                    controller: _manualTokenController,
-                    decoration: const InputDecoration(
-                      labelText: 'アクセストークン',
-                      hintText: 'eyJ...',
-                      border: OutlineInputBorder(),
+                    SamlAuthConfig() => _BrowserLoginButton(
+                      label: 'SSOでログイン',
+                      onPressed: _loginWithSaml,
                     ),
-                    maxLines: 3,
-                  ),
+                  },
+
+                  const SizedBox(height: 24),
+                  const Divider(),
                   const SizedBox(height: 8),
-                  FilledButton(
-                    key: const Key('manual_token_submit'),
-                    onPressed: _loginWithManualToken,
-                    child: const Text('このトークンで続行'),
+
+                  // QR pairing link
+                  OutlinedButton.icon(
+                    key: const Key('qr_pairing_button'),
+                    onPressed: () => context.push('/auth/qr'),
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text('QRコードでペアリング'),
                   ),
+
+                  const SizedBox(height: 8),
+
+                  // Manual token entry (collapsible)
+                  TextButton(
+                    key: const Key('manual_token_toggle'),
+                    onPressed:
+                        () => setState(
+                          () => _showManualToken = !_showManualToken,
+                        ),
+                    child: Text(_showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力'),
+                  ),
+
+                  if (_showManualToken) ...[
+                    const SizedBox(height: 8),
+                    TextField(
+                      key: const Key('manual_token_field'),
+                      controller: _manualTokenController,
+                      decoration: const InputDecoration(
+                        labelText: 'アクセストークン',
+                        hintText: 'eyJ...',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      key: const Key('manual_token_submit'),
+                      onPressed: _loginWithManualToken,
+                      child: const Text('このトークンで続行'),
+                    ),
+                  ],
                 ],
-              ],
-            ),
+              ),
     );
   }
 }
@@ -271,10 +276,7 @@ class _ProviderBadge extends StatelessWidget {
       CognitoAuthConfig() => ('Amazon Cognito', Icons.cloud),
     };
 
-    return Chip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-    );
+    return Chip(avatar: Icon(icon, size: 18), label: Text(label));
   }
 }
 
@@ -344,10 +346,7 @@ class _CredentialForm extends StatelessWidget {
 }
 
 class _BrowserLoginButton extends StatelessWidget {
-  const _BrowserLoginButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _BrowserLoginButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;

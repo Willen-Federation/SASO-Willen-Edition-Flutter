@@ -32,24 +32,26 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (_) => setState(() => _loading = true),
-          onPageFinished: (_) => setState(() => _loading = false),
-          onNavigationRequest: (request) {
-            final uri = Uri.tryParse(request.url);
-            if (uri != null && uri.scheme == SamlWebViewPage.callbackScheme) {
-              final token = uri.queryParameters['token'];
-              Navigator.of(context).pop(token);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(widget.loginUrl));
+    _controller =
+        WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onPageStarted: (_) => setState(() => _loading = true),
+              onPageFinished: (_) => setState(() => _loading = false),
+              onNavigationRequest: (request) {
+                final uri = Uri.tryParse(request.url);
+                if (uri != null &&
+                    uri.scheme == SamlWebViewPage.callbackScheme) {
+                  final token = uri.queryParameters['token'];
+                  Navigator.of(context).pop(token);
+                  return NavigationDecision.prevent;
+                }
+                return NavigationDecision.navigate;
+              },
+            ),
+          )
+          ..loadRequest(Uri.parse(widget.loginUrl));
   }
 
   @override
@@ -65,8 +67,7 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_loading)
-            const LinearProgressIndicator(),
+          if (_loading) const LinearProgressIndicator(),
         ],
       ),
     );

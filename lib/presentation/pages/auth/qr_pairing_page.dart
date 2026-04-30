@@ -94,11 +94,12 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
           IconButton(
             icon: ValueListenableBuilder(
               valueListenable: _controller,
-              builder: (_, state, __) => Icon(
-                state.torchState == TorchState.on
-                    ? Icons.flash_off
-                    : Icons.flash_on,
-              ),
+              builder:
+                  (_, state, __) => Icon(
+                    state.torchState == TorchState.on
+                        ? Icons.flash_off
+                        : Icons.flash_on,
+                  ),
             ),
             onPressed: _controller.toggleTorch,
           ),
@@ -106,10 +107,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
       ),
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-          ),
+          MobileScanner(controller: _controller, onDetect: _onDetect),
 
           // Scanning overlay
           Center(
@@ -131,43 +129,44 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
             child: Container(
               color: Colors.black54,
               padding: const EdgeInsets.all(16),
-              child: _processing
-                  ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+              child:
+                  _processing
+                      ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'ペアリング中...',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_errorMessage != null) ...[
+                          SizedBox(width: 12),
                           Text(
-                            _errorMessage!,
-                            style: const TextStyle(color: Colors.red),
+                            'ペアリング中...',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      )
+                      : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_errorMessage != null) ...[
+                            Text(
+                              _errorMessage!,
+                              style: const TextStyle(color: Colors.red),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                          const Text(
+                            'SASO管理画面に表示されたQRコードをスキャンしてください',
+                            style: TextStyle(color: Colors.white70),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 8),
                         ],
-                        const Text(
-                          'SASO管理画面に表示されたQRコードをスキャンしてください',
-                          style: TextStyle(color: Colors.white70),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                      ),
             ),
           ),
         ],

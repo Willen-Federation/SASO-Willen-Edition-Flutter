@@ -174,11 +174,13 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         final refreshToken = json['refresh_token'] as String;
         final deviceId = json['device_id'] as int;
 
-        await ref.read(serverConfigNotifierProvider.notifier).updateTokenPair(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          deviceId: deviceId,
-        );
+        await ref
+            .read(serverConfigNotifierProvider.notifier)
+            .updateTokenPair(
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              deviceId: deviceId,
+            );
 
         state = AuthState.authenticated(
           userId: 'qr-device',
@@ -206,11 +208,13 @@ class AuthStateNotifier extends _$AuthStateNotifier {
 
   void _applyResult(AuthResult result, AuthService service) {
     result.when(
-      success: (userId, token, _, expiresAt) => state = AuthState.authenticated(
-        userId: userId,
-        token: token,
-        expiresAt: expiresAt,
-      ),
+      success:
+          (userId, token, _, expiresAt) =>
+              state = AuthState.authenticated(
+                userId: userId,
+                token: token,
+                expiresAt: expiresAt,
+              ),
       failure: (_, __) => state = const AuthState.unauthenticated(),
     );
   }

@@ -115,8 +115,7 @@ class CognitoAuthService implements AuthService {
 
       final session = await Amplify.Auth.fetchAuthSession();
       final cognitoSession = session as CognitoAuthSession;
-      final token =
-          cognitoSession.userPoolTokensResult.value.accessToken.raw;
+      final token = cognitoSession.userPoolTokensResult.value.accessToken.raw;
       final userId = cognitoSession.userSubResult.value;
 
       _cachedToken = token;
@@ -150,8 +149,7 @@ class CognitoAuthService implements AuthService {
         options: const FetchAuthSessionOptions(forceRefresh: true),
       );
       final cognitoSession = session as CognitoAuthSession;
-      final token =
-          cognitoSession.userPoolTokensResult.value.accessToken.raw;
+      final token = cognitoSession.userPoolTokensResult.value.accessToken.raw;
       _cachedToken = token;
       await _secureStorage.write(AppConstants.jwtTokenKey, token);
       return true;

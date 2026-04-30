@@ -8,30 +8,24 @@ import 'package:saso_willen_edition/presentation/providers/auth_state_provider.d
 import 'package:saso_willen_edition/presentation/providers/server_config_provider.dart';
 
 Widget _wrap(Widget child, List<Override> overrides) {
-  return ProviderScope(
-    overrides: overrides,
-    child: MaterialApp(home: child),
-  );
+  return ProviderScope(overrides: overrides, child: MaterialApp(home: child));
 }
 
 void main() {
   group('LoginPage — provider badge and UI variants', () {
     testWidgets('shows credential form for legacy provider', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
-            ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -43,22 +37,19 @@ void main() {
 
     testWidgets('shows browser button for oidc provider', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(
-                const AuthProviderConfig.oidc(issuer: 'https://sso.example.com'),
-              ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(
+              const AuthProviderConfig.oidc(issuer: 'https://sso.example.com'),
             ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -69,25 +60,22 @@ void main() {
 
     testWidgets('shows browser button for auth0 provider', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(
-                const AuthProviderConfig.auth0(
-                  domain: 'ex.auth0.com',
-                  clientId: 'cid',
-                ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(
+              const AuthProviderConfig.auth0(
+                domain: 'ex.auth0.com',
+                clientId: 'cid',
               ),
             ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -97,24 +85,21 @@ void main() {
 
     testWidgets('shows SSO button for SAML provider', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(
-                const AuthProviderConfig.saml(
-                  loginUrl: 'https://idp.example.com/sso',
-                ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(
+              const AuthProviderConfig.saml(
+                loginUrl: 'https://idp.example.com/sso',
               ),
             ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -125,22 +110,19 @@ void main() {
 
     testWidgets('shows credential form for firebase provider', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(
-                const AuthProviderConfig.firebase(projectId: 'proj'),
-              ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(
+              const AuthProviderConfig.firebase(projectId: 'proj'),
             ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -151,20 +133,17 @@ void main() {
 
     testWidgets('shows QR pairing link on all providers', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
-            ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 
@@ -177,20 +156,17 @@ void main() {
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
-        _wrap(
-          const LoginPage(),
-          [
-            authProviderConfigNotifierProvider.overrideWith(
-              () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
-            ),
-            serverConfigNotifierProvider.overrideWith(
-              () => _FakeServerConfigNotifier(),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ],
-        ),
+        _wrap(const LoginPage(), [
+          authProviderConfigNotifierProvider.overrideWith(
+            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          ),
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfigNotifier(),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
       );
       await tester.pumpAndSettle();
 

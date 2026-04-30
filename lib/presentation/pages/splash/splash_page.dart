@@ -40,8 +40,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     }
 
     // 4. Discover which auth provider the server has enabled.
-    final providerConfig =
-        await AuthDiscoveryService().discover(config.baseUrl);
+    final providerConfig = await AuthDiscoveryService().discover(
+      config.baseUrl,
+    );
     if (!mounted) return;
     ref.read(authProviderConfigNotifierProvider.notifier).set(providerConfig);
 

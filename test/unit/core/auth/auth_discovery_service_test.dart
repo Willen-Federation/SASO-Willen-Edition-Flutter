@@ -70,15 +70,18 @@ void main() {
     expect((result as OidcAuthConfig).issuer, 'https://sso.example.com');
   });
 
-  test('returns FirebaseAuthConfig when server returns firebase provider', () async {
-    const body = '{"provider":"firebase","config":{"projectId":"my-proj"}}';
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response(body, 200));
+  test(
+    'returns FirebaseAuthConfig when server returns firebase provider',
+    () async {
+      const body = '{"provider":"firebase","config":{"projectId":"my-proj"}}';
+      when(
+        () => client.get(any(), headers: any(named: 'headers')),
+      ).thenAnswer((_) async => http.Response(body, 200));
 
-    final result = await service.discover('https://saso.example.com');
-    expect(result, isA<FirebaseAuthConfig>());
-  });
+      final result = await service.discover('https://saso.example.com');
+      expect(result, isA<FirebaseAuthConfig>());
+    },
+  );
 
   test('returns Auth0AuthConfig when server returns auth0 provider', () async {
     const body =
@@ -92,16 +95,19 @@ void main() {
     expect((result as Auth0AuthConfig).domain, 'ex.auth0.com');
   });
 
-  test('returns CognitoAuthConfig when server returns cognito provider', () async {
-    const body =
-        '{"provider":"cognito","config":{"userPoolId":"us-east-1_X","clientId":"c","region":"us-east-1"}}';
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response(body, 200));
+  test(
+    'returns CognitoAuthConfig when server returns cognito provider',
+    () async {
+      const body =
+          '{"provider":"cognito","config":{"userPoolId":"us-east-1_X","clientId":"c","region":"us-east-1"}}';
+      when(
+        () => client.get(any(), headers: any(named: 'headers')),
+      ).thenAnswer((_) async => http.Response(body, 200));
 
-    final result = await service.discover('https://saso.example.com');
-    expect(result, isA<CognitoAuthConfig>());
-  });
+      final result = await service.discover('https://saso.example.com');
+      expect(result, isA<CognitoAuthConfig>());
+    },
+  );
 
   test('returns SamlAuthConfig when server returns saml provider', () async {
     const body =
@@ -122,9 +128,10 @@ void main() {
 
     await service.discover('https://saso.example.com');
 
-    final captured = verify(
-      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-    ).captured;
+    final captured =
+        verify(
+          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+        ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://saso.example.com/api/v1/auth/providers',
