@@ -37,8 +37,8 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
 
-  # Barcode scanning (AVFoundation on iOS 26)
-  mobile_scanner: ^6.0.0
+  # Barcode scanning
+  mobile_scanner: ^5.2.0
 
   # Image capture & photo library access
   image_picker: ^1.1.2
