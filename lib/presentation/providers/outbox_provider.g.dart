@@ -6,7 +6,7 @@ part of 'outbox_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$pendingCountHash() => r'2f7fb6a4e7f24105acf934db4224f127a0801ead';
+String _$pendingCountHash() => r'3beea5d01ae66c874457f6c774f580d55ac5dd4f';
 
 /// Total count of pending/failed outbox items (registrations + adjustments).
 ///

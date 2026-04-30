@@ -6,7 +6,7 @@ part of 'api_client_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sasoApiClientHash() => r'c2001fe9233574389e26bd477db6bd716b7bb44e';
+String _$sasoApiClientHash() => r'329d7cb4781005a152df9960b7470758604eeea3';
 
 /// See also [sasoApiClient].
 @ProviderFor(sasoApiClient)
@@ -24,7 +24,7 @@ final sasoApiClientProvider = AutoDisposeProvider<SasoApiClient>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SasoApiClientRef = AutoDisposeProviderRef<SasoApiClient>;
-String _$itemRepositoryHash() => r'8967cffd9d42dac5b2187dd90adc35f099e613f2';
+String _$itemRepositoryHash() => r'a35d62627514e79c61eb811e4fc407e2290227b2';
 
 /// See also [itemRepository].
 @ProviderFor(itemRepository)

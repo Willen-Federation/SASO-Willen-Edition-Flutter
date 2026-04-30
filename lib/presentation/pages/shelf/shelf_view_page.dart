@@ -17,7 +17,7 @@ part 'shelf_view_page.g.dart';
 
 @riverpod
 Future<({String label, List<Item> items})> shelfData(
-  ShelfDataRef ref,
+  Ref ref,
   String shelfId,
 ) async {
   final config = ref.watch(serverConfigNotifierProvider);

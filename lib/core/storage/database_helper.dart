@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -5,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 part 'database_helper.g.dart';
 
 @riverpod
-Future<DatabaseHelper> databaseHelper(DatabaseHelperRef ref) async {
+Future<DatabaseHelper> databaseHelper(Ref ref) async {
   final helper = DatabaseHelper();
   await helper.initialize();
   return helper;

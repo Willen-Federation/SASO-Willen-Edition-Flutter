@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,7 +19,7 @@ import 'navigator_key.dart';
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) => GoRouter(
+GoRouter appRouter(Ref ref) => GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
