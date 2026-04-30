@@ -100,7 +100,9 @@ void main() {
     });
 
     test('missing provider field falls back to legacy', () {
-      final result = AuthProviderConfig.fromJson({'config': {}});
+      final result = AuthProviderConfig.fromJson({
+        'config': <String, dynamic>{},
+      });
       expect(result, isA<LegacyAuthConfig>());
     });
 

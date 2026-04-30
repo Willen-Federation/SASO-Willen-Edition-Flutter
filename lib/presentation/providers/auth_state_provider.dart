@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -36,7 +37,7 @@ class AuthProviderConfigNotifier extends _$AuthProviderConfigNotifier {
 /// Selects and instantiates the appropriate [AuthService] based on the
 /// currently detected provider config and server URL.
 @riverpod
-AuthService authService(AuthServiceRef ref) {
+AuthService authService(Ref ref) {
   final config = ref.watch(serverConfigNotifierProvider);
   final providerConfig = ref.watch(authProviderConfigNotifierProvider);
   final secureStorage = ref.watch(secureStorageProvider);

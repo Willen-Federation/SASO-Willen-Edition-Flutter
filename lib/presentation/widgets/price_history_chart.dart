@@ -1,7 +1,5 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../data/models/price_history_entry.dart';
 
@@ -71,18 +69,28 @@ class _PriceSparkline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.primary;
+    final textDirection = Directionality.of(context);
     return CustomPaint(
-      painter: _SparklinePainter(entries: entries, color: color),
+      painter: _SparklinePainter(
+        entries: entries,
+        color: color,
+        textDirection: textDirection,
+      ),
       child: const SizedBox.expand(),
     );
   }
 }
 
 class _SparklinePainter extends CustomPainter {
-  _SparklinePainter({required this.entries, required this.color});
+  _SparklinePainter({
+    required this.entries,
+    required this.color,
+    required this.textDirection,
+  });
 
   final List<PriceHistoryEntry> entries;
   final Color color;
+  final TextDirection textDirection;
 
   static final _labelFmt = NumberFormat('#,###');
   static final _dateFmt = DateFormat('M/d');
@@ -150,7 +158,7 @@ class _SparklinePainter extends CustomPainter {
     void drawLabel(String text, Offset anchor) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
-        textDirection: ui.TextDirection.ltr,
+        textDirection: textDirection,
       )..layout();
       tp.paint(
         canvas,
@@ -166,9 +174,12 @@ class _SparklinePainter extends CustomPainter {
     void drawDateLabel(String text, double x, {bool right = false}) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: dateStyle),
-        textDirection: ui.TextDirection.ltr,
+        textDirection: textDirection,
       )..layout();
-      tp.paint(canvas, Offset(right ? x - tp.width : x, padTop + chartH + 4));
+      canvas.drawText(
+        tp,
+        Offset(right ? x - tp.width : x, padTop + chartH + 4),
+      );
     }
 
     drawDateLabel(_dateFmt.format(entries.first.fetchedAt.toLocal()), padLeft);
@@ -181,7 +192,13 @@ class _SparklinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SparklinePainter old) =>
-      old.entries != entries || old.color != color;
+      old.entries != entries ||
+      old.color != color ||
+      old.textDirection != textDirection;
+}
+
+extension on Canvas {
+  void drawText(TextPainter tp, Offset offset) => tp.paint(this, offset);
 }
 
 // ── Source chip ────────────────────────────────────────────────────────────
