@@ -3,10 +3,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../presentation/pages/category/category_browser_page.dart';
 import '../presentation/pages/home/home_page.dart';
+import '../presentation/pages/inventory/inventory_adjust_page.dart';
 import '../presentation/pages/item/item_detail_page.dart';
 import '../presentation/pages/item/item_register_page.dart';
 import '../presentation/pages/item/item_search_page.dart';
 import '../presentation/pages/location/location_list_page.dart';
+import '../presentation/pages/outbox/outbox_page.dart';
 import '../presentation/pages/scanner/barcode_scanner_page.dart';
 import '../presentation/pages/settings/server_settings_page.dart';
 import '../presentation/pages/shelf/shelf_view_page.dart';
@@ -29,10 +31,21 @@ GoRouter appRouter(AppRouterRef ref) => GoRouter(
       builder:
           (_, state) => ItemDetailPage(itemId: state.pathParameters['id']!),
     ),
-    GoRoute(path: '/scanner', builder: (_, __) => const BarcodeScannerPage()),
+    GoRoute(
+      path: '/scanner',
+      builder: (_, state) {
+        final mode = switch (state.uri.queryParameters['mode']) {
+          'register' => ScannerMode.register,
+          'inventory' => ScannerMode.inventory,
+          _ => ScannerMode.search,
+        };
+        return BarcodeScannerPage(mode: mode);
+      },
+    ),
+    // Legacy route kept for backward compatibility.
     GoRoute(
       path: '/scanner/jan',
-      builder: (_, __) => const BarcodeScannerPage(returnJanCode: true),
+      builder: (_, __) => const BarcodeScannerPage(mode: ScannerMode.register),
     ),
     GoRoute(
       path: '/categories',
@@ -51,6 +64,16 @@ GoRouter appRouter(AppRouterRef ref) => GoRouter(
       },
     ),
     GoRoute(
+      path: '/inventory/adjust',
+      builder:
+          (_, state) => InventoryAdjustPage(
+            prefillJanCode: state.uri.queryParameters['janCode'],
+            prefillItemId: int.tryParse(
+              state.uri.queryParameters['itemId'] ?? '',
+            ),
+          ),
+    ),
+    GoRoute(
       path: '/locations',
       builder: (_, state) {
         final extra = state.extra as Map<String, dynamic>?;
@@ -60,5 +83,6 @@ GoRouter appRouter(AppRouterRef ref) => GoRouter(
         );
       },
     ),
+    GoRoute(path: '/outbox', builder: (_, __) => const OutboxPage()),
   ],
 );

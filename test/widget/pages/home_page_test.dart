@@ -22,6 +22,10 @@ GoRouter _buildRouter() => GoRouter(
     GoRoute(path: '/scanner', builder: (_, __) => const Scaffold()),
     GoRoute(path: '/categories', builder: (_, __) => const Scaffold()),
     GoRoute(path: '/shelves/:id', builder: (_, __) => const Scaffold()),
+    GoRoute(path: '/items/register', builder: (_, __) => const Scaffold()),
+    GoRoute(path: '/locations', builder: (_, __) => const Scaffold()),
+    GoRoute(path: '/inventory/adjust', builder: (_, __) => const Scaffold()),
+    GoRoute(path: '/outbox', builder: (_, __) => const Scaffold()),
   ],
 );
 
@@ -52,10 +56,26 @@ void main() {
       expect(find.byKey(const Key('search_fab')), findsOneWidget);
     });
 
-    testWidgets('displays 4 feature cards', (tester) async {
+    testWidgets('displays 4 feature cards in initial viewport', (tester) async {
       await tester.pumpWidget(_buildApp(ApiMode.mock));
       await tester.pumpAndSettle();
       expect(find.byType(Card), findsNWidgets(4));
     });
+
+    testWidgets(
+      'menu_inventory_scan card is present when viewport tall enough',
+      (tester) async {
+        tester.view.physicalSize = const Size(800, 1400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(_buildApp(ApiMode.mock));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('menu_inventory_scan')), findsOneWidget);
+        expect(find.text('入出庫スキャン'), findsOneWidget);
+      },
+    );
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,10 +16,7 @@ class PriceHistoryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
       return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text('価格データがありません'),
-        ),
+        child: Padding(padding: EdgeInsets.all(32), child: Text('価格データがありません')),
       );
     }
 
@@ -27,10 +26,7 @@ class PriceHistoryChart extends StatelessWidget {
         if (entries.length >= 2) ...[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              '価格推移',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            child: Text('価格推移', style: Theme.of(context).textTheme.titleSmall),
           ),
           SizedBox(
             height: 120,
@@ -43,10 +39,7 @@ class PriceHistoryChart extends StatelessWidget {
         ],
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Text(
-            '取得履歴',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
+          child: Text('取得履歴', style: Theme.of(context).textTheme.titleSmall),
         ),
         ...entries.reversed.map(
           (e) => ListTile(
@@ -125,18 +118,16 @@ class _SparklinePainter extends CustomPainter {
     }
     fillPath.lineTo(toOffset(n - 1, prices[n - 1]).dx, padTop + chartH);
     fillPath.close();
-    canvas.drawPath(
-      fillPath,
-      Paint()..color = color.withValues(alpha: 0.12),
-    );
+    canvas.drawPath(fillPath, Paint()..color = color.withValues(alpha: 0.12));
 
     // Line.
-    final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+    final linePaint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
 
     final linePath = Path();
     linePath.moveTo(toOffset(0, prices[0]).dx, toOffset(0, prices[0]).dy);
@@ -159,7 +150,7 @@ class _SparklinePainter extends CustomPainter {
     void drawLabel(String text, Offset anchor) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
-        textDirection: TextDirection.ltr,
+        textDirection: ui.TextDirection.ltr,
       )..layout();
       tp.paint(
         canvas,
@@ -175,18 +166,12 @@ class _SparklinePainter extends CustomPainter {
     void drawDateLabel(String text, double x, {bool right = false}) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: dateStyle),
-        textDirection: TextDirection.ltr,
+        textDirection: ui.TextDirection.ltr,
       )..layout();
-      canvas.drawText(
-        tp,
-        Offset(right ? x - tp.width : x, padTop + chartH + 4),
-      );
+      tp.paint(canvas, Offset(right ? x - tp.width : x, padTop + chartH + 4));
     }
 
-    drawDateLabel(
-      _dateFmt.format(entries.first.fetchedAt.toLocal()),
-      padLeft,
-    );
+    drawDateLabel(_dateFmt.format(entries.first.fetchedAt.toLocal()), padLeft);
     drawDateLabel(
       _dateFmt.format(entries.last.fetchedAt.toLocal()),
       padLeft + chartW,
@@ -197,10 +182,6 @@ class _SparklinePainter extends CustomPainter {
   @override
   bool shouldRepaint(_SparklinePainter old) =>
       old.entries != entries || old.color != color;
-}
-
-extension on Canvas {
-  void drawText(TextPainter tp, Offset offset) => tp.paint(this, offset);
 }
 
 // ── Source chip ────────────────────────────────────────────────────────────

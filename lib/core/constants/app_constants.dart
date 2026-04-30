@@ -8,6 +8,7 @@ abstract final class AppConstants {
   static const String jwtTokenKey = 'jwt_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String deviceIdKey = 'device_id';
+  static const String offlineModeKey = 'offline_mode';
 
   static const Duration httpTimeout = Duration(seconds: 30);
   static const Duration cacheMaxAge = Duration(hours: 24);

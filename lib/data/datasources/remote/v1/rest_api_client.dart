@@ -1,14 +1,17 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/problem_details.dart';
+import '../../../models/ai_analysis_model.dart';
 import '../../../models/category_model.dart';
 import '../../../models/config_bundle_model.dart';
 import '../../../models/device_token_model.dart';
 import '../../../models/feature_flag_model.dart';
 import '../../../models/item_model.dart';
+import '../../../models/mcp_item_model.dart';
 import '../../../models/pairing_code_model.dart';
 import '../../../models/shelf_model.dart';
 import '../../../models/token_pair_model.dart';
@@ -268,7 +271,9 @@ class RestV1ApiClient implements SasoApiClient {
     final request = http.Request('PATCH', uri);
     request.headers.addAll(_headers);
     request.body = jsonEncode(patch);
-    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final streamed = await _http
+        .send(request)
+        .timeout(AppConstants.httpTimeout);
     final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return FeatureFlagModel.fromJson(
@@ -283,6 +288,121 @@ class RestV1ApiClient implements SasoApiClient {
         .delete(uri, headers: _headers)
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
+  }
+
+  // ---------------------------------------------------------------------------
+  // AI-assisted item registration
+  // ---------------------------------------------------------------------------
+
+  /// Register an item with server-side AI completion.
+  ///
+  /// Sends all available inputs (name, janCode, categoryId, price, stock,
+  /// optional image) as multipart/form-data to
+  /// POST /api/v1/items/register-with-ai.
+  ///
+  /// The server fills blank fields using its registered AI provider and
+  /// returns the created item.
+  Future<McpItemModel> registerItemWithAi({
+    String? name,
+    String? janCode,
+    int? categoryId,
+    int price = 0,
+    int stock = 0,
+    XFile? image,
+    String? draftId,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/items/register-with-ai');
+    final request =
+        http.MultipartRequest('POST', uri)
+          ..headers['Authorization'] = 'Bearer $jwtToken'
+          ..headers['Accept'] = 'application/json';
+
+    if (name != null && name.isNotEmpty) request.fields['name'] = name;
+    if (janCode != null && janCode.isNotEmpty)
+      request.fields['janCode'] = janCode;
+    if (categoryId != null) request.fields['categoryId'] = '$categoryId';
+    request.fields['price'] = '$price';
+    request.fields['stock'] = '$stock';
+    if (draftId != null && draftId.isNotEmpty)
+      request.fields['draftId'] = draftId;
+
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    }
+
+    http.StreamedResponse streamed;
+    try {
+      streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    } catch (e) {
+      throw Exception('registerItemWithAi network error: $e');
+    }
+    final response = await http.Response.fromStream(streamed);
+    _handleErrors(response);
+    return McpItemModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  /// Send image + partial inputs to the server for AI analysis and draft creation.
+  ///
+  /// POST /api/v1/images/analyze-and-draft
+  /// Returns [AiAnalysisModel] with suggested fields + optional draftId.
+  Future<AiAnalysisModel> analyzeAndDraftImage({
+    XFile? image,
+    String? name,
+    String? janCode,
+    int? categoryId,
+    int? price,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/images/analyze-and-draft');
+    final request =
+        http.MultipartRequest('POST', uri)
+          ..headers['Authorization'] = 'Bearer $jwtToken'
+          ..headers['Accept'] = 'application/json';
+
+    if (name != null && name.isNotEmpty) request.fields['name'] = name;
+    if (janCode != null && janCode.isNotEmpty)
+      request.fields['janCode'] = janCode;
+    if (categoryId != null) request.fields['categoryId'] = '$categoryId';
+    if (price != null) request.fields['price'] = '$price';
+
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    }
+
+    http.StreamedResponse streamed;
+    try {
+      streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    } catch (e) {
+      throw Exception('analyzeAndDraftImage network error: $e');
+    }
+    final response = await http.Response.fromStream(streamed);
+    _handleErrors(response);
+    return AiAnalysisModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Full data sync
+  // ---------------------------------------------------------------------------
+
+  /// Fetch all items with pagination for full offline sync.
+  /// Returns raw JSON list for storage in the local cache.
+  Future<List<Map<String, dynamic>>> fetchAllItemsRaw({
+    int page = 1,
+    int limit = 200,
+  }) async {
+    final uri = Uri.parse(
+      '$serverUrl/api/v1/items',
+    ).replace(queryParameters: {'limit': '$limit', 'page': '$page'});
+    final response = await _http
+        .get(uri, headers: _headers)
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List<dynamic>? ?? [];
+    return data.cast<Map<String, dynamic>>();
   }
 
   // ---------------------------------------------------------------------------

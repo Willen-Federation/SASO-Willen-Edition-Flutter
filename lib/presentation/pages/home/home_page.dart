@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../presentation/providers/outbox_provider.dart';
 import '../../../presentation/providers/server_config_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -11,10 +12,26 @@ class HomePage extends ConsumerWidget {
     final config = ref.watch(serverConfigNotifierProvider);
     final isMock = config.apiMode == ApiMode.mock;
 
+    final pendingCountAsync = ref.watch(pendingCountProvider);
+    final pendingCount = pendingCountAsync.when(
+      data: (n) => n,
+      loading: () => 0,
+      error: (_, __) => 0,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('SASO Willen'),
         actions: [
+          if (pendingCount > 0)
+            Badge.count(
+              count: pendingCount,
+              child: IconButton(
+                icon: const Icon(Icons.sync_problem_outlined),
+                tooltip: '保留中データ',
+                onPressed: () => context.push('/outbox'),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.push('/settings'),
@@ -81,10 +98,11 @@ class HomePage extends ConsumerWidget {
                   onTap: () => context.push('/categories'),
                 ),
                 _MenuCard(
-                  icon: Icons.shelves,
-                  label: '棚を見る',
-                  color: Colors.purple,
-                  onTap: () => _showShelfDialog(context),
+                  key: const Key('menu_inventory_scan'),
+                  icon: Icons.inventory_2_outlined,
+                  label: '入出庫スキャン',
+                  color: Colors.deepOrange,
+                  onTap: () => context.push('/scanner?mode=inventory'),
                 ),
               ],
             ),
@@ -97,42 +115,6 @@ class HomePage extends ConsumerWidget {
         icon: const Icon(Icons.search),
         label: const Text('検索'),
       ),
-    );
-  }
-
-  void _showShelfDialog(BuildContext context) {
-    final controller = TextEditingController();
-    showDialog<void>(
-      context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('棚IDを入力'),
-            content: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: '例: A-01',
-                labelText: '棚ID',
-              ),
-              autofocus: true,
-              textCapitalization: TextCapitalization.characters,
-              onSubmitted: (v) {
-                ctx.pop();
-                if (v.isNotEmpty) context.push('/shelves/$v');
-              },
-            ),
-            actions: [
-              TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
-              FilledButton(
-                onPressed: () {
-                  ctx.pop();
-                  if (controller.text.isNotEmpty) {
-                    context.push('/shelves/${controller.text.toUpperCase()}');
-                  }
-                },
-                child: const Text('移動'),
-              ),
-            ],
-          ),
     );
   }
 }

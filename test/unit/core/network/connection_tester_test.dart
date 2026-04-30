@@ -53,7 +53,7 @@ void main() {
     expect((captured[1] as Map<String, String>)['Cookie'], 'sid=abc');
   });
 
-  test('rest mode hits /api/v1/categories with bearer header', () async {
+  test('rest mode hits /api/v1/health with accept header', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response('{}', 200));
@@ -73,12 +73,9 @@ void main() {
         ).captured;
     expect(
       (captured[0] as Uri).toString(),
-      'https://api.example.com/api/v1/categories',
+      'https://api.example.com/api/v1/health',
     );
-    expect(
-      (captured[1] as Map<String, String>)['Authorization'],
-      'Bearer tok-1',
-    );
+    expect((captured[1] as Map<String, String>)['Accept'], 'application/json');
   });
 
   test('non-mock mode with empty url returns failure without HTTP', () async {
