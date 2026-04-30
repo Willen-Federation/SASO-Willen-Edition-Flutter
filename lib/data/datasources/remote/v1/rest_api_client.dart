@@ -318,13 +318,15 @@ class RestV1ApiClient implements SasoApiClient {
           ..headers['Accept'] = 'application/json';
 
     if (name != null && name.isNotEmpty) request.fields['name'] = name;
-    if (janCode != null && janCode.isNotEmpty)
+    if (janCode != null && janCode.isNotEmpty) {
       request.fields['janCode'] = janCode;
+    }
     if (categoryId != null) request.fields['categoryId'] = '$categoryId';
     request.fields['price'] = '$price';
     request.fields['stock'] = '$stock';
-    if (draftId != null && draftId.isNotEmpty)
+    if (draftId != null && draftId.isNotEmpty) {
       request.fields['draftId'] = draftId;
+    }
 
     if (image != null) {
       request.files.add(await http.MultipartFile.fromPath('image', image.path));
@@ -361,8 +363,9 @@ class RestV1ApiClient implements SasoApiClient {
           ..headers['Accept'] = 'application/json';
 
     if (name != null && name.isNotEmpty) request.fields['name'] = name;
-    if (janCode != null && janCode.isNotEmpty)
+    if (janCode != null && janCode.isNotEmpty) {
       request.fields['janCode'] = janCode;
+    }
     if (categoryId != null) request.fields['categoryId'] = '$categoryId';
     if (price != null) request.fields['price'] = '$price';
 

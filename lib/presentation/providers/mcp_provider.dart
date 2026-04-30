@@ -152,8 +152,9 @@ Future<McpItemModel> registerItem(
     'price': p.price,
   };
   if (p.janCode != null && p.janCode!.isNotEmpty) args['janCode'] = p.janCode;
-  if (p.imageUrl != null && p.imageUrl!.isNotEmpty)
+  if (p.imageUrl != null && p.imageUrl!.isNotEmpty) {
     args['imageUrl'] = p.imageUrl;
+  }
   if (p.draftId != null && p.draftId!.isNotEmpty) args['draftId'] = p.draftId;
   final result = await client.callTool('register_item', args);
   return McpItemModel.fromJson(result);
