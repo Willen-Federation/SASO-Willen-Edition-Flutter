@@ -42,10 +42,10 @@ class McpClient {
   /// Initialize the MCP session (protocol handshake).
   /// Call once before using [callTool].
   Future<void> initialize() async {
-    await _send('initialize', {
+    await _send('initialize', <String, dynamic>{
       'protocolVersion': '2024-11-05',
-      'capabilities': {},
-      'clientInfo': {
+      'capabilities': <String, dynamic>{},
+      'clientInfo': <String, dynamic>{
         'name': 'SASO Willen Flutter',
         'version': AppConstants.version,
       },

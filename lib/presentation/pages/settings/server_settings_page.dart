@@ -23,6 +23,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
   final ConnectionTester _connectionTester = ConnectionTester();
   bool _testing = false;
   ConnectionTestResult? _lastTestResult;
+  late bool _offlineMode;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     final config = ref.read(serverConfigNotifierProvider);
     _urlController.text = config.baseUrl;
     _selectedMode = config.apiMode;
+    _offlineMode = config.offlineMode;
     _initFlagOverrides();
   }
 
@@ -176,6 +178,58 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               ),
             ),
           ),
+        const SizedBox(height: 16),
+
+        // Offline / data sync section
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'オフラインモード',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SwitchListTile(
+                  title: const Text('オフラインモード'),
+                  subtitle: const Text('ONにすると書き込みをキューに蓄積し、サーバーへ送らない'),
+                  value: _offlineMode,
+                  onChanged: (v) {
+                    setState(() => _offlineMode = v);
+                    ref
+                        .read(serverConfigNotifierProvider.notifier)
+                        .setOfflineMode(enabled: v);
+                  },
+                ),
+                const Divider(height: 1),
+                const SizedBox(height: 8),
+                Text('データ管理', style: Theme.of(context).textTheme.titleSmall),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.cloud_download_outlined),
+                      label: const Text('全データをダウンロード'),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('この機能は今後対応予定です')),
+                        );
+                      },
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.sync_outlined),
+                      label: const Text('保留中データを送信'),
+                      onPressed: () => context.push('/outbox'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
 
         // Feature Flags (debug only visible to users too for QA)

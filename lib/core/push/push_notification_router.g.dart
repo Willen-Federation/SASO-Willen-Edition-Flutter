@@ -7,7 +7,7 @@ part of 'push_notification_router.dart';
 // **************************************************************************
 
 String _$pushNotificationServiceHash() =>
-    r'82656d16e87d7ff7613d870d54044779fd67b4dd';
+    r'eb3cab1bfd0659df11aaab8965158bb18d8eaeeb';
 
 /// Selects the active push notification service based on feature flags.
 /// SNS takes precedence over FCM when both are enabled.

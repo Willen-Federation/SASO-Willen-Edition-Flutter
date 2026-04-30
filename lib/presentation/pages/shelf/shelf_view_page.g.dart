@@ -6,7 +6,7 @@ part of 'shelf_view_page.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$shelfDataHash() => r'90a007d29ae95efa3ef10a82d89ccf2bd651d92f';
+String _$shelfDataHash() => r'9a4fc33394d6a526c4c778ec22d76cbcfb77e790';
 
 /// Copied from Dart SDK
 class _SystemHash {

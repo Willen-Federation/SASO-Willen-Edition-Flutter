@@ -17,6 +17,7 @@ abstract class ServerConfig with _$ServerConfig {
     String? jwtToken,
     String? refreshToken,
     int? deviceId,
+    @Default(false) bool offlineMode,
   }) = _ServerConfig;
 }
 
@@ -31,11 +32,13 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final modeIndex = prefs.getInt(AppConstants.apiModeKey) ?? 0;
     final refreshToken = prefs.getString(AppConstants.refreshTokenKey);
     final deviceId = prefs.getInt(AppConstants.deviceIdKey);
+    final offlineMode = prefs.getBool(AppConstants.offlineModeKey) ?? false;
     state = ServerConfig(
       baseUrl: url,
       apiMode: ApiMode.values[modeIndex],
       refreshToken: refreshToken,
       deviceId: deviceId,
+      offlineMode: offlineMode,
     );
   }
 
@@ -69,14 +72,16 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     );
   }
 
+  Future<void> setOfflineMode({required bool enabled}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(AppConstants.offlineModeKey, enabled);
+    state = state.copyWith(offlineMode: enabled);
+  }
+
   Future<void> clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(AppConstants.refreshTokenKey);
     await prefs.remove(AppConstants.deviceIdKey);
-    state = state.copyWith(
-      jwtToken: null,
-      refreshToken: null,
-      deviceId: null,
-    );
+    state = state.copyWith(jwtToken: null, refreshToken: null, deviceId: null);
   }
 }

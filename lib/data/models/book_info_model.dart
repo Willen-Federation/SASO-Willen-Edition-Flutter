@@ -16,12 +16,15 @@ class BookInfoModel {
   final String title;
   final String? author;
   final String? publisher;
+
   /// Raw publication date string (e.g. "20090101" or "2009-01").
   final String? pubDate;
   final String? coverUrl;
+
   /// 定価 (list price) in JPY, when available.
   final int? price;
   final String? description;
+
   /// Which API provided this record: 'openbd' | 'google_books'.
   final String source;
 }

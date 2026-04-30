@@ -6,7 +6,7 @@ part of 'item_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itemByIdHash() => r'543ac3995a09da23617ef2808ab2d81dcb168b5c';
+String _$itemByIdHash() => r'4f778aff6e02e14abde39822e73ca4f64a288c6c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -142,7 +142,7 @@ class _ItemByIdProviderElement extends AutoDisposeFutureProviderElement<Item>
   String get id => (origin as ItemByIdProvider).id;
 }
 
-String _$itemSearchHash() => r'915cb838dbfb411aaa7f68789f7e2a2295351b52';
+String _$itemSearchHash() => r'470cbfa98b843e21ddc453ac8f3c3f5ffaef13fb';
 
 /// See also [itemSearch].
 @ProviderFor(itemSearch)

@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/datasources/mock/mock_api_client.dart';
 import '../../data/datasources/remote/legacy/legacy_api_client.dart';
@@ -8,7 +9,7 @@ import 'server_config_provider.dart';
 part 'category_provider.g.dart';
 
 @riverpod
-Future<List<Category>> categories(CategoriesRef ref) async {
+Future<List<Category>> categories(Ref ref) async {
   final config = ref.watch(serverConfigNotifierProvider);
 
   final client = switch (config.apiMode) {

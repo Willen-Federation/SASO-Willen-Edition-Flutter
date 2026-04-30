@@ -23,6 +23,7 @@ class PriceHistoryEntry {
   final String isbn;
   final int price;
   final String currency;
+
   /// 'openbd' | 'google_books' | 'manual'
   final String source;
   final DateTime fetchedAt;

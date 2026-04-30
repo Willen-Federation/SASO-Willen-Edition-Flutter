@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../domain/value_objects/feature_code.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../domain/value_objects/shelf_id.dart';
 
-class BarcodeScannerPage extends StatefulWidget {
-  const BarcodeScannerPage({super.key, this.returnJanCode = false});
+/// Determines what happens when a barcode is successfully detected.
+enum ScannerMode {
+  /// Navigate to the matching item / shelf / feature page.
+  search,
 
-  /// When true, the first detected barcode is returned to the caller via
-  /// [Navigator.pop] instead of navigating to item/shelf pages.
-  final bool returnJanCode;
+  /// Return the raw barcode string to the caller via [Navigator.pop].
+  /// Backward-compatible replacement for the former [returnJanCode] parameter.
+  register,
+
+  /// Navigate to the inventory adjustment page with the scanned code.
+  inventory,
+}
+
+class BarcodeScannerPage extends StatefulWidget {
+  const BarcodeScannerPage({super.key, this.mode = ScannerMode.search});
+
+  final ScannerMode mode;
 
   @override
   State<BarcodeScannerPage> createState() => _BarcodeScannerPageState();
@@ -29,21 +42,29 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
 
   void _onDetect(BarcodeCapture capture) {
     if (_processing) return;
-    final barcode = capture.barcodes.firstOrNull;
-    final raw = barcode?.rawValue;
+    final raw = capture.barcodes.firstOrNull?.rawValue;
     if (raw == null || raw.isEmpty) return;
 
     setState(() => _processing = true);
+    HapticFeedback.mediumImpact();
+    SystemSound.play(SystemSoundType.click);
     _route(raw);
   }
 
   void _route(String raw) {
-    // JAN capture mode: return the raw barcode value to the caller.
-    if (widget.returnJanCode) {
-      context.pop(raw);
-      return;
+    switch (widget.mode) {
+      case ScannerMode.register:
+        context.pop(raw);
+        return;
+      case ScannerMode.inventory:
+        context.push('/inventory/adjust?janCode=${Uri.encodeComponent(raw)}');
+        return;
+      case ScannerMode.search:
+        _routeSearch(raw);
     }
+  }
 
+  void _routeSearch(String raw) {
     // 12-digit → feature code → item detail
     final featureCode = FeatureCode.tryParse(raw);
     if (featureCode != null) {
@@ -65,7 +86,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       return;
     }
 
-    // ISBN detected — route directly to registration with auto-fill.
+    // ISBN → registration with auto-fill
     if (IsbnLookupService.isIsbn(raw)) {
       context.pushReplacement(
         '/items/register?janCode=${Uri.encodeComponent(raw)}',
@@ -73,7 +94,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       return;
     }
 
-    // Unrecognized code — offer to register as new item.
+    // Unrecognized — offer to register
     setState(() => _processing = false);
     _offerItemRegistration(raw);
   }
@@ -81,35 +102,46 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   void _offerItemRegistration(String janCode) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('コードを認識できません'),
-        content: Text(
-          '$janCode\n\nこのコードで新しいアイテムを登録しますか？',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => ctx.pop(),
-            child: const Text('キャンセル'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('コードを認識できません'),
+            content: Text('$janCode\n\nこのコードで新しいアイテムを登録しますか？'),
+            actions: [
+              TextButton(
+                onPressed: () => ctx.pop(),
+                child: const Text('キャンセル'),
+              ),
+              FilledButton.icon(
+                onPressed: () {
+                  ctx.pop();
+                  context.pushReplacement(
+                    '/items/register?janCode=${Uri.encodeComponent(janCode)}',
+                  );
+                },
+                icon: const Icon(Icons.add_box_outlined),
+                label: const Text('アイテム登録'),
+              ),
+            ],
           ),
-          FilledButton.icon(
-            onPressed: () {
-              ctx.pop();
-              context.pushReplacement(
-                '/items/register?janCode=${Uri.encodeComponent(janCode)}',
-              );
-            },
-            icon: const Icon(Icons.add_box_outlined),
-            label: const Text('アイテム登録'),
-          ),
-        ],
-      ),
     );
   }
+
+  String get _title => switch (widget.mode) {
+    ScannerMode.search => 'バーコードスキャン',
+    ScannerMode.register => 'バーコード読み取り',
+    ScannerMode.inventory => '入出庫スキャン',
+  };
+
+  String get _hint => switch (widget.mode) {
+    ScannerMode.search => 'バーコードをフレーム内に合わせてください',
+    ScannerMode.register => '読み取るバーコードをフレーム内に合わせてください',
+    ScannerMode.inventory => '棚または商品のバーコードをスキャンしてください',
+  };
 
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('バーコードスキャン'),
+      title: Text(_title),
       actions: [
         IconButton(
           icon: const Icon(Icons.flash_on),
@@ -139,14 +171,14 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         ),
         if (_processing)
           const Center(child: CircularProgressIndicator(color: Colors.white)),
-        const Positioned(
+        Positioned(
           bottom: 48,
           left: 0,
           right: 0,
           child: Text(
-            'バーコードをフレーム内に合わせてください',
+            _hint,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 14),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
         ),
       ],

@@ -26,21 +26,25 @@ class FeatureFlagModel {
         description: json['description'] as String? ?? '',
         enabled: json['enabled'] as bool? ?? false,
         rolloutPercent: json['rolloutPercent'] as int? ?? 0,
-        conditions: (json['conditions'] as Map<String, dynamic>?)
+        conditions:
+            (json['conditions'] as Map<String, dynamic>?)
                 ?.cast<String, dynamic>() ??
             const {},
         errorThreshold: json['errorThreshold'] as int? ?? 0,
         errorWindowMinutes: json['errorWindowMinutes'] as int? ?? 60,
-        autoDisabledAt: json['autoDisabledAt'] != null
-            ? DateTime.parse(json['autoDisabledAt'] as String)
-            : null,
+        autoDisabledAt:
+            json['autoDisabledAt'] != null
+                ? DateTime.parse(json['autoDisabledAt'] as String)
+                : null,
         autoDisableReason: json['autoDisableReason'] as String?,
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'] as String)
-            : null,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'] as String)
-            : null,
+        createdAt:
+            json['createdAt'] != null
+                ? DateTime.parse(json['createdAt'] as String)
+                : null,
+        updatedAt:
+            json['updatedAt'] != null
+                ? DateTime.parse(json['updatedAt'] as String)
+                : null,
       );
 
   final int? id;

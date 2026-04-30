@@ -8,13 +8,18 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../data/datasources/local/pending_registration_dao.dart';
 import '../../../data/datasources/local/price_history_dao.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
+import '../../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../../data/models/book_info_model.dart';
 import '../../../data/models/mcp_category_model.dart';
 import '../../../data/models/mcp_item_model.dart';
+import '../../../data/models/pending_registration.dart';
 import '../../../data/models/price_history_entry.dart';
+import '../../providers/isbn_provider.dart';
 import '../../providers/mcp_provider.dart';
+import '../../providers/server_config_provider.dart';
 import '../../widgets/price_history_chart.dart';
 
 class ItemRegisterPage extends ConsumerStatefulWidget {
@@ -39,6 +44,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   bool _saving = false;
   String? _errorMessage;
   McpItemModel? _savedItem;
+  String? _draftId;
 
   BookInfoModel? _bookInfo;
   bool _fetchingIsbn = false;
@@ -84,9 +90,9 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       final info = await service.lookup(isbn);
       if (!mounted) return;
       if (info == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('書籍情報が見つかりませんでした')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('書籍情報が見つかりませんでした')));
         return;
       }
       setState(() {
@@ -128,14 +134,18 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => DraggableScrollableSheet(
-        initialChildSize: 0.55,
-        minChildSize: 0.3,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (_, scrollController) =>
-            _PriceHistorySheet(isbn: isbn, scrollController: scrollController),
-      ),
+      builder:
+          (_) => DraggableScrollableSheet(
+            initialChildSize: 0.55,
+            minChildSize: 0.3,
+            maxChildSize: 0.9,
+            expand: false,
+            builder:
+                (_, scrollController) => _PriceHistorySheet(
+                  isbn: isbn,
+                  scrollController: scrollController,
+                ),
+          ),
     );
   }
 
@@ -157,37 +167,101 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       return;
     }
 
-    final client = ref.read(mcpClientProvider);
-    if (client == null) {
-      setState(() => _errorMessage = 'サーバーに接続されていません (REST モード + JWT 必要)');
-      return;
-    }
-
     setState(() {
       _saving = true;
       _errorMessage = null;
     });
 
+    final name = _nameController.text.trim();
+    final janCode =
+        _janController.text.trim().isEmpty ? null : _janController.text.trim();
+    final price = int.tryParse(_priceController.text) ?? 0;
+    final stock = int.tryParse(_stockController.text) ?? 0;
+
+    // 1. Save to local outbox first (guarantees data survives network failures).
+    final db = await ref.read(databaseHelperProvider.future);
+    final dao = PendingRegistrationDao(db.db);
+    final localId = await dao.insert(
+      PendingRegistration(
+        name: name,
+        categoryId: _selectedCategory!.id,
+        janCode: janCode,
+        price: price,
+        stock: stock,
+        imagePath: _capturedImage?.path,
+        draftId: _draftId,
+        status: 'pending',
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    // 2. Offline mode: queue only, no server call.
+    final config = ref.read(serverConfigNotifierProvider);
+    if (config.offlineMode) {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _savedItem = _localPreviewItem(name, price, stock);
+        });
+      }
+      return;
+    }
+
+    // 3. Attempt server submission.
     try {
-      final item = await registerItem(
-        client,
-        RegisterItemParams(
-          name: _nameController.text.trim(),
+      await dao.updateStatus(localId, 'syncing');
+
+      McpItemModel item;
+      if (config.apiMode == ApiMode.rest && config.jwtToken != null) {
+        final restClient = RestV1ApiClient(
+          serverUrl: config.baseUrl,
+          jwtToken: config.jwtToken!,
+        );
+        item = await restClient.registerItemWithAi(
+          name: name,
+          janCode: janCode,
           categoryId: _selectedCategory!.id,
-          janCode: _janController.text.trim().isEmpty
-              ? null
-              : _janController.text.trim(),
-          price: int.tryParse(_priceController.text) ?? 0,
-          stock: int.tryParse(_stockController.text) ?? 0,
-        ),
-      );
+          price: price,
+          stock: stock,
+          image: _capturedImage,
+          draftId: _draftId,
+        );
+      } else {
+        final client = ref.read(mcpClientProvider);
+        if (client == null) throw Exception('サーバーに接続されていません');
+        item = await registerItem(
+          client,
+          RegisterItemParams(
+            name: name,
+            categoryId: _selectedCategory!.id,
+            janCode: janCode,
+            price: price,
+            stock: stock,
+            draftId: _draftId,
+          ),
+        );
+      }
+
+      await dao.updateStatus(localId, 'completed', syncedAt: DateTime.now());
       if (mounted) setState(() => _savedItem = item);
     } catch (e) {
-      if (mounted) setState(() => _errorMessage = '登録失敗: $e');
+      await dao.updateStatus(localId, 'failed', errorMessage: '$e');
+      if (mounted) {
+        setState(() => _errorMessage = '送信失敗 (ローカル保存済み): $e');
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
+
+  McpItemModel _localPreviewItem(String name, int price, int stock) =>
+      McpItemModel(
+        id: 0,
+        name: name,
+        categoryId: _selectedCategory?.id,
+        price: price,
+        stock: stock,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -217,8 +291,8 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 border: OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.sentences,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
+              validator:
+                  (v) => (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
             ),
             const SizedBox(height: 12),
 
@@ -232,9 +306,10 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'スキャンして入力',
-                  onPressed: () => context.push('/scanner/jan').then((code) {
-                    if (code is String) _janController.text = code;
-                  }),
+                  onPressed:
+                      () => context.push('/scanner/jan').then((code) {
+                        if (code is String) _janController.text = code;
+                      }),
                 ),
               ),
               keyboardType: TextInputType.number,
@@ -309,13 +384,14 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
 
             FilledButton.icon(
               onPressed: _saving ? null : _save,
-              icon: _saving
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.save_outlined),
+              icon:
+                  _saving
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.save_outlined),
               label: Text(_saving ? '登録中…' : '登録する'),
             ),
           ],
@@ -344,16 +420,17 @@ class _IsbnFetchBanner extends StatelessWidget {
         leading: const Icon(Icons.menu_book_outlined),
         title: const Text('ISBNを検出しました'),
         subtitle: const Text('書籍情報を自動取得できます'),
-        trailing: fetching
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : FilledButton.tonal(
-                onPressed: onFetch,
-                child: const Text('取得'),
-              ),
+        trailing:
+            fetching
+                ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : FilledButton.tonal(
+                  onPressed: onFetch,
+                  child: const Text('取得'),
+                ),
       ),
     );
   }
@@ -387,12 +464,13 @@ class _BookInfoCard extends StatelessWidget {
                   width: 60,
                   height: 80,
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
-                    width: 60,
-                    height: 80,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.book_outlined, size: 28),
-                  ),
+                  placeholder:
+                      (_, __) => Container(
+                        width: 60,
+                        height: 80,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.book_outlined, size: 28),
+                      ),
                   errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
                 ),
               )
@@ -430,10 +508,9 @@ class _BookInfoCard extends StatelessWidget {
                   if (book.publisher != null)
                     Text(
                       book.publisher!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: Colors.grey),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -520,13 +597,13 @@ class _PriceHistorySheet extends ConsumerWidget {
         const Divider(height: 1),
         Expanded(
           child: historyAsync.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('取得失敗: $e')),
-            data: (entries) => ListView(
-              controller: scrollController,
-              children: [PriceHistoryChart(entries: entries)],
-            ),
+            data:
+                (entries) => ListView(
+                  controller: scrollController,
+                  children: [PriceHistoryChart(entries: entries)],
+                ),
           ),
         ),
       ],
@@ -596,14 +673,6 @@ class _ImageCaptureTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              '※ 画像アップロードはサーバー対応後に有効になります',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.grey),
-            ),
           ],
         ),
       ),
@@ -616,10 +685,7 @@ class _ImageCaptureTile extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _CategoryPickerTile extends ConsumerWidget {
-  const _CategoryPickerTile({
-    required this.selected,
-    required this.onSelected,
-  });
+  const _CategoryPickerTile({required this.selected, required this.onSelected});
 
   final McpCategoryModel? selected;
   final ValueChanged<McpCategoryModel> onSelected;
@@ -630,31 +696,34 @@ class _CategoryPickerTile extends ConsumerWidget {
 
     return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
-      error: (e, _) => Text(
-        'カテゴリ取得失敗: $e',
-        style: TextStyle(color: Theme.of(context).colorScheme.error),
-      ),
-      data: (categories) => DropdownButtonFormField<McpCategoryModel>(
-        decoration: const InputDecoration(
-          labelText: 'カテゴリ *',
-          border: OutlineInputBorder(),
-        ),
-        value: selected,
-        hint: const Text('カテゴリを選択'),
-        items: categories
-            .map(
-              (cat) => DropdownMenuItem(
-                value: cat,
-                child: Text(
-                  '${'　' * cat.depth}${cat.displayName} (${cat.code})',
-                ),
-              ),
-            )
-            .toList(),
-        onChanged: (v) {
-          if (v != null) onSelected(v);
-        },
-      ),
+      error:
+          (e, _) => Text(
+            'カテゴリ取得失敗: $e',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+      data:
+          (categories) => DropdownButtonFormField<McpCategoryModel>(
+            decoration: const InputDecoration(
+              labelText: 'カテゴリ *',
+              border: OutlineInputBorder(),
+            ),
+            value: selected,
+            hint: const Text('カテゴリを選択'),
+            items:
+                categories
+                    .map(
+                      (cat) => DropdownMenuItem(
+                        value: cat,
+                        child: Text(
+                          '${'　' * cat.depth}${cat.displayName} (${cat.code})',
+                        ),
+                      ),
+                    )
+                    .toList(),
+            onChanged: (v) {
+              if (v != null) onSelected(v);
+            },
+          ),
     );
   }
 }
@@ -689,7 +758,11 @@ class _SuccessView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Text('ID: ${item.id}  在庫: ${item.stock}'),
+              Text(
+                item.id == 0
+                    ? '保留中 (ローカル保存済み)  在庫: ${item.stock}'
+                    : 'ID: ${item.id}  在庫: ${item.stock}',
+              ),
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

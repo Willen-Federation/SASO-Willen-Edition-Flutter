@@ -7,7 +7,7 @@ part of 'feature_flag_provider.dart';
 // **************************************************************************
 
 String _$featureFlagServiceHash() =>
-    r'31c34abaebe5136d54a889acb9ca95e1cd9783a7';
+    r'785a2bdc9e6ff086a6051a75ff1b17811dd50e45';
 
 /// See also [featureFlagService].
 @ProviderFor(featureFlagService)
@@ -26,7 +26,7 @@ final featureFlagServiceProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FeatureFlagServiceRef = AutoDisposeProviderRef<FeatureFlagService>;
-String _$featureFlagHash() => r'ef7606c5defe001435ec16119d0b555c66dc5c1e';
+String _$featureFlagHash() => r'5dfc0a130fc4f8eac2034a44641ef64c48c2c0dc';
 
 /// Copied from Dart SDK
 class _SystemHash {

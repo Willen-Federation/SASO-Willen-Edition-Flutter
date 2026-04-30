@@ -1,6 +1,6 @@
 /// Response from POST /api/v1/mobile/pairing-codes.
 ///
-/// qrPayload  — SASO1:<base64url_token>|<server_url> — encode this as QR.
+/// qrPayload  — SASO1:[base64url_token]|[server_url] — encode this as QR.
 /// qrDataUri  — ready-to-use data URI (data:image/png;base64,...) for display.
 class PairingCodeModel {
   const PairingCodeModel({
