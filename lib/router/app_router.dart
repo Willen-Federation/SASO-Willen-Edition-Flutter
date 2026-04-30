@@ -67,9 +67,15 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: '/splash', builder: (_, __) => const SplashPage()),
       GoRoute(path: '/auth/login', builder: (_, __) => const LoginPage()),
       GoRoute(path: '/auth/qr', builder: (_, __) => const QrPairingPage()),
-      GoRoute(path: '/settings', builder: (_, __) => const ServerSettingsPage()),
+      GoRoute(
+        path: '/settings',
+        builder: (_, __) => const ServerSettingsPage(),
+      ),
       GoRoute(path: '/home', builder: (_, __) => const HomePage()),
-      GoRoute(path: '/items/search', builder: (_, __) => const ItemSearchPage()),
+      GoRoute(
+        path: '/items/search',
+        builder: (_, __) => const ItemSearchPage(),
+      ),
       GoRoute(
         path: '/items/:id',
         builder:
@@ -89,7 +95,8 @@ GoRouter appRouter(Ref ref) {
       // Legacy route kept for backward compatibility.
       GoRoute(
         path: '/scanner/jan',
-        builder: (_, __) => const BarcodeScannerPage(mode: ScannerMode.register),
+        builder:
+            (_, __) => const BarcodeScannerPage(mode: ScannerMode.register),
       ),
       GoRoute(
         path: '/categories',
