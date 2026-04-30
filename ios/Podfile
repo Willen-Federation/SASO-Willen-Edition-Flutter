@@ -42,5 +42,23 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['DEFINES_MODULE'] = 'YES'
     end
+
+    # mobile_scanner 6.x is Swift-only: MobileScannerPlugin.h was removed.
+    # GeneratedPluginRegistrant.m falls through to @import mobile_scanner which
+    # Clang cannot resolve in either framework linkage mode.
+    # This script runs after Swift compiles (generating mobile_scanner-Swift.h)
+    # and creates a stub MobileScannerPlugin.h that imports the Swift bridge,
+    # so __has_include returns true and @import is never reached.
+    next unless target.name == 'mobile_scanner'
+
+    phase = target.new_shell_script_build_phase('Create MobileScannerPlugin ObjC stub header')
+    phase.shell_script = <<~'BASH'
+      HEADERS="${BUILT_PRODUCTS_DIR}/mobile_scanner.framework/Headers"
+      SWIFT_H="${HEADERS}/mobile_scanner-Swift.h"
+      STUB="${HEADERS}/MobileScannerPlugin.h"
+      if [ -f "${SWIFT_H}" ] && [ ! -f "${STUB}" ]; then
+        printf '#import <mobile_scanner/mobile_scanner-Swift.h>\n' > "${STUB}"
+      fi
+    BASH
   end
 end
