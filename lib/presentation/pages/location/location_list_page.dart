@@ -19,15 +19,14 @@ class LocationListPage extends ConsumerWidget {
     final locationsAsync = ref.watch(storageLocationsProvider(parentId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(parentName ?? '場所一覧'),
-      ),
+      appBar: AppBar(title: Text(parentName ?? '場所一覧')),
       body: locationsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => _ErrorView(
-          error: e,
-          onRetry: () => ref.invalidate(storageLocationsProvider(parentId)),
-        ),
+        error:
+            (e, _) => _ErrorView(
+              error: e,
+              onRetry: () => ref.invalidate(storageLocationsProvider(parentId)),
+            ),
         data: (locations) {
           if (locations.isEmpty) {
             return const _EmptyView();
@@ -93,10 +92,11 @@ class _LocationTile extends StatelessWidget {
           const Icon(Icons.chevron_right),
         ],
       ),
-      onTap: () => context.push(
-        '/locations',
-        extra: {'parentId': location.id, 'parentName': location.name},
-      ),
+      onTap:
+          () => context.push(
+            '/locations',
+            extra: {'parentId': location.id, 'parentName': location.name},
+          ),
     );
   }
 }
@@ -111,10 +111,7 @@ class _EmptyView extends StatelessWidget {
       children: [
         const Icon(Icons.warehouse_outlined, size: 64, color: Colors.grey),
         const SizedBox(height: 12),
-        Text(
-          '場所が登録されていません',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
+        Text('場所が登録されていません', style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(height: 4),
         const Text('サーバーでストレージロケーションを作成してください'),
       ],

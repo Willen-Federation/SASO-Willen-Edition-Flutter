@@ -8,7 +8,7 @@ import '../../../../data/models/book_info_model.dart';
 /// Google Books fallback.  Does not require any API key.
 class IsbnLookupService {
   IsbnLookupService({http.Client? httpClient})
-      : _http = httpClient ?? http.Client();
+    : _http = httpClient ?? http.Client();
 
   final http.Client _http;
 
@@ -70,8 +70,7 @@ class IsbnLookupService {
     final resp = await _http.get(uri).timeout(_timeout);
     if (resp.statusCode != 200) return null;
 
-    final List<dynamic> data =
-        jsonDecode(resp.body) as List<dynamic>;
+    final List<dynamic> data = jsonDecode(resp.body) as List<dynamic>;
     if (data.isEmpty || data[0] == null) return null;
 
     final book = data[0] as Map<String, dynamic>;
@@ -136,8 +135,7 @@ class IsbnLookupService {
 
     final saleInfo = item['saleInfo'] as Map<String, dynamic>?;
     int? price;
-    final retailPrice =
-        saleInfo?['retailPrice'] as Map<String, dynamic>?;
+    final retailPrice = saleInfo?['retailPrice'] as Map<String, dynamic>?;
     if (retailPrice != null) {
       price = (retailPrice['amount'] as num?)?.round();
     }
