@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../push_notification_service.dart';
 
@@ -7,7 +8,11 @@ class FcmPushService implements PushNotificationService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   @override
+  bool get isSupported => Firebase.apps.isNotEmpty;
+
+  @override
   Future<void> initialize() async {
+    if (!isSupported) return;
     await requestPermission();
 
     // Show banner + badge + sound when app is in foreground (iOS)
@@ -64,9 +69,6 @@ class FcmPushService implements PushNotificationService {
           data: msg.data.cast<String, String>(),
         ),
       );
-
-  @override
-  bool get isSupported => true;
 }
 
 @pragma('vm:entry-point')

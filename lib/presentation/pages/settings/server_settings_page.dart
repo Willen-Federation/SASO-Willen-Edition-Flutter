@@ -109,9 +109,11 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ...ApiMode.values.map(
                   (mode) => RadioListTile<ApiMode>(
                     value: mode,
+                    // ignore: deprecated_member_use
                     groupValue: _selectedMode,
                     title: Text(_modeLabel(mode)),
                     subtitle: Text(_modeDescription(mode)),
+                    // ignore: deprecated_member_use
                     onChanged: (v) {
                       if (v != null) setState(() => _selectedMode = v);
                     },

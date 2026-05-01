@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ServerConfig {
 
- String get baseUrl; ApiMode get apiMode; String? get sessionCookie; String? get jwtToken; String? get refreshToken; int? get deviceId;
+ String get baseUrl; ApiMode get apiMode; String? get sessionCookie; String? get jwtToken; String? get refreshToken; int? get deviceId; bool get offlineMode;
 /// Create a copy of ServerConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ServerConfigCopyWith<ServerConfig> get copyWith => _$ServerConfigCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerConfig&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiMode, apiMode) || other.apiMode == apiMode)&&(identical(other.sessionCookie, sessionCookie) || other.sessionCookie == sessionCookie)&&(identical(other.jwtToken, jwtToken) || other.jwtToken == jwtToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerConfig&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiMode, apiMode) || other.apiMode == apiMode)&&(identical(other.sessionCookie, sessionCookie) || other.sessionCookie == sessionCookie)&&(identical(other.jwtToken, jwtToken) || other.jwtToken == jwtToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.offlineMode, offlineMode) || other.offlineMode == offlineMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,baseUrl,apiMode,sessionCookie,jwtToken,refreshToken,deviceId);
+int get hashCode => Object.hash(runtimeType,baseUrl,apiMode,sessionCookie,jwtToken,refreshToken,deviceId,offlineMode);
 
 @override
 String toString() {
-  return 'ServerConfig(baseUrl: $baseUrl, apiMode: $apiMode, sessionCookie: $sessionCookie, jwtToken: $jwtToken, refreshToken: $refreshToken, deviceId: $deviceId)';
+  return 'ServerConfig(baseUrl: $baseUrl, apiMode: $apiMode, sessionCookie: $sessionCookie, jwtToken: $jwtToken, refreshToken: $refreshToken, deviceId: $deviceId, offlineMode: $offlineMode)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ServerConfigCopyWith<$Res>  {
   factory $ServerConfigCopyWith(ServerConfig value, $Res Function(ServerConfig) _then) = _$ServerConfigCopyWithImpl;
 @useResult
 $Res call({
- String baseUrl, ApiMode apiMode, String? sessionCookie, String? jwtToken, String? refreshToken, int? deviceId
+ String baseUrl, ApiMode apiMode, String? sessionCookie, String? jwtToken, String? refreshToken, int? deviceId, bool offlineMode
 });
 
 
@@ -62,7 +62,7 @@ class _$ServerConfigCopyWithImpl<$Res>
 
 /// Create a copy of ServerConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? baseUrl = null,Object? apiMode = null,Object? sessionCookie = freezed,Object? jwtToken = freezed,Object? refreshToken = freezed,Object? deviceId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? baseUrl = null,Object? apiMode = null,Object? sessionCookie = freezed,Object? jwtToken = freezed,Object? refreshToken = freezed,Object? deviceId = freezed,Object? offlineMode = null,}) {
   return _then(_self.copyWith(
 baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiMode: null == apiMode ? _self.apiMode : apiMode // ignore: cast_nullable_to_non_nullable
@@ -70,7 +70,8 @@ as ApiMode,sessionCookie: freezed == sessionCookie ? _self.sessionCookie : sessi
 as String?,jwtToken: freezed == jwtToken ? _self.jwtToken : jwtToken // ignore: cast_nullable_to_non_nullable
 as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,deviceId: freezed == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,offlineMode: null == offlineMode ? _self.offlineMode : offlineMode // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId,  bool offlineMode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServerConfig() when $default != null:
-return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId);case _:
+return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId,_that.offlineMode);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId,  bool offlineMode)  $default,) {final _that = this;
 switch (_that) {
 case _ServerConfig():
-return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId);case _:
+return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId,_that.offlineMode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String baseUrl,  ApiMode apiMode,  String? sessionCookie,  String? jwtToken,  String? refreshToken,  int? deviceId,  bool offlineMode)?  $default,) {final _that = this;
 switch (_that) {
 case _ServerConfig() when $default != null:
-return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId);case _:
+return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_that.refreshToken,_that.deviceId,_that.offlineMode);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_
 
 
 class _ServerConfig implements ServerConfig {
-  const _ServerConfig({this.baseUrl = '', this.apiMode = ApiMode.mock, this.sessionCookie, this.jwtToken, this.refreshToken, this.deviceId});
+  const _ServerConfig({this.baseUrl = '', this.apiMode = ApiMode.mock, this.sessionCookie, this.jwtToken, this.refreshToken, this.deviceId, this.offlineMode = false});
   
 
 @override@JsonKey() final  String baseUrl;
@@ -220,6 +221,7 @@ class _ServerConfig implements ServerConfig {
 @override final  String? jwtToken;
 @override final  String? refreshToken;
 @override final  int? deviceId;
+@override@JsonKey() final  bool offlineMode;
 
 /// Create a copy of ServerConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +233,16 @@ _$ServerConfigCopyWith<_ServerConfig> get copyWith => __$ServerConfigCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServerConfig&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiMode, apiMode) || other.apiMode == apiMode)&&(identical(other.sessionCookie, sessionCookie) || other.sessionCookie == sessionCookie)&&(identical(other.jwtToken, jwtToken) || other.jwtToken == jwtToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServerConfig&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiMode, apiMode) || other.apiMode == apiMode)&&(identical(other.sessionCookie, sessionCookie) || other.sessionCookie == sessionCookie)&&(identical(other.jwtToken, jwtToken) || other.jwtToken == jwtToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.deviceId, deviceId) || other.deviceId == deviceId)&&(identical(other.offlineMode, offlineMode) || other.offlineMode == offlineMode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,baseUrl,apiMode,sessionCookie,jwtToken,refreshToken,deviceId);
+int get hashCode => Object.hash(runtimeType,baseUrl,apiMode,sessionCookie,jwtToken,refreshToken,deviceId,offlineMode);
 
 @override
 String toString() {
-  return 'ServerConfig(baseUrl: $baseUrl, apiMode: $apiMode, sessionCookie: $sessionCookie, jwtToken: $jwtToken, refreshToken: $refreshToken, deviceId: $deviceId)';
+  return 'ServerConfig(baseUrl: $baseUrl, apiMode: $apiMode, sessionCookie: $sessionCookie, jwtToken: $jwtToken, refreshToken: $refreshToken, deviceId: $deviceId, offlineMode: $offlineMode)';
 }
 
 
@@ -251,7 +253,7 @@ abstract mixin class _$ServerConfigCopyWith<$Res> implements $ServerConfigCopyWi
   factory _$ServerConfigCopyWith(_ServerConfig value, $Res Function(_ServerConfig) _then) = __$ServerConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String baseUrl, ApiMode apiMode, String? sessionCookie, String? jwtToken, String? refreshToken, int? deviceId
+ String baseUrl, ApiMode apiMode, String? sessionCookie, String? jwtToken, String? refreshToken, int? deviceId, bool offlineMode
 });
 
 
@@ -268,7 +270,7 @@ class __$ServerConfigCopyWithImpl<$Res>
 
 /// Create a copy of ServerConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? baseUrl = null,Object? apiMode = null,Object? sessionCookie = freezed,Object? jwtToken = freezed,Object? refreshToken = freezed,Object? deviceId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? baseUrl = null,Object? apiMode = null,Object? sessionCookie = freezed,Object? jwtToken = freezed,Object? refreshToken = freezed,Object? deviceId = freezed,Object? offlineMode = null,}) {
   return _then(_ServerConfig(
 baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiMode: null == apiMode ? _self.apiMode : apiMode // ignore: cast_nullable_to_non_nullable
@@ -276,7 +278,8 @@ as ApiMode,sessionCookie: freezed == sessionCookie ? _self.sessionCookie : sessi
 as String?,jwtToken: freezed == jwtToken ? _self.jwtToken : jwtToken // ignore: cast_nullable_to_non_nullable
 as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,deviceId: freezed == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,offlineMode: null == offlineMode ? _self.offlineMode : offlineMode // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
