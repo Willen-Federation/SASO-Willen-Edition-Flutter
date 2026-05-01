@@ -37,8 +37,9 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
 
-  # Barcode scanning (AVFoundation on iOS 26)
-  mobile_scanner: ^6.0.0
+  # Barcode scanning. 7.x switches from Google MLKit to AVFoundation /
+  # Vision on iOS, which is required for arm64 iOS 26+ simulators.
+  mobile_scanner: ^7.2.0
 
   # Image capture & photo library access
   image_picker: ^1.1.2

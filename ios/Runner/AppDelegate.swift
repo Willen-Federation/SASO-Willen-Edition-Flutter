@@ -5,7 +5,7 @@ import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate,
-    UNUserNotificationCenterDelegate, MessagingDelegate {
+    MessagingDelegate {
 
   override func application(
     _ application: UIApplication,
