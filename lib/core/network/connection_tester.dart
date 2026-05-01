@@ -92,6 +92,9 @@ class ConnectionTester {
       'Accept': 'application/json, text/html',
       if (config.sessionCookie != null) 'Cookie': config.sessionCookie!,
     },
-    ApiMode.rest => const {'Accept': 'application/json'},
+    ApiMode.rest => {
+      'Accept': 'application/json',
+      if (config.jwtToken != null) 'Authorization': 'Bearer ${config.jwtToken!}',
+    },
   };
 }

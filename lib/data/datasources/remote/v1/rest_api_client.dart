@@ -23,19 +23,23 @@ import '../saso_api_client.dart';
 class RestV1ApiClient implements SasoApiClient {
   RestV1ApiClient({
     required this.serverUrl,
-    required this.jwtToken,
+    this.jwtToken,
     http.Client? httpClient,
   }) : _http = httpClient ?? http.Client();
 
   final String serverUrl;
-  final String jwtToken;
+
+  /// Bearer JWT for authenticated endpoints. Optional — leave null when
+  /// calling pre-auth endpoints such as `POST /api/v1/mobile/connect`.
+  final String? jwtToken;
   final http.Client _http;
 
   @override
   bool get isMock => false;
 
   Map<String, String> get _headers => {
-    'Authorization': 'Bearer $jwtToken',
+    if (jwtToken != null && jwtToken!.isNotEmpty)
+      'Authorization': 'Bearer $jwtToken',
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
@@ -149,8 +153,8 @@ class RestV1ApiClient implements SasoApiClient {
           uri,
           headers: _headers,
           body: jsonEncode({
-            'pairing_token': pairingToken,
-            'device_name': deviceName,
+            'token': pairingToken,
+            'deviceName': deviceName,
           }),
         )
         .timeout(AppConstants.httpTimeout);

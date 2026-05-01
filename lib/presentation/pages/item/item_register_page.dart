@@ -14,6 +14,7 @@ import '../../../data/models/book_info_model.dart';
 import '../../../data/models/mcp_category_model.dart';
 import '../../../data/models/mcp_item_model.dart';
 import '../../../data/models/price_history_entry.dart';
+import '../../providers/isbn_provider.dart';
 import '../../providers/mcp_provider.dart';
 import '../../widgets/price_history_chart.dart';
 
@@ -639,7 +640,7 @@ class _CategoryPickerTile extends ConsumerWidget {
           labelText: 'カテゴリ *',
           border: OutlineInputBorder(),
         ),
-        value: selected,
+        initialValue: selected,
         hint: const Text('カテゴリを選択'),
         items: categories
             .map(

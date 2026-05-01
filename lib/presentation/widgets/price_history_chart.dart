@@ -1,3 +1,5 @@
+import 'dart:ui' as ui show TextDirection;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -159,7 +161,7 @@ class _SparklinePainter extends CustomPainter {
     void drawLabel(String text, Offset anchor) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
-        textDirection: TextDirection.ltr,
+        textDirection: ui.TextDirection.ltr,
       )..layout();
       tp.paint(
         canvas,
@@ -175,7 +177,7 @@ class _SparklinePainter extends CustomPainter {
     void drawDateLabel(String text, double x, {bool right = false}) {
       final tp = TextPainter(
         text: TextSpan(text: text, style: dateStyle),
-        textDirection: TextDirection.ltr,
+        textDirection: ui.TextDirection.ltr,
       )..layout();
       canvas.drawText(
         tp,

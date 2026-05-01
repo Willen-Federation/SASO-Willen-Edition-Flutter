@@ -56,6 +56,12 @@ dependencies:
   # OIDC / OAuth2 [ff_auth_oidc]
   flutter_appauth: ^9.0.0
 
+  # Mobile pairing flow — opens the server's /m/setup URL in the system
+  # in-app browser (ASWebAuthenticationSession on iOS, Custom Tabs on
+  # Android, popup on web) and parses the jp.willen.saso://callback
+  # fragment after the user authenticates.
+  flutter_web_auth_2: ^4.1.0
+
   # UI
   cupertino_icons: ^1.0.8
   cached_network_image: ^3.4.1

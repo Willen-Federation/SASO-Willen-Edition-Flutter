@@ -7,6 +7,7 @@ import '../presentation/pages/item/item_detail_page.dart';
 import '../presentation/pages/item/item_register_page.dart';
 import '../presentation/pages/item/item_search_page.dart';
 import '../presentation/pages/location/location_list_page.dart';
+import '../presentation/pages/registration/registration_page.dart';
 import '../presentation/pages/scanner/barcode_scanner_page.dart';
 import '../presentation/pages/settings/server_settings_page.dart';
 import '../presentation/pages/shelf/shelf_view_page.dart';
@@ -21,6 +22,10 @@ GoRouter appRouter(AppRouterRef ref) => GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (_, __) => const SplashPage()),
+    GoRoute(
+      path: '/register',
+      builder: (_, __) => const RegistrationPage(),
+    ),
     GoRoute(path: '/settings', builder: (_, __) => const ServerSettingsPage()),
     GoRoute(path: '/home', builder: (_, __) => const HomePage()),
     GoRoute(path: '/items/search', builder: (_, __) => const ItemSearchPage()),
