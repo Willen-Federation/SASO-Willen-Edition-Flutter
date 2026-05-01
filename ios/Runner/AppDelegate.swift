@@ -15,8 +15,13 @@ import UserNotifications
     UNUserNotificationCenter.current().delegate = self
     Messaging.messaging().delegate = self
 
-    // Request APNs token early; firebase_messaging Flutter plugin forwards it to FCM.
+    // Request APNs token early; firebase_messaging Flutter plugin forwards
+    // it to FCM. On the iOS simulator there is no aps-environment
+    // entitlement, so calling this raises an uncaught NSCocoaError —
+    // we skip on the simulator and let real builds register.
+    #if !targetEnvironment(simulator)
     application.registerForRemoteNotifications()
+    #endif
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

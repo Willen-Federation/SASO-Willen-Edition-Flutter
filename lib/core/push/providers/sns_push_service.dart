@@ -9,6 +9,10 @@ import '../push_notification_service.dart';
 /// (excluded from git for real deployments; stub committed for open-source builds).
 class SnsPushService implements PushNotificationService {
   String? _token;
+  bool _ready = false;
+
+  @override
+  bool get isSupported => Amplify.isConfigured;
 
   @override
   Future<void> initialize() async {
@@ -22,6 +26,7 @@ class SnsPushService implements PushNotificationService {
         return;
       }
     }
+    _ready = true;
     await requestPermission();
 
     Amplify.Notifications.Push.onTokenReceived.listen((token) {
@@ -45,25 +50,26 @@ class SnsPushService implements PushNotificationService {
   Future<PushMessage?> getInitialMessage() async => null;
 
   @override
-  Stream<PushMessage> get onMessage =>
-      Amplify.Notifications.Push.onNotificationReceivedInForeground.map(
-        (event) => PushMessage(
-          title: event.title ?? '',
-          body: event.body ?? '',
-          data: Map<String, String>.from(event.data),
-        ),
-      );
+  Stream<PushMessage> get onMessage {
+    if (!_ready) return const Stream<PushMessage>.empty();
+    return Amplify.Notifications.Push.onNotificationReceivedInForeground.map(
+      (event) => PushMessage(
+        title: event.title ?? '',
+        body: event.body ?? '',
+        data: Map<String, String>.from(event.data),
+      ),
+    );
+  }
 
   @override
-  Stream<PushMessage> get onMessageOpenedApp =>
-      Amplify.Notifications.Push.onNotificationOpened.map(
-        (event) => PushMessage(
-          title: event.title ?? '',
-          body: event.body ?? '',
-          data: Map<String, String>.from(event.data),
-        ),
-      );
-
-  @override
-  bool get isSupported => true;
+  Stream<PushMessage> get onMessageOpenedApp {
+    if (!_ready) return const Stream<PushMessage>.empty();
+    return Amplify.Notifications.Push.onNotificationOpened.map(
+      (event) => PushMessage(
+        title: event.title ?? '',
+        body: event.body ?? '',
+        data: Map<String, String>.from(event.data),
+      ),
+    );
+  }
 }
