@@ -112,15 +112,16 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                     if (v != null) setState(() => _selectedMode = v);
                   },
                   child: Column(
-                    children: ApiMode.values
-                        .map(
-                          (mode) => RadioListTile<ApiMode>(
-                            value: mode,
-                            title: Text(_modeLabel(mode)),
-                            subtitle: Text(_modeDescription(mode)),
-                          ),
-                        )
-                        .toList(),
+                    children:
+                        ApiMode.values
+                            .map(
+                              (mode) => RadioListTile<ApiMode>(
+                                value: mode,
+                                title: Text(_modeLabel(mode)),
+                                subtitle: Text(_modeDescription(mode)),
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ],

@@ -40,14 +40,14 @@ void main() {
   });
 
   Widget twoPaneAt(Size size) => MaterialApp(
-        home: MediaQuery(
-          data: MediaQueryData(size: size),
-          child: const TwoPaneScaffold(
-            master: Text('master'),
-            detail: Text('detail'),
-          ),
-        ),
-      );
+    home: MediaQuery(
+      data: MediaQueryData(size: size),
+      child: const TwoPaneScaffold(
+        master: Text('master'),
+        detail: Text('detail'),
+      ),
+    ),
+  );
 
   testWidgets('TwoPaneScaffold collapses on phones', (tester) async {
     await tester.pumpWidget(twoPaneAt(const Size(390, 844)));

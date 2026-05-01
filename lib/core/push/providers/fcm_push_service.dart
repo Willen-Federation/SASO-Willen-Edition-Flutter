@@ -69,7 +69,6 @@ class FcmPushService implements PushNotificationService {
           data: msg.data.cast<String, String>(),
         ),
       );
-
 }
 
 @pragma('vm:entry-point')

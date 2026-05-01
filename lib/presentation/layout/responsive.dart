@@ -47,10 +47,10 @@ class Responsive {
     double tablet = 640,
     double desktop = 800,
   }) => switch (size) {
-        ScreenSize.mobile => mobile,
-        ScreenSize.tablet => tablet,
-        ScreenSize.desktop => desktop,
-      };
+    ScreenSize.mobile => mobile,
+    ScreenSize.tablet => tablet,
+    ScreenSize.desktop => desktop,
+  };
 }
 
 /// Centres its [child] within a column whose width is capped to
