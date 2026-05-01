@@ -106,22 +106,17 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               children: [
                 Text('APIモード', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                RadioGroup<ApiMode>(
-                  groupValue: _selectedMode,
-                  onChanged: (v) {
-                    if (v != null) setState(() => _selectedMode = v);
-                  },
-                  child: Column(
-                    children:
-                        ApiMode.values
-                            .map(
-                              (mode) => RadioListTile<ApiMode>(
-                                value: mode,
-                                title: Text(_modeLabel(mode)),
-                                subtitle: Text(_modeDescription(mode)),
-                              ),
-                            )
-                            .toList(),
+                ...ApiMode.values.map(
+                  (mode) => RadioListTile<ApiMode>(
+                    value: mode,
+                    // ignore: deprecated_member_use
+                    groupValue: _selectedMode,
+                    title: Text(_modeLabel(mode)),
+                    subtitle: Text(_modeDescription(mode)),
+                    // ignore: deprecated_member_use
+                    onChanged: (v) {
+                      if (v != null) setState(() => _selectedMode = v);
+                    },
                   ),
                 ),
               ],
