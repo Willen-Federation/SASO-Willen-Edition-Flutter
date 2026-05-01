@@ -163,6 +163,34 @@ class RestV1ApiClient implements SasoApiClient {
     );
   }
 
+  /// Exchange a QR pairing token for an access+refresh token pair.
+  ///
+  /// Unlike [connect], this version does NOT require a Bearer token — it is
+  /// the initial pairing call made before the mobile device has any credentials.
+  Future<TokenPairModel> connectWithPairingToken({
+    required String pairingToken,
+    required String deviceName,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
+    final response = await _http
+        .post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'pairing_token': pairingToken,
+            'device_name': deviceName,
+          }),
+        )
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return TokenPairModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
   /// Rotate the access token using a refresh token.
   /// The old refresh token is invalidated; store the new one.
   Future<TokenPairModel> refreshAccessToken(String refreshToken) async {

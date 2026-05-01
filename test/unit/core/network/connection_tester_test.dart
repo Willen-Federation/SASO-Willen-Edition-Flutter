@@ -53,7 +53,7 @@ void main() {
     expect((captured[1] as Map<String, String>)['Cookie'], 'sid=abc');
   });
 
-  test('rest mode hits /api/v1/health with accept header', () async {
+  test('rest mode hits /api/v1/health without bearer header', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response('{}', 200));
@@ -74,6 +74,11 @@ void main() {
     expect(
       (captured[0] as Uri).toString(),
       'https://api.example.com/api/v1/health',
+    );
+    // Health probe does not send credentials.
+    expect(
+      (captured[1] as Map<String, String>).containsKey('Authorization'),
+      isFalse,
     );
     expect((captured[1] as Map<String, String>)['Accept'], 'application/json');
   });
