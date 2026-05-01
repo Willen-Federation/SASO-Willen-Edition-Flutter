@@ -1,4 +1,2 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
-// mobile_scanner (MLKit) excludes arm64 from simulator; force x86_64 via Rosetta on Apple Silicon CI runners.
-EXCLUDED_ARCHS[sdk=iphonesimulator*]=arm64

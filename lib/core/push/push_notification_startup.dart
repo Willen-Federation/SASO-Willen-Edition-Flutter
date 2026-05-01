@@ -39,14 +39,20 @@ class _PushNotificationStartupState
     final service = ref.read(pushNotificationServiceProvider);
     if (!service.isSupported) return;
 
-    await service.initialize();
+    // Push initialisation is best-effort: APNs may be unavailable in
+    // simulators, FirebaseApp may not be configured for non-prod builds,
+    // and Amplify may fail to bootstrap when running offline. None of
+    // these conditions should block the rest of the app.
+    try {
+      await service.initialize();
 
-    // Handle notification tap that launched the app from terminated state.
-    final initial = await service.getInitialMessage();
-    if (initial != null) _routeFromMessage(initial);
+      final initial = await service.getInitialMessage();
+      if (initial != null) _routeFromMessage(initial);
 
-    // Handle notification tap when app was backgrounded.
-    _openedSub = service.onMessageOpenedApp.listen(_routeFromMessage);
+      _openedSub = service.onMessageOpenedApp.listen(_routeFromMessage);
+    } catch (e, stack) {
+      debugPrint('Push notifications unavailable: $e\n$stack');
+    }
   }
 
   void _routeFromMessage(PushMessage message) {

@@ -4,17 +4,30 @@ import UIKit
 import UserNotifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, MessagingDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate,
+    MessagingDelegate {
 
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
+    // Set delegates before super so no notification events are missed.
     UNUserNotificationCenter.current().delegate = self
     Messaging.messaging().delegate = self
+
+    // Request APNs token early; firebase_messaging Flutter plugin forwards
+    // it to FCM. On the iOS simulator there is no aps-environment
+    // entitlement, so calling this raises an uncaught NSCocoaError —
+    // we skip on the simulator and let real builds register.
+    #if !targetEnvironment(simulator)
     application.registerForRemoteNotifications()
+    #endif
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 
   // Show banner + badge + sound when the app is in the foreground.

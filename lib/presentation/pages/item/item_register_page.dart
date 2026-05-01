@@ -707,7 +707,7 @@ class _CategoryPickerTile extends ConsumerWidget {
               labelText: 'カテゴリ *',
               border: OutlineInputBorder(),
             ),
-            value: selected,
+            initialValue: selected,
             hint: const Text('カテゴリを選択'),
             items:
                 categories

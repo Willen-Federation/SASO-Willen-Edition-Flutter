@@ -27,6 +27,20 @@
             </intent-filter>
         </activity>
 
+        <!-- flutter_web_auth_2 callback receiver: catches the
+             jp.willen.saso://callback redirect from the SASO server's
+             mobile pairing flow. -->
+        <activity
+            android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
+            android:exported="true">
+            <intent-filter android:label="flutter_web_auth_2">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="jp.willen.saso"/>
+            </intent-filter>
+        </activity>
+
         <!-- FCM: default notification channel shown on Android 8+ -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

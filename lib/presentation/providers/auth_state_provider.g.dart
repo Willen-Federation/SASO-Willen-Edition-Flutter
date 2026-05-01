@@ -6,7 +6,7 @@ part of 'auth_state_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'1e94953233e9a82ba657fc69924f8f75db3915c2';
+String _$authServiceHash() => r'dca69043d18e3de8c4e683dc86e187cb3ccde780';
 
 /// Selects and instantiates the appropriate [AuthService] based on the
 /// currently detected provider config and server URL.

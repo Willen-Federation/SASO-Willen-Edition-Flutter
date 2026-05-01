@@ -28,6 +28,19 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>バーコードスキャンのためにカメラを使用します。</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>jp.willen.saso</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>jp.willen.saso</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

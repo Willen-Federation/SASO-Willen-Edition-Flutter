@@ -3,7 +3,7 @@ DART        := dart
 IOS26_DEVICE := 6220269A-82B9-4382-B652-952116BA7E80
 
 .PHONY: setup gen fmt analyze test test-unit test-widget test-integration \
-        test-all build-ios-sim run-ios clean help
+        test-all build-ios-sim run-ios clean help verify
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -23,6 +23,10 @@ fmt: ## Format all Dart source files
 
 analyze: ## Run static analysis
 	$(FLUTTER) analyze
+
+verify: ## CI gate — strict analyzer + full test suite
+	$(FLUTTER) analyze --fatal-infos --fatal-warnings
+	$(FLUTTER) test
 
 test: test-unit test-widget ## Run unit and widget tests
 
