@@ -98,7 +98,7 @@ class RestV1ApiClient implements SasoApiClient {
 
   @override
   Future<ShelfModel> fetchShelf(String shelfId) async {
-    final uri = Uri.parse('$serverUrl/api/v1/shelves/$shelfId');
+    final uri = Uri.parse('$serverUrl/api/v1/storage-locations/$shelfId');
     final response = await _http
         .get(uri, headers: _headers)
         .timeout(AppConstants.httpTimeout);
@@ -110,7 +110,7 @@ class RestV1ApiClient implements SasoApiClient {
 
   @override
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId) async {
-    final uri = Uri.parse('$serverUrl/api/v1/shelves/$shelfId/items');
+    final uri = Uri.parse('$serverUrl/api/v1/storage-locations/$shelfId/items');
     final response = await _http
         .get(uri, headers: _headers)
         .timeout(AppConstants.httpTimeout);
@@ -118,6 +118,47 @@ class RestV1ApiClient implements SasoApiClient {
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
     return data.cast<Map<String, dynamic>>().map(ItemModel.fromJson).toList();
+  }
+
+  @override
+  Future<ItemModel> createItem(
+    Map<String, dynamic> body, {
+    String? idempotencyKey,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/items');
+    final headers = {
+      ..._headers,
+      if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
+    };
+    final response = await _http
+        .post(uri, headers: headers, body: jsonEncode(body))
+        .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+    return ItemModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  @override
+  Future<ItemModel> updateItem(
+    String itemId,
+    Map<String, dynamic> patch, {
+    String? idempotencyKey,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/items/$itemId');
+    final headers = {
+      ..._headers,
+      if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
+    };
+    final request = http.Request('PATCH', uri);
+    request.headers.addAll(headers);
+    request.body = jsonEncode(patch);
+    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final response = await http.Response.fromStream(streamed);
+    _handleErrors(response);
+    return ItemModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 
   // ---------------------------------------------------------------------------
