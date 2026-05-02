@@ -14,5 +14,7 @@ abstract interface class SasoApiClient {
   Future<List<CategoryModel>> fetchCategories();
   Future<ShelfModel> fetchShelf(String shelfId);
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId);
+  Future<ItemModel> createItem(Map<String, dynamic> body, {String? idempotencyKey});
+  Future<ItemModel> updateItem(String itemId, Map<String, dynamic> patch, {String? idempotencyKey});
   bool get isMock;
 }

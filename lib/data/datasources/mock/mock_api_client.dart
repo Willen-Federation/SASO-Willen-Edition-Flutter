@@ -80,4 +80,37 @@ class MockApiClient implements SasoApiClient {
     if (shelf == null) return [];
     return MockData.items.where((i) => shelf.itemIds.contains(i.id)).toList();
   }
+
+  @override
+  Future<ItemModel> createItem(
+    Map<String, dynamic> body, {
+    String? idempotencyKey,
+  }) async {
+    await Future<void>.delayed(_delay);
+    final item = ItemModel(
+      id: 'mock-${DateTime.now().millisecondsSinceEpoch}',
+      name: (body['name'] as String?) ?? 'New Item',
+      description: body['description'] as String?,
+      categoryId: '${body['categoryId'] ?? '1'}',
+      registeredAt: DateTime.now().toIso8601String(),
+    );
+    return item;
+  }
+
+  @override
+  Future<ItemModel> updateItem(
+    String itemId,
+    Map<String, dynamic> patch, {
+    String? idempotencyKey,
+  }) async {
+    await Future<void>.delayed(_delay);
+    final existing = MockData.items.where((i) => i.id == itemId).firstOrNull;
+    if (existing == null) throw Exception('Item not found: $itemId');
+    return existing.copyWith(
+      name: (patch['name'] as String?) ?? existing.name,
+      description: patch.containsKey('description')
+          ? patch['description'] as String?
+          : existing.description,
+    );
+  }
 }

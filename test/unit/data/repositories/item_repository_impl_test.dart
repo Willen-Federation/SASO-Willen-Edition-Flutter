@@ -51,6 +51,21 @@ class _FakeApiClient implements SasoApiClient {
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId) async => [];
 
   @override
+  Future<ItemModel> createItem(
+    Map<String, dynamic> body, {
+    String? idempotencyKey,
+  }) async =>
+      throw UnimplementedError();
+
+  @override
+  Future<ItemModel> updateItem(
+    String itemId,
+    Map<String, dynamic> patch, {
+    String? idempotencyKey,
+  }) async =>
+      throw UnimplementedError();
+
+  @override
   bool get isMock => true;
 }
 
