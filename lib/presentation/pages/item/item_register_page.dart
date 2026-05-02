@@ -13,10 +13,11 @@ import '../../../data/datasources/local/price_history_dao.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../../data/models/book_info_model.dart';
-import '../../../data/models/mcp_category_model.dart';
 import '../../../data/models/mcp_item_model.dart';
 import '../../../data/models/pending_registration.dart';
 import '../../../data/models/price_history_entry.dart';
+import '../../../domain/entities/category.dart';
+import '../../providers/category_provider.dart';
 import '../../providers/isbn_provider.dart';
 import '../../providers/mcp_provider.dart';
 import '../../providers/server_config_provider.dart';
@@ -39,7 +40,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   final _priceController = TextEditingController(text: '0');
   final _stockController = TextEditingController(text: '0');
 
-  McpCategoryModel? _selectedCategory;
+  Category? _selectedCategory;
   XFile? _capturedImage;
   bool _saving = false;
   String? _errorMessage;
@@ -184,7 +185,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     final localId = await dao.insert(
       PendingRegistration(
         name: name,
-        categoryId: _selectedCategory!.id,
+        categoryId: int.tryParse(_selectedCategory!.id) ?? 0,
         janCode: janCode,
         price: price,
         stock: stock,
@@ -220,7 +221,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
         item = await restClient.registerItemWithAi(
           name: name,
           janCode: janCode,
-          categoryId: _selectedCategory!.id,
+          categoryId: int.tryParse(_selectedCategory!.id),
           price: price,
           stock: stock,
           image: _capturedImage,
@@ -233,7 +234,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
           client,
           RegisterItemParams(
             name: name,
-            categoryId: _selectedCategory!.id,
+            categoryId: int.tryParse(_selectedCategory!.id) ?? 0,
             janCode: janCode,
             price: price,
             stock: stock,
@@ -258,7 +259,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       McpItemModel(
         id: 0,
         name: name,
-        categoryId: _selectedCategory?.id,
+        categoryId: int.tryParse(_selectedCategory?.id ?? ''),
         price: price,
         stock: stock,
       );
@@ -681,18 +682,18 @@ class _ImageCaptureTile extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Category picker (flat list from MCP list_categories)
+// Category picker (REST categoriesProvider)
 // ---------------------------------------------------------------------------
 
 class _CategoryPickerTile extends ConsumerWidget {
   const _CategoryPickerTile({required this.selected, required this.onSelected});
 
-  final McpCategoryModel? selected;
-  final ValueChanged<McpCategoryModel> onSelected;
+  final Category? selected;
+  final ValueChanged<Category> onSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(mcpCategoriesProvider);
+    final categoriesAsync = ref.watch(categoriesProvider);
 
     return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
@@ -702,7 +703,7 @@ class _CategoryPickerTile extends ConsumerWidget {
             style: TextStyle(color: Theme.of(context).colorScheme.error),
           ),
       data:
-          (categories) => DropdownButtonFormField<McpCategoryModel>(
+          (categories) => DropdownButtonFormField<Category>(
             decoration: const InputDecoration(
               labelText: 'カテゴリ *',
               border: OutlineInputBorder(),
@@ -715,9 +716,7 @@ class _CategoryPickerTile extends ConsumerWidget {
                     .map(
                       (cat) => DropdownMenuItem(
                         value: cat,
-                        child: Text(
-                          '${'　' * cat.depth}${cat.displayName} (${cat.code})',
-                        ),
+                        child: Text('${'　' * cat.depth}${cat.name}'),
                       ),
                     )
                     .toList(),
