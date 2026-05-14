@@ -183,6 +183,9 @@ class RestV1ApiClient implements SasoApiClient {
 
   /// Exchange a QR pairing token for an access+refresh token pair.
   /// [pairingToken] is the raw token from the QR payload (without the SASO1: prefix).
+  ///
+  /// This variant is for authenticated contexts (device already has a token).
+  /// For the initial pairing scan use [connectWithPairingToken] instead.
   Future<TokenPairModel> connect({
     required String pairingToken,
     required String deviceName,
@@ -191,10 +194,13 @@ class RestV1ApiClient implements SasoApiClient {
     final response = await _http
         .post(
           uri,
-          headers: _headers,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
           body: jsonEncode({
-            'pairing_token': pairingToken,
-            'device_name': deviceName,
+            'token': pairingToken,
+            'deviceName': deviceName,
           }),
         )
         .timeout(AppConstants.httpTimeout);
@@ -206,8 +212,7 @@ class RestV1ApiClient implements SasoApiClient {
 
   /// Exchange a QR pairing token for an access+refresh token pair.
   ///
-  /// Unlike [connect], this version does NOT require a Bearer token — it is
-  /// the initial pairing call made before the mobile device has any credentials.
+  /// Use this for the initial pairing scan — no Bearer token is required.
   Future<TokenPairModel> connectWithPairingToken({
     required String pairingToken,
     required String deviceName,
@@ -221,8 +226,8 @@ class RestV1ApiClient implements SasoApiClient {
             'Accept': 'application/json',
           },
           body: jsonEncode({
-            'pairing_token': pairingToken,
-            'device_name': deviceName,
+            'token': pairingToken,
+            'deviceName': deviceName,
           }),
         )
         .timeout(AppConstants.httpTimeout);
