@@ -26,8 +26,16 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Default English value; per-locale overrides live in
+	     ios/Runner/<locale>.lproj/InfoPlist.strings so the camera prompt
+	     respects the device language on iPhone 17 / iOS 26.5. -->
 	<key>NSCameraUsageDescription</key>
-	<string>バーコードスキャンのためにカメラを使用します。</string>
+	<string>Used to scan barcodes during inventory work.</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ja</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

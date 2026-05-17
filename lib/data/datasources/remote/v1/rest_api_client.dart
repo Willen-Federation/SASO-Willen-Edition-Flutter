@@ -5,14 +5,12 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/problem_details.dart';
-import '../../../models/ai_analysis_model.dart';
+import '../../../models/barcode_resource_model.dart';
 import '../../../models/category_model.dart';
 import '../../../models/config_bundle_model.dart';
-import '../../../models/device_token_model.dart';
 import '../../../models/feature_flag_model.dart';
+import '../../../models/item_draft_model.dart';
 import '../../../models/item_model.dart';
-import '../../../models/mcp_item_model.dart';
-import '../../../models/pairing_code_model.dart';
 import '../../../models/shelf_model.dart';
 import '../../../models/token_pair_model.dart';
 import '../saso_api_client.dart';
@@ -221,51 +219,12 @@ class RestV1ApiClient implements SasoApiClient {
   }
 
   // ---------------------------------------------------------------------------
-  // Mobile QR pairing & token management
+  // Mobile QR pairing & tokens (phone-callable subset)
   // ---------------------------------------------------------------------------
-
-  /// Generate a short-lived QR pairing code (10 min).
-  ///
-  /// The returned [PairingCodeModel.qrPayload] is the SASO1: string to encode
-  /// as a QR code. [PairingCodeModel.qrDataUri] is a ready-to-display
-  /// data URI image (data:image/png;base64,...).
-  Future<PairingCodeModel> createPairingCode() async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/pairing-codes');
-    final response = await _authenticatedRequest(
-      () =>
-          _http.post(uri, headers: _headers).timeout(AppConstants.httpTimeout),
-    );
-    _handleErrors(response);
-    return PairingCodeModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
-  }
-
-  /// Exchange a QR pairing token for an access+refresh token pair.
-  /// [pairingToken] is the raw token from the QR payload (without the SASO1: prefix).
-  ///
-  /// This variant is for authenticated contexts (device already has a token).
-  /// For the initial pairing scan use [connectWithPairingToken] instead.
-  Future<TokenPairModel> connect({
-    required String pairingToken,
-    required String deviceName,
-  }) async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
-    final response = await _http
-        .post(
-          uri,
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
-        )
-        .timeout(AppConstants.httpTimeout);
-    _handleErrors(response);
-    return TokenPairModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
-  }
+  //
+  // Pairing-code generation and device-token management live behind the
+  // admin session and are *not* callable from a mobile JWT — see
+  // docs/api-endpoint-map.md. The phone reaches them via /mypage on web.
 
   /// Exchange a QR pairing token for an access+refresh token pair.
   ///
@@ -323,64 +282,8 @@ class RestV1ApiClient implements SasoApiClient {
     );
   }
 
-  /// List all device tokens registered for the current account.
-  Future<List<DeviceTokenModel>> fetchDeviceTokens() async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens');
-    final response = await _authenticatedRequest(
-      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
-    );
-    _handleErrors(response);
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = body['data'] as List<dynamic>;
-    return data
-        .cast<Map<String, dynamic>>()
-        .map(DeviceTokenModel.fromJson)
-        .toList();
-  }
-
-  /// Revoke a device token by its ID (remote logout for a specific device).
-  Future<void> revokeDeviceToken(int tokenId) async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens/$tokenId');
-    final response = await _authenticatedRequest(
-      () => _http
-          .delete(uri, headers: _headers)
-          .timeout(AppConstants.httpTimeout),
-    );
-    _handleErrors(response);
-  }
-
-  /// Register an FCM / APNs push token with the SASO backend so the
-  /// server can fan out notifications to this device.
-  ///
-  /// Issue #19 — Flutter side ships this method ahead of the backend
-  /// `POST /api/v1/mobile/devices/push-token` endpoint. While the
-  /// backend rollout is in flight the server may answer:
-  ///   * 404 — endpoint not yet deployed at all
-  ///   * 501 — endpoint reserved but `device_push_token` table missing
-  /// Both are treated as a no-op so the auth flow doesn't regress.
-  /// Any other failure is surfaced via `_handleErrors`.
-  ///
-  /// `platform`: `'fcm'` on Android, `'apns'` on iOS. Server is the
-  /// authority on the enumeration; this method passes the value
-  /// through unmodified.
-  Future<void> registerPushToken({
-    required String token,
-    required String platform,
-  }) async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/devices/push-token');
-    final response = await _http
-        .post(
-          uri,
-          headers: _headers,
-          body: jsonEncode({'token': token, 'platform': platform}),
-        )
-        .timeout(AppConstants.httpTimeout);
-    if (response.statusCode == 404 || response.statusCode == 501) return;
-    _handleErrors(response);
-  }
-
   // ---------------------------------------------------------------------------
-  // Feature flags (admin / debug)
+  // Feature flags (operator surface — kept for parity with backend spec)
   // ---------------------------------------------------------------------------
 
   /// List all feature flags defined on the server.
@@ -457,133 +360,134 @@ class RestV1ApiClient implements SasoApiClient {
   }
 
   // ---------------------------------------------------------------------------
-  // AI-assisted item registration
+  // Push notification registration
   // ---------------------------------------------------------------------------
 
-  /// Register an item with server-side AI completion.
+  /// Register the device's push notification token with the backend so the
+  /// server can deliver pushes to this device. Issue #19.
   ///
-  /// Sends all available inputs (name, janCode, categoryId, price, stock,
-  /// optional image) as multipart/form-data to
-  /// POST /api/v1/items/register-with-ai.
-  ///
-  /// The server fills blank fields using its registered AI provider and
-  /// returns the created item.
-  Future<McpItemModel> registerItemWithAi({
-    String? name,
-    String? janCode,
-    int? categoryId,
-    int price = 0,
-    int stock = 0,
-    XFile? image,
-    String? draftId,
+  /// Silent-degrades on 404 and 501 — the endpoint may not yet be deployed
+  /// against older backends. Any other 4xx/5xx surfaces as an exception.
+  Future<void> registerPushToken({
+    required String token,
+    required String platform,
   }) async {
-    final uri = Uri.parse('$serverUrl/api/v1/items/register-with-ai');
-    final http.Response response;
-    try {
-      response = await _authenticatedRequest(() async {
-        final request =
-            http.MultipartRequest('POST', uri)
-              ..headers['Authorization'] = 'Bearer $_accessToken'
-              ..headers['Accept'] = 'application/json';
-
-        if (name != null && name.isNotEmpty) request.fields['name'] = name;
-        if (janCode != null && janCode.isNotEmpty) {
-          request.fields['janCode'] = janCode;
-        }
-        if (categoryId != null) request.fields['categoryId'] = '$categoryId';
-        request.fields['price'] = '$price';
-        request.fields['stock'] = '$stock';
-        if (draftId != null && draftId.isNotEmpty) {
-          request.fields['draftId'] = draftId;
-        }
-
-        if (image != null) {
-          request.files.add(
-            await http.MultipartFile.fromPath('image', image.path),
-          );
-        }
-
-        final streamed = await _http
-            .send(request)
-            .timeout(AppConstants.httpTimeout);
-        return http.Response.fromStream(streamed);
-      });
-    } catch (e) {
-      throw Exception('registerItemWithAi network error: $e');
-    }
-    _handleErrors(response);
-    return McpItemModel.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/devices/push-token');
+    final response = await _authenticatedRequest(
+      () => _http
+          .post(
+            uri,
+            headers: _headers,
+            body: jsonEncode({'token': token, 'platform': platform}),
+          )
+          .timeout(AppConstants.httpTimeout),
     );
+    if (response.statusCode == 404 || response.statusCode == 501) return;
+    _handleErrors(response);
   }
 
-  /// Send image + partial inputs to the server for AI analysis and draft creation.
+  // ---------------------------------------------------------------------------
+  // Item-draft upload (replaces the /items/register-with-ai path).
+  // ---------------------------------------------------------------------------
+
+  /// Upload an image + optional hints to `POST /api/v1/items/drafts`.
   ///
-  /// POST /api/v1/images/analyze-and-draft
-  /// Returns [AiAnalysisModel] with suggested fields + optional draftId.
-  Future<AiAnalysisModel> analyzeAndDraftImage({
-    XFile? image,
-    String? name,
+  /// The server stores an `item_draft` row and enqueues background
+  /// enrichment (barcode lookup → AI vision → merge). The HTTP response
+  /// returns only the draft id and initial status; the mobile app re-checks
+  /// the items list after the worker finishes.
+  ///
+  /// Field names match the backend's `multipart/form-data` schema —
+  /// `item_name`, `jan_code`, `price`, `barcode_hint`, `isbn`, `image`.
+  Future<ItemDraftModel> createItemDraftWithAi({
+    String? itemName,
     String? janCode,
-    int? categoryId,
-    int? price,
+    String? isbn,
+    String? price,
+    String? barcodeHint,
+    XFile? image,
   }) async {
-    final uri = Uri.parse('$serverUrl/api/v1/images/analyze-and-draft');
-    final http.Response response;
-    try {
-      response = await _authenticatedRequest(() async {
-        final request =
-            http.MultipartRequest('POST', uri)
-              ..headers['Authorization'] = 'Bearer $_accessToken'
-              ..headers['Accept'] = 'application/json';
+    final uri = Uri.parse('$serverUrl/api/v1/items/drafts');
+    final response = await _authenticatedRequest(() async {
+      final request =
+          http.MultipartRequest('POST', uri)
+            ..headers['Authorization'] = 'Bearer $_accessToken'
+            ..headers['Accept'] = 'application/json';
 
-        if (name != null && name.isNotEmpty) request.fields['name'] = name;
-        if (janCode != null && janCode.isNotEmpty) {
-          request.fields['janCode'] = janCode;
-        }
-        if (categoryId != null) request.fields['categoryId'] = '$categoryId';
-        if (price != null) request.fields['price'] = '$price';
+      if (itemName != null && itemName.isNotEmpty) {
+        request.fields['item_name'] = itemName;
+      }
+      if (janCode != null && janCode.isNotEmpty) {
+        request.fields['jan_code'] = janCode;
+      }
+      if (isbn != null && isbn.isNotEmpty) request.fields['isbn'] = isbn;
+      if (price != null && price.isNotEmpty) request.fields['price'] = price;
+      if (barcodeHint != null && barcodeHint.isNotEmpty) {
+        request.fields['barcode_hint'] = barcodeHint;
+      }
+      if (image != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
+      }
 
-        if (image != null) {
-          request.files.add(
-            await http.MultipartFile.fromPath('image', image.path),
-          );
-        }
-
-        final streamed = await _http
-            .send(request)
-            .timeout(AppConstants.httpTimeout);
-        return http.Response.fromStream(streamed);
-      });
-    } catch (e) {
-      throw Exception('analyzeAndDraftImage network error: $e');
-    }
+      final streamed = await _http
+          .send(request)
+          .timeout(AppConstants.httpTimeout);
+      return http.Response.fromStream(streamed);
+    });
     _handleErrors(response);
-    return AiAnalysisModel.fromJson(
+    return ItemDraftModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
     );
   }
 
   // ---------------------------------------------------------------------------
-  // Full data sync
+  // Full data sync (cursor pagination per OpenAPI spec).
   // ---------------------------------------------------------------------------
 
-  /// Fetch all items with pagination for full offline sync.
-  /// Returns raw JSON list for storage in the local cache.
-  Future<List<Map<String, dynamic>>> fetchAllItemsRaw({
-    int page = 1,
-    int limit = 200,
-  }) async {
+  /// Fetch one page of items for offline sync.
+  ///
+  /// Pass [cursor] = `null` for the first page; pass the value returned in
+  /// `next_cursor` for subsequent pages. Returns both the page contents and
+  /// the cursor for the next call (or `null` when no more pages remain).
+  Future<({List<Map<String, dynamic>> items, int? nextCursor})>
+  fetchAllItemsRaw({int? cursor, int limit = 200}) async {
+    final params = <String, String>{
+      'limit': '$limit',
+      if (cursor != null) 'cursor': '$cursor',
+    };
     final uri = Uri.parse(
       '$serverUrl/api/v1/items',
-    ).replace(queryParameters: {'limit': '$limit', 'page': '$page'});
+    ).replace(queryParameters: params);
     final response = await _authenticatedRequest(
       () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
     );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = body['data'] as List<dynamic>? ?? [];
-    return data.cast<Map<String, dynamic>>();
+    final data = (body['data'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
+    final nextCursor = body['next_cursor'] as int?;
+    return (items: data, nextCursor: nextCursor);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Barcode lookup
+  // ---------------------------------------------------------------------------
+
+  /// Look up a barcode string. Returns the linked item id if any, plus any
+  /// barcode metadata the server has cached.
+  Future<BarcodeResourceModel> lookupBarcode(String code) async {
+    final uri = Uri.parse(
+      '$serverUrl/api/v1/barcode/${Uri.encodeComponent(code)}',
+    );
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
+    _handleErrors(response);
+    return BarcodeResourceModel.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -609,11 +513,16 @@ class RestV1ApiClient implements SasoApiClient {
 
   void _handleErrors(http.Response response) {
     if (response.statusCode < 400) return;
+    Map<String, dynamic>? json;
     try {
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      throw ProblemDetails.fromJson(json);
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) json = decoded;
     } catch (_) {
-      throw Exception('HTTP ${response.statusCode}');
+      // Not JSON — fall through to the generic HTTP exception.
     }
+    if (json != null) {
+      throw ProblemDetails.fromJson(json);
+    }
+    throw Exception('HTTP ${response.statusCode}');
   }
 }

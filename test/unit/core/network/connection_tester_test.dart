@@ -88,7 +88,7 @@ void main() {
       const ServerConfig(apiMode: ApiMode.legacy),
     );
     expect(result, isA<ConnectionTestFailure>());
-    expect((result as ConnectionTestFailure).message, contains('未入力'));
+    expect((result as ConnectionTestFailure).message, 'URL_MISSING');
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
 

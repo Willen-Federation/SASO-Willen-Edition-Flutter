@@ -1,0 +1,4 @@
+/* Localized Info.plist strings — Japanese */
+
+"NSCameraUsageDescription" = "バーコードスキャンのためにカメラを使用します。";
+"CFBundleDisplayName" = "SASO Willen";
