@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
+import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/storage/database_helper.dart';
 import '../../data/datasources/local/item_local_cache.dart';
@@ -6,6 +7,7 @@ import '../../data/datasources/mock/mock_api_client.dart';
 import '../../data/datasources/remote/legacy/legacy_api_client.dart';
 import '../../data/datasources/remote/saso_api_client.dart';
 import '../../data/datasources/remote/v1/rest_api_client.dart';
+import '../../data/datasources/remote/v1/retry_client.dart';
 import '../../data/repositories/item_repository_impl.dart';
 import '../../domain/repositories/item_repository.dart';
 import 'server_config_provider.dart';
@@ -24,6 +26,7 @@ SasoApiClient sasoApiClient(Ref ref) {
     ApiMode.rest => RestV1ApiClient(
       serverUrl: config.baseUrl,
       jwtToken: config.jwtToken ?? '',
+      httpClient: RetryClient(http.Client()),
     ),
   };
 }
