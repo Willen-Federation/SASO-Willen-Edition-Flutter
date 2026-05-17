@@ -13,7 +13,10 @@ import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/auth/providers/saml_auth_service.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/push/push_notification_router.dart';
+import '../../core/push/push_token_registrar.dart';
 import '../../core/storage/secure_storage.dart';
+import '../../data/datasources/remote/v1/rest_api_client.dart';
 import 'server_config_provider.dart';
 
 part 'auth_state_provider.g.dart';
@@ -141,7 +144,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     }
     const err = AuthResult.failure(
       message: 'SAML service not active',
-      code: 'wrong_provider',
+      code: AuthErrorCodes.wrongProvider,
     );
     state = const AuthState.unauthenticated();
     return err;
@@ -183,6 +186,10 @@ class AuthStateNotifier extends _$AuthStateNotifier {
               deviceId: deviceId,
             );
 
+        // Best-effort push token registration (issue #19). Failures are logged
+        // but do not block the login flow.
+        await _registerPushToken(serverUrl: serverUrl, accessToken: accessToken);
+
         state = AuthState.authenticated(
           userId: 'qr-device',
           token: accessToken,
@@ -191,11 +198,15 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       }
       state = const AuthState.unauthenticated();
       return AuthResult.failure(
-        message: 'ペアリング失敗 (HTTP ${response.statusCode})',
+        message: 'HTTP ${response.statusCode}',
+        code: AuthErrorCodes.pairingHttpError,
       );
     } catch (e) {
       state = const AuthState.unauthenticated();
-      return AuthResult.failure(message: e.toString());
+      return AuthResult.failure(
+        message: e.toString(),
+        code: AuthErrorCodes.pairingNetworkError,
+      );
     }
   }
 
@@ -224,9 +235,42 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     // Placeholder — can be replaced with device_info_plus for real device name.
     return 'SASO Mobile';
   }
+
+  Future<void> _registerPushToken({
+    required String serverUrl,
+    required String accessToken,
+  }) async {
+    try {
+      final pushService = ref.read(pushNotificationServiceProvider);
+      if (!pushService.isSupported) return;
+      final client = RestV1ApiClient(
+        serverUrl: serverUrl,
+        jwtToken: accessToken,
+      );
+      final registrar = PushTokenRegistrar(
+        send:
+            ({required String platform, required String token}) =>
+                client.registerPushToken(platform: platform, token: token),
+        pushService: pushService,
+      );
+      await registrar.start();
+    } catch (_) {
+      // Push registration is best-effort.
+    }
+  }
 }
 
 // Convenience getter used by router redirect and splash page.
 extension AuthStateX on AuthState {
   bool get isAuthenticated => this is Authenticated;
+}
+
+/// Machine-readable error codes returned by [AuthStateNotifier]. The UI layer
+/// resolves these against [AppLocalizations] so messages can be translated.
+///
+/// Strings are stable identifiers — never display them directly to the user.
+abstract final class AuthErrorCodes {
+  static const String wrongProvider = 'auth.wrong_provider';
+  static const String pairingHttpError = 'auth.pairing_http_error';
+  static const String pairingNetworkError = 'auth.pairing_network_error';
 }

@@ -7,7 +7,10 @@
     <application
         android:label="saso_willen_edition"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -29,15 +32,23 @@
 
         <!-- flutter_web_auth_2 callback receiver: catches the
              jp.willen.saso://callback redirect from the SASO server's
-             mobile pairing flow. -->
+             mobile pairing flow.
+
+             launchMode=singleTask + taskAffinity="" + excludeFromRecents
+             prevent forged-callback injection from a co-installed app
+             clobbering the live task / appearing in Recents.  See HIGH-004
+             (MED-002) in the security audit. -->
         <activity
             android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
             <intent-filter android:label="flutter_web_auth_2">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="jp.willen.saso"/>
+                <data android:scheme="jp.willen.saso" android:host="callback"/>
             </intent-filter>
         </activity>
 

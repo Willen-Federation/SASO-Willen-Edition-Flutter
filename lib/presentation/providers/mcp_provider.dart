@@ -7,14 +7,22 @@ import '../../data/models/stock_adjustment_model.dart';
 import '../../data/models/storage_location_model.dart';
 import 'server_config_provider.dart';
 
-/// Provides an [McpClient] configured from [ServerConfigNotifier].
-/// Returns null when not in REST mode or JWT is absent.
-final mcpClientProvider = Provider<McpClient?>((ref) {
+/// Provides an [McpClient] configured from [ServerConfigNotifier], with the
+/// JSON-RPC 2.0 `initialize` handshake already completed.
+///
+/// Returns null when not in REST mode, JWT is absent, or base URL is empty,
+/// so callers can fall through to a no-op path.
+final mcpClientProvider = FutureProvider<McpClient?>((ref) async {
   final config = ref.watch(serverConfigNotifierProvider);
   if (config.apiMode != ApiMode.rest) return null;
   if (config.jwtToken == null || config.jwtToken!.isEmpty) return null;
   if (config.baseUrl.isEmpty) return null;
-  return McpClient(serverUrl: config.baseUrl, jwtToken: config.jwtToken!);
+  final client = McpClient(
+    serverUrl: config.baseUrl,
+    jwtToken: config.jwtToken!,
+  );
+  await client.initialize();
+  return client;
 });
 
 // ---------------------------------------------------------------------------
@@ -23,7 +31,7 @@ final mcpClientProvider = Provider<McpClient?>((ref) {
 
 final mcpItemSearchProvider = FutureProvider.family<List<McpItemModel>, String>(
   (ref, query) async {
-    final client = ref.watch(mcpClientProvider);
+    final client = await ref.watch(mcpClientProvider.future);
     if (client == null) return [];
     final result = await client.callTool('search_items', {
       'query': query,
@@ -45,7 +53,7 @@ final mcpItemByIdProvider = FutureProvider.family<McpItemModel?, int>((
   ref,
   id,
 ) async {
-  final client = ref.watch(mcpClientProvider);
+  final client = await ref.watch(mcpClientProvider.future);
   if (client == null) return null;
   final result = await client.callTool('get_item', {'id': id});
   if (result['found'] != true) return null;
@@ -63,7 +71,7 @@ final storageLocationsProvider =
       ref,
       parentId,
     ) async {
-      final client = ref.watch(mcpClientProvider);
+      final client = await ref.watch(mcpClientProvider.future);
       if (client == null) return [];
       final args = <String, dynamic>{};
       if (parentId != null) args['parentId'] = parentId;
@@ -82,7 +90,7 @@ final storageLocationsProvider =
 final mcpCategoriesProvider = FutureProvider<List<McpCategoryModel>>((
   ref,
 ) async {
-  final client = ref.watch(mcpClientProvider);
+  final client = await ref.watch(mcpClientProvider.future);
   if (client == null) return [];
   final result = await client.callTool('list_categories', {'format': 'flat'});
   final categories = result['categories'] as List<dynamic>? ?? [];
@@ -106,7 +114,7 @@ final mcpItemByJanProvider = FutureProvider.family<McpItemModel?, String>((
   ref,
   janCode,
 ) async {
-  final client = ref.watch(mcpClientProvider);
+  final client = await ref.watch(mcpClientProvider.future);
   if (client == null) return null;
   final result = await client.callTool('search_items', {
     'query': janCode,

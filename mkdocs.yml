@@ -88,9 +88,9 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  # NOTE: emoji_index / emoji_generator were previously configured with
+  # `!!python/name:` YAML tags that require PyYAML's unsafe loader. mkdocs-material
+  # falls back to sensible defaults when the keys are omitted; see MED-007.
   - attr_list
   - md_in_html
   - tables

@@ -32,6 +32,10 @@ class McpClient {
   final http.Client _http;
 
   int _nextId = 1;
+  bool _initialized = false;
+
+  /// Whether [initialize] has completed successfully.
+  bool get isInitialized => _initialized;
 
   Map<String, String> get _headers => {
     'Authorization': 'Bearer $jwtToken',
@@ -50,13 +54,21 @@ class McpClient {
         'version': AppConstants.version,
       },
     });
+    _initialized = true;
   }
 
   /// Call a named MCP tool with [arguments] and return the raw result map.
+  ///
+  /// Throws [StateError] if called before [initialize] has completed.
   Future<Map<String, dynamic>> callTool(
     String toolName,
     Map<String, dynamic> arguments,
   ) async {
+    if (!_initialized) {
+      throw StateError(
+        'McpClient.initialize() must be called before callTool().',
+      );
+    }
     final result = await _send('tools/call', {
       'name': toolName,
       'arguments': arguments,

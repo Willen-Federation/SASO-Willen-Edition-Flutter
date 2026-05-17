@@ -48,5 +48,15 @@
   "flagAuthFirebase": "Firebase Authentication",
   "flagOfflineMode": "Offline Mode",
   "flagBarcodeScanner": "Barcode Scanner",
-  "flagLabelPrint": "Label Printing"
+  "flagLabelPrint": "Label Printing",
+  "samlProviderNotActive": "SAML provider is not active",
+  "pairingFailed": "Pairing failed",
+  "pairingFailedWithStatus": "Pairing failed (HTTP {status})",
+  "@pairingFailedWithStatus": {
+    "placeholders": { "status": { "type": "int" } }
+  },
+  "pairingNetworkError": "Pairing network error: {details}",
+  "@pairingNetworkError": {
+    "placeholders": { "details": { "type": "String" } }
+  }
 }

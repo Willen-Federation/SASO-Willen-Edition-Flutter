@@ -41,7 +41,7 @@ Widget _buildApp({
 }) => ProviderScope(
   overrides: [
     // No MCP client unless explicitly requested.
-    if (!hasMcp) mcpClientProvider.overrideWithValue(null),
+    if (!hasMcp) mcpClientProvider.overrideWith((ref) async => null),
     // Use mock API mode so server config is inert.
     serverConfigNotifierProvider.overrideWith(() => _MockConfig(ApiMode.mock)),
   ],

@@ -1,0 +1,32 @@
+# Code ownership for security-sensitive paths.
+# Pull requests touching any path below require an approval from the matching
+# team in addition to the default reviewers.
+#
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# CI / workflow definitions and supply-chain config.
+/.github/workflows/                       @willen-federation/security-reviewers
+/.github/dependabot.yml                   @willen-federation/security-reviewers
+/.github/CODEOWNERS                       @willen-federation/security-reviewers
+
+# Native platform configuration (signing, entitlements, manifests).
+/android/app/build.gradle.kts             @willen-federation/security-reviewers
+/android/app/src/main/AndroidManifest.xml @willen-federation/security-reviewers
+/android/app/src/main/res/xml/            @willen-federation/security-reviewers
+/ios/Runner/Info.plist                    @willen-federation/security-reviewers
+/ios/Runner/Runner.entitlements           @willen-federation/security-reviewers
+/ios/Runner/AppDelegate.swift             @willen-federation/security-reviewers
+
+# Auth + storage paths.
+/lib/amplifyconfiguration.dart            @willen-federation/security-reviewers
+/lib/core/auth/                           @willen-federation/security-reviewers
+/lib/core/storage/secure_storage.dart     @willen-federation/security-reviewers
+/lib/data/datasources/remote/v1/          @willen-federation/security-reviewers
+/lib/presentation/pages/auth/             @willen-federation/security-reviewers
+/lib/presentation/providers/auth_state_provider.dart @willen-federation/security-reviewers
+/lib/presentation/providers/server_config_provider.dart @willen-federation/security-reviewers
+
+# Dependency and policy documents.
+/pubspec.yaml                             @willen-federation/security-reviewers
+/pubspec.lock                             @willen-federation/security-reviewers
+/SECURITY.md                              @willen-federation/security-reviewers

@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,15 +21,15 @@ jobs:
     name: Format & Analyze
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
@@ -42,15 +45,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: analyze
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
@@ -62,7 +65,7 @@ jobs:
         run: flutter test test/widget/ --coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
         with:
           files: coverage/lcov.info
         continue-on-error: true
@@ -72,15 +75,15 @@ jobs:
     runs-on: macos-15
     needs: analyze
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
@@ -97,11 +100,11 @@ jobs:
   #   runs-on: [self-hosted, macOS, ios-simulator]
   #   needs: build-ios
   #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: subosito/flutter-action@v2
+  #     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+  #     - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
   #       with:
   #         flutter-version: ${{ env.FLUTTER_VERSION }}
-  #     - run: flutter pub get
+  #     - run: flutter pub get --enforce-lockfile
   #     - run: dart run build_runner build --delete-conflicting-outputs
   #     - run: |
   #         flutter test integration_test/ \

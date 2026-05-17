@@ -67,7 +67,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
       _errorMessage = null;
     });
     try {
-      final client = ref.read(mcpClientProvider);
+      final client = await ref.read(mcpClientProvider.future);
       if (client == null) return;
 
       McpItemModel? found;
@@ -125,7 +125,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
       _errorMessage = null;
     });
     try {
-      final client = ref.read(mcpClientProvider);
+      final client = await ref.read(mcpClientProvider.future);
       if (client == null) return;
       final result = await client.callTool('get_item', {'id': id});
       if (!mounted) return;
@@ -148,7 +148,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
 
   Future<void> _submit() async {
     if (_item == null) return;
-    final client = ref.read(mcpClientProvider);
+    final client = await ref.read(mcpClientProvider.future);
     if (client == null) return;
 
     final signedDelta = _reason == AdjustmentReason.checkOut ? -_delta : _delta;
@@ -331,14 +331,18 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
       );
     }
 
-    final client = ref.watch(mcpClientProvider);
+    final clientAsync = ref.watch(mcpClientProvider);
+    final clientReady = clientAsync.maybeWhen(
+      data: (client) => client != null,
+      orElse: () => false,
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('入出庫')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (client == null) const _NoMcpBanner(),
+          if (!clientReady) const _NoMcpBanner(),
           if (_phase == _Phase.shelf) ...[
             _ScanPhaseCard(
               stepNumber: 1,

@@ -228,7 +228,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
           draftId: _draftId,
         );
       } else {
-        final client = ref.read(mcpClientProvider);
+        final client = await ref.read(mcpClientProvider.future);
         if (client == null) throw Exception('サーバーに接続されていません');
         item = await registerItem(
           client,

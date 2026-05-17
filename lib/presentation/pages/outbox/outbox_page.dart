@@ -59,7 +59,7 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
     final db = await ref.read(databaseHelperProvider.future);
     final regDao = PendingRegistrationDao(db.db);
     final adjDao = PendingAdjustmentDao(db.db);
-    final mcpClient = ref.read(mcpClientProvider);
+    final mcpClient = await ref.read(mcpClientProvider.future);
 
     final all = [..._regs, ..._adjs];
     if (all.isEmpty) return;
@@ -242,7 +242,7 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
 
   Future<void> _retryRegistration(PendingRegistration reg) async {
     if (reg.id == null) return;
-    final mcpClient = ref.read(mcpClientProvider);
+    final mcpClient = await ref.read(mcpClientProvider.future);
     if (mcpClient == null) {
       ScaffoldMessenger.of(
         context,
@@ -273,7 +273,7 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
 
   Future<void> _retryAdjustment(PendingAdjustment adj) async {
     if (adj.id == null) return;
-    final mcpClient = ref.read(mcpClientProvider);
+    final mcpClient = await ref.read(mcpClientProvider.future);
     if (mcpClient == null) {
       ScaffoldMessenger.of(
         context,

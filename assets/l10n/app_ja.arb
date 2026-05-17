@@ -59,5 +59,16 @@
   "flagAuthFirebase": "Firebase認証",
   "flagOfflineMode": "オフラインモード",
   "flagBarcodeScanner": "バーコードスキャン",
-  "flagLabelPrint": "ラベル印刷"
+  "flagLabelPrint": "ラベル印刷",
+
+  "samlProviderNotActive": "SAMLプロバイダーが有効ではありません",
+  "pairingFailed": "ペアリング失敗",
+  "pairingFailedWithStatus": "ペアリング失敗 (HTTP {status})",
+  "@pairingFailedWithStatus": {
+    "placeholders": { "status": { "type": "int" } }
+  },
+  "pairingNetworkError": "ペアリング通信エラー: {details}",
+  "@pairingNetworkError": {
+    "placeholders": { "details": { "type": "String" } }
+  }
 }

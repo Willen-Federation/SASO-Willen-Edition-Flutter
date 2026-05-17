@@ -391,6 +391,30 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ラベル印刷'**
   String get flagLabelPrint;
+
+  /// No description provided for @samlProviderNotActive.
+  ///
+  /// In ja, this message translates to:
+  /// **'SAMLプロバイダーが有効ではありません'**
+  String get samlProviderNotActive;
+
+  /// No description provided for @pairingFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'ペアリング失敗'**
+  String get pairingFailed;
+
+  /// No description provided for @pairingFailedWithStatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'ペアリング失敗 (HTTP {status})'**
+  String pairingFailedWithStatus(int status);
+
+  /// No description provided for @pairingNetworkError.
+  ///
+  /// In ja, this message translates to:
+  /// **'ペアリング通信エラー: {details}'**
+  String pairingNetworkError(String details);
 }
 
 class _AppLocalizationsDelegate

@@ -154,4 +154,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flagLabelPrint => 'ラベル印刷';
+
+  @override
+  String get samlProviderNotActive => 'SAMLプロバイダーが有効ではありません';
+
+  @override
+  String get pairingFailed => 'ペアリング失敗';
+
+  @override
+  String pairingFailedWithStatus(int status) =>
+      'ペアリング失敗 (HTTP $status)';
+
+  @override
+  String pairingNetworkError(String details) =>
+      'ペアリング通信エラー: $details';
 }

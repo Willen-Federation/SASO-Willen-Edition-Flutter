@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  APNs / FCM environment.  Use "production" for App Store and TestFlight
+	  builds; Xcode's Debug.entitlements override (added separately) flips this
+	  to "development" so Sandbox APNs is used when running from a developer
+	  build.  See MED-008.
+	-->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>

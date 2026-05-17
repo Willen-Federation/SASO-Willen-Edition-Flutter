@@ -20,6 +20,25 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
 
+  <!-- Content Security Policy (MED-010).
+       Flutter web requires 'unsafe-eval' for its dart2js runtime and
+       'unsafe-inline' for the canvaskit shader pipeline; the remaining
+       directives clamp scope to first-party origins. Tune connect-src for
+       the deployed backend before shipping. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com;
+                 connect-src 'self' https: wss:;
+                 img-src 'self' data: https:;
+                 style-src 'self' 'unsafe-inline';
+                 font-src 'self' data:;
+                 object-src 'none';
+                 base-uri 'self';
+                 frame-ancestors 'none';
+                 form-action 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">

@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/auth/auth_service.dart';
+import '../../providers/auth_error_messages.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
+import 'qr_pairing_validator.dart';
 
 /// QR code pairing page for SASO token exchange.
 ///
@@ -49,19 +51,22 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     final payload = raw.substring(_prefix.length);
     final parts = payload.split('|');
     final pairingToken = parts.first;
-
-    // Server URL from QR takes precedence; fall back to configured URL.
     final qrServerUrl = parts.length > 1 ? parts[1] : null;
-    final configuredUrl = ref.read(serverConfigNotifierProvider).baseUrl;
-    final serverUrl =
-        (qrServerUrl != null && qrServerUrl.isNotEmpty)
-            ? qrServerUrl
-            : configuredUrl;
 
-    if (serverUrl.isEmpty) {
+    final configuredUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+
+    final serverUrl = QrPairingValidator.resolveServerUrl(
+      qrServerUrl: qrServerUrl,
+      configuredUrl: configuredUrl,
+    );
+
+    if (serverUrl == null) {
       setState(() {
         _processing = false;
-        _errorMessage = 'サーバーURLが設定されていません。設定画面から入力してください。';
+        _errorMessage =
+            configuredUrl.isEmpty
+                ? 'サーバーURLが設定されていません。設定画面から入力してください。'
+                : 'QRコードのサーバーURLが設定済みのサーバーと一致しません。';
       });
       await _controller.start();
       return;
@@ -75,10 +80,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
 
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, __) {
+      failure: (msg, code) {
         setState(() {
           _processing = false;
-          _errorMessage = msg;
+          _errorMessage = localizedAuthErrorMessage(context, code, msg);
         });
         _controller.start();
       },

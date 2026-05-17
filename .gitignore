@@ -1,6 +1,9 @@
 # Miscellaneous
 *.class
 *.lock
+# pubspec.lock IS committed for reproducible application builds.
+# See SECURITY.md and `flutter pub get --enforce-lockfile` in CI.
+!pubspec.lock
 *.log
 *.pyc
 *.swp

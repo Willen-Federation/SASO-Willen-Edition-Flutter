@@ -154,4 +154,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flagLabelPrint => 'Label Printing';
+
+  @override
+  String get samlProviderNotActive => 'SAML provider is not active';
+
+  @override
+  String get pairingFailed => 'Pairing failed';
+
+  @override
+  String pairingFailedWithStatus(int status) =>
+      'Pairing failed (HTTP $status)';
+
+  @override
+  String pairingNetworkError(String details) =>
+      'Pairing network error: $details';
 }
