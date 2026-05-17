@@ -1,6 +1,12 @@
 # Miscellaneous
 *.class
 *.lock
+# Issue #34 — ios/Podfile.lock is checked in so iOS builds across
+# developer machines + CI reproduce the same CocoaPods graph. The
+# `*.lock` rule above is intentionally broad (covers vendor lock
+# files, editor swap locks, etc.); the explicit unignore is the
+# narrow exception.
+!ios/Podfile.lock
 # Issue #26-MED-006 — Dart application projects (publish_to: none)
 # must check in pubspec.lock so every developer + CI runner
 # resolves the exact same package graph. The `*.lock` rule above is
