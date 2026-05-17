@@ -31,10 +31,10 @@ http.StreamedResponse _ok({int status = 200, String body = ''}) =>
 
 void main() {
   group('RetryClient', () {
-    final zeroDelays = const [Duration.zero, Duration.zero, Duration.zero];
+    const zeroDelays = [Duration.zero, Duration.zero, Duration.zero];
 
     test('GET — succeeds on first try', () async {
-      final inner = _ScriptedClient([() async => _ok(status: 200, body: 'a')]);
+      final inner = _ScriptedClient([() async => _ok(body: 'a')]);
       final client = RetryClient(inner, delays: zeroDelays);
 
       final response = await client.get(Uri.parse('http://x/'));
@@ -46,7 +46,7 @@ void main() {
     test('GET — retries on 500 then succeeds', () async {
       final inner = _ScriptedClient([
         () async => _ok(status: 500),
-        () async => _ok(status: 200, body: 'ok'),
+        () async => _ok(body: 'ok'),
       ]);
       final client = RetryClient(inner, delays: zeroDelays);
 
@@ -79,7 +79,7 @@ void main() {
     test('GET — retries on SocketException', () async {
       final inner = _ScriptedClient([
         () async => throw const SocketException('down'),
-        () async => _ok(status: 200, body: 'ok'),
+        () async => _ok(body: 'ok'),
       ]);
       final client = RetryClient(inner, delays: zeroDelays);
 
