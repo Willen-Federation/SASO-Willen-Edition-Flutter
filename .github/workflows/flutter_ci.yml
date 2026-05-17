@@ -10,6 +10,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Issue #26-MED-005 — workflow-level permissions block.
+# Default every job to read-only `contents`. Jobs that need more
+# (e.g. uploading coverage to codecov) elevate at the job level.
+# Without this, GitHub's default token grants `contents: write` and
+# `actions: write` to every job — a compromised dependency could push
+# to the repo or modify other workflows.
+permissions:
+  contents: read
+
 env:
   # NOTE: pinned to 3.29.2 — the version `subosito/flutter-action@v2`
   # could resolve at the time of the last green run (commit 0f7d3c7).
@@ -20,13 +29,19 @@ env:
   FLUTTER_VERSION: '3.29.2'
 
 jobs:
+  # Issue #26-MED-004 — third-party actions pinned to immutable SHAs
+  # rather than mutable `@v4` / `@v2` tags. A compromised upstream
+  # repo cannot retroactively swap the action body without changing
+  # the SHA, which would trip the diff at PR-review time. SHAs below
+  # match the named version; refresh on every dependency bump
+  # (Dependabot handles this — see .github/dependabot.yml).
   analyze:
     name: Format & Analyze
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
@@ -47,10 +62,14 @@ jobs:
     name: Unit & Widget Tests
     runs-on: ubuntu-latest
     needs: analyze
+    # codecov upload requires `id-token: write` for OIDC auth.
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
@@ -68,7 +87,7 @@ jobs:
         run: flutter test test/widget/ --coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@0da7aa657d958d32c117fc47c1f192d4c10a4477 # v4.6.0
         with:
           files: coverage/lcov.info
         continue-on-error: true
@@ -78,9 +97,9 @@ jobs:
     runs-on: macos-15
     needs: analyze
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
@@ -103,8 +122,8 @@ jobs:
   #   runs-on: [self-hosted, macOS, ios-simulator]
   #   needs: build-ios
   #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: subosito/flutter-action@v2
+  #     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+  #     - uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0
   #       with:
   #         flutter-version: ${{ env.FLUTTER_VERSION }}
   #     - run: flutter pub get
