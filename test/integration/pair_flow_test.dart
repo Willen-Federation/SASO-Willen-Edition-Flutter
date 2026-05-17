@@ -42,8 +42,11 @@ void main() {
     expect(pair.accessToken, 'access.jwt');
     expect(pair.refreshToken, 'refresh.opaque');
     expect(observed, isNotNull);
-    expect(observed!.headers['Authorization'], isNull,
-        reason: 'initial pairing must NOT carry a Bearer token');
+    expect(
+      observed!.headers['Authorization'],
+      isNull,
+      reason: 'initial pairing must NOT carry a Bearer token',
+    );
     final body = jsonDecode(observed!.body) as Map<String, dynamic>;
     expect(body['token'], 'pairing-code-xyz');
     expect(body['deviceName'], 'iPhone 17');

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DEBUG-ONLY network security config (src/debug overrides src/main for debug builds).
+
+  Allows cleartext HTTP so the emulator can reach the local backend at
+  10.0.2.2:8080 (the host machine) without TLS. User-installed CAs
+  (Charles / mitmproxy) are also trusted, matching the existing debug
+  override intent in the main config.
+
+  NEVER ship this file in a release build — the main
+  res/xml/network_security_config.xml enforces HTTPS-only for
+  release/profile builds.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

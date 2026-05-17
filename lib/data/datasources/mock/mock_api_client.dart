@@ -26,6 +26,9 @@ class MockApiClient implements SasoApiClient {
   Future<List<ItemModel>> searchItems({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
   }) async {
     await Future<void>.delayed(_delay);
     var results = MockData.items;

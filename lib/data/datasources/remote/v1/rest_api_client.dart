@@ -114,10 +114,16 @@ class RestV1ApiClient implements SasoApiClient {
   Future<List<ItemModel>> searchItems({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
   }) async {
     final params = <String, String>{
       if (query != null) 'q': query,
       if (categoryId != null) 'category_id': categoryId,
+      if (barcode != null) 'barcode': barcode,
+      if (isbn != null) 'isbn': isbn,
+      if (labelCode != null) 'label_code': labelCode,
       'limit': '20',
     };
     final uri = Uri.parse(
@@ -403,6 +409,7 @@ class RestV1ApiClient implements SasoApiClient {
     String? itemName,
     String? janCode,
     String? isbn,
+    String? labelCode,
     String? price,
     String? barcodeHint,
     XFile? image,
@@ -421,6 +428,9 @@ class RestV1ApiClient implements SasoApiClient {
         request.fields['jan_code'] = janCode;
       }
       if (isbn != null && isbn.isNotEmpty) request.fields['isbn'] = isbn;
+      if (labelCode != null && labelCode.isNotEmpty) {
+        request.fields['label_code'] = labelCode;
+      }
       if (price != null && price.isNotEmpty) request.fields['price'] = price;
       if (barcodeHint != null && barcodeHint.isNotEmpty) {
         request.fields['barcode_hint'] = barcodeHint;
@@ -465,8 +475,8 @@ class RestV1ApiClient implements SasoApiClient {
     );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = (body['data'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>();
+    final data =
+        (body['data'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
     final nextCursor = body['next_cursor'] as int?;
     return (items: data, nextCursor: nextCursor);
   }

@@ -18,8 +18,23 @@ Future<List<Item>> itemSearch(
   Ref ref, {
   String? query,
   String? categoryId,
+  String? barcode,
+  String? isbn,
+  String? labelCode,
 }) async {
-  if ((query == null || query.isEmpty) && categoryId == null) return [];
+  final hasInput =
+      (query != null && query.isNotEmpty) ||
+      categoryId != null ||
+      (barcode != null && barcode.isNotEmpty) ||
+      (isbn != null && isbn.isNotEmpty) ||
+      (labelCode != null && labelCode.isNotEmpty);
+  if (!hasInput) return [];
   final repo = await ref.watch(itemRepositoryProvider.future);
-  return repo.search(query: query, categoryId: categoryId);
+  return repo.search(
+    query: query,
+    categoryId: categoryId,
+    barcode: barcode,
+    isbn: isbn,
+    labelCode: labelCode,
+  );
 }

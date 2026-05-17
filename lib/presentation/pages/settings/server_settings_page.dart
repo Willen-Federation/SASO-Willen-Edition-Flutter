@@ -26,6 +26,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
   bool _testing = false;
   ConnectionTestResult? _lastTestResult;
   late bool _offlineMode;
+  late bool _aiAutofill;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     _urlController.text = config.baseUrl;
     _selectedMode = config.apiMode;
     _offlineMode = config.offlineMode;
+    _aiAutofill = config.aiAutofillEnabled;
     _initFlagOverrides();
   }
 
@@ -66,9 +68,9 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     final base = _urlController.text.trim();
     final l10n = AppLocalizations.of(context)!;
     if (base.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.qrPairingNoServerUrl)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.qrPairingNoServerUrl)));
       return;
     }
     Uri uri;
@@ -81,10 +83,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
       return;
     }
     try {
-      final ok = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.openWebPortalFailed(uri.toString()))),
@@ -150,6 +149,8 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     final l10n = AppLocalizations.of(context)!;
     final baseUrl = _urlController.text.trim();
     final mypageUrl = baseUrl.isEmpty ? '<server>/mypage/' : '$baseUrl/mypage/';
+    final isProduction = _selectedMode == ApiMode.rest;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsHeader),
@@ -158,34 +159,76 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // API Mode
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.apiMode,
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  ...ApiMode.values.map(
-                    (mode) => RadioListTile<ApiMode>(
-                      value: mode,
-                      // ignore: deprecated_member_use
-                      groupValue: _selectedMode,
-                      title: Text(_modeLabel(mode, l10n)),
-                      subtitle: Text(_modeDescription(mode, l10n)),
-                      // ignore: deprecated_member_use
-                      onChanged: (v) {
-                        if (v != null) setState(() => _selectedMode = v);
-                      },
-                    ),
+          // ── Production mode banner ─────────────────────────────────────
+          if (isProduction) ...[
+            Card(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: ListTile(
+                leading: Icon(
+                  Icons.verified_outlined,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+                title: Text(
+                  '本番モードで接続中',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
+                ),
+                subtitle: Text(
+                  _urlController.text.isNotEmpty
+                      ? _urlController.text
+                      : 'サーバーURL未設定',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                trailing: TextButton.icon(
+                  icon: const Icon(Icons.link_off),
+                  label: const Text('再設定'),
+                  style: TextButton.styleFrom(
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                  onPressed: () => context.go('/onboarding'),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
+          ],
+
+          // ── API Mode (hidden in production / REST mode) ────────────────
+          if (!isProduction) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.apiMode,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    ...ApiMode.values.map(
+                      (mode) => RadioListTile<ApiMode>(
+                        value: mode,
+                        // ignore: deprecated_member_use
+                        groupValue: _selectedMode,
+                        title: Text(_modeLabel(mode, l10n)),
+                        subtitle: Text(_modeDescription(mode, l10n)),
+                        // ignore: deprecated_member_use
+                        onChanged: (v) {
+                          if (v != null) setState(() => _selectedMode = v);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Server URL
           if (_selectedMode != ApiMode.mock)
@@ -214,15 +257,16 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                         OutlinedButton.icon(
                           key: const Key('test_connection_button'),
                           onPressed: _testing ? null : _testConnection,
-                          icon: _testing
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.network_check),
+                          icon:
+                              _testing
+                                  ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Icon(Icons.network_check),
                           label: Text(l10n.testConnection),
                         ),
                         const SizedBox(width: 12),
@@ -283,8 +327,10 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                   ),
                   const Divider(height: 1),
                   const SizedBox(height: 8),
-                  Text('Data management',
-                      style: Theme.of(context).textTheme.titleSmall),
+                  Text(
+                    'Data management',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -312,53 +358,92 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
           ),
           const SizedBox(height: 16),
 
-          // Feature Flags (debug only visible to users too for QA)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        l10n.featureFlags,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(width: 8),
-                      if (kDebugMode)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'DEBUG',
-                            style: TextStyle(fontSize: 10),
-                          ),
+          // ── AI autofill (only in REST/production mode) ─────────────────
+          if (isProduction) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.auto_awesome_outlined),
+                        const SizedBox(width: 8),
+                        Text(
+                          'AI自動入力',
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  ..._flagOverrides.entries.map(
-                    (e) => SwitchListTile(
-                      title: Text(_flagLabel(e.key, l10n)),
-                      subtitle: Text(e.key),
-                      value: e.value,
+                      ],
+                    ),
+                    SwitchListTile(
+                      title: const Text('バーコードスキャン時に自動入力'),
+                      subtitle: const Text(
+                        'JANコード・ISBNを読み取ると商品情報を自動取得してフォームに入力します',
+                      ),
+                      value: _aiAutofill,
                       onChanged: (v) {
-                        setState(() => _flagOverrides[e.key] = v);
-                        _localFlags.setFlag(e.key, v);
+                        setState(() => _aiAutofill = v);
+                        ref
+                            .read(serverConfigNotifierProvider.notifier)
+                            .setAiAutofill(enabled: v);
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 16),
+          ],
+
+          // ── Feature Flags (hidden in production, debug/QA only) ────────
+          if (!isProduction)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          l10n.featureFlags,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(width: 8),
+                        if (kDebugMode)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.amber,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'DEBUG',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    ..._flagOverrides.entries.map(
+                      (e) => SwitchListTile(
+                        title: Text(_flagLabel(e.key, l10n)),
+                        subtitle: Text(e.key),
+                        value: e.value,
+                        onChanged: (v) {
+                          setState(() => _flagOverrides[e.key] = v);
+                          _localFlags.setFlag(e.key, v);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -370,11 +455,12 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     ApiMode.rest => l10n.apiModeRest,
   };
 
-  String _modeDescription(ApiMode mode, AppLocalizations l10n) => switch (mode) {
-    ApiMode.mock => l10n.apiModeMock,
-    ApiMode.legacy => l10n.apiModeLegacy,
-    ApiMode.rest => l10n.apiModeRest,
-  };
+  String _modeDescription(ApiMode mode, AppLocalizations l10n) =>
+      switch (mode) {
+        ApiMode.mock => l10n.apiModeMock,
+        ApiMode.legacy => l10n.apiModeLegacy,
+        ApiMode.rest => l10n.apiModeRest,
+      };
 
   String _flagLabel(String key, AppLocalizations l10n) => switch (key) {
     FeatureFlags.restApiV1 => l10n.flagRestApi,

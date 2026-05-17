@@ -33,9 +33,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       return;
     }
 
-    // 3. No server URL: must configure first.
+    // 3. No server URL: show Getting Started onboarding on first launch.
     if (config.baseUrl.isEmpty) {
-      context.go('/settings');
+      context.go('/onboarding');
       return;
     }
 

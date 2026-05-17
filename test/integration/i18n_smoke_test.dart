@@ -15,22 +15,24 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [Locale('ja'), Locale('en')],
-        home: Builder(builder: (ctx) {
-          final l10n = AppLocalizations.of(ctx)!;
-          return Scaffold(
-            body: Column(
-              children: [
-                Text(l10n.qrPairingTitle),
-                Text(l10n.qrPairingInProgress),
-                Text(l10n.qrPairingInstruction),
-                Text(l10n.qrPairingNoServerUrl),
-                Text(l10n.settingsSaved),
-                Text(l10n.offlineBadge),
-                Text(l10n.manageDevicesOnWeb),
-              ],
-            ),
-          );
-        }),
+        home: Builder(
+          builder: (ctx) {
+            final l10n = AppLocalizations.of(ctx)!;
+            return Scaffold(
+              body: Column(
+                children: [
+                  Text(l10n.qrPairingTitle),
+                  Text(l10n.qrPairingInProgress),
+                  Text(l10n.qrPairingInstruction),
+                  Text(l10n.qrPairingNoServerUrl),
+                  Text(l10n.settingsSaved),
+                  Text(l10n.offlineBadge),
+                  Text(l10n.manageDevicesOnWeb),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
     await tester.pumpAndSettle();

@@ -53,8 +53,5 @@ http.Response problem({
     'traceId': '00000000-0000-4000-8000-000000000000',
   }),
   status,
-  headers: {
-    'content-type': 'application/problem+json',
-    ...extraHeaders,
-  },
+  headers: {'content-type': 'application/problem+json', ...extraHeaders},
 );

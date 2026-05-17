@@ -16,10 +16,12 @@ import '../../../data/models/book_info_model.dart';
 import '../../../data/models/mcp_item_model.dart';
 import '../../../data/models/pending_registration.dart';
 import '../../../data/models/price_history_entry.dart';
+import '../../../data/models/product_info_model.dart';
 import '../../../domain/entities/category.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/isbn_provider.dart';
 import '../../providers/mcp_provider.dart';
+import '../../providers/product_lookup_provider.dart';
 import '../../providers/server_config_provider.dart';
 import '../../widgets/price_history_chart.dart';
 
@@ -37,6 +39,7 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _janController = TextEditingController();
+  final _labelCodeController = TextEditingController();
   final _priceController = TextEditingController(text: '0');
   final _stockController = TextEditingController(text: '0');
 
@@ -50,6 +53,9 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   BookInfoModel? _bookInfo;
   bool _fetchingIsbn = false;
 
+  ProductInfoModel? _productInfo;
+  bool _fetchingProduct = false;
+
   @override
   void initState() {
     super.initState();
@@ -59,9 +65,18 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     _janController.addListener(_onJanChanged);
 
     // Auto-fetch when a JAN/ISBN code is pre-filled (e.g., from scanner).
-    if (widget.prefillJanCode != null &&
-        IsbnLookupService.isIsbn(widget.prefillJanCode!)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _fetchIsbnInfo());
+    if (widget.prefillJanCode != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final code = widget.prefillJanCode!;
+        final aiOn = ref.read(serverConfigNotifierProvider).aiAutofillEnabled;
+        if (IsbnLookupService.isIsbn(code)) {
+          // Always fetch ISBN info; if AI autofill is on, do it silently.
+          _fetchIsbnInfo(silent: aiOn);
+        } else if (aiOn) {
+          // AI mode: auto-fetch JAN product info.
+          _fetchProductInfo(code);
+        }
+      });
     }
   }
 
@@ -70,16 +85,31 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     _janController.removeListener(_onJanChanged);
     _nameController.dispose();
     _janController.dispose();
+    _labelCodeController.dispose();
     _priceController.dispose();
     _stockController.dispose();
     super.dispose();
   }
 
-  void _onJanChanged() => setState(() {});
+  void _onJanChanged() {
+    setState(() {});
+    // When AI autofill is on: auto-trigger lookup for a complete barcode.
+    final code = _janController.text.trim();
+    final aiOn = ref.read(serverConfigNotifierProvider).aiAutofillEnabled;
+    if (!aiOn || code.length < 8) return;
+    if (IsbnLookupService.isIsbn(code) && _bookInfo == null && !_fetchingIsbn) {
+      _fetchIsbnInfo(silent: true);
+    } else if (!IsbnLookupService.isIsbn(code) &&
+        RegExp(r'^\d{8,14}$').hasMatch(code) &&
+        _productInfo == null &&
+        !_fetchingProduct) {
+      _fetchProductInfo(code);
+    }
+  }
 
   bool get _janIsIsbn => IsbnLookupService.isIsbn(_janController.text.trim());
 
-  Future<void> _fetchIsbnInfo() async {
+  Future<void> _fetchIsbnInfo({bool silent = false}) async {
     final isbn = _janController.text.trim();
     if (!IsbnLookupService.isIsbn(isbn)) return;
     setState(() {
@@ -91,18 +121,19 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       final info = await service.lookup(isbn);
       if (!mounted) return;
       if (info == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('書籍情報が見つかりませんでした')));
+        if (!silent) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('書籍情報が見つかりませんでした')));
+        }
         return;
       }
       setState(() {
         _bookInfo = info;
-        // Auto-fill name only when still blank.
+        _productInfo = null; // clear any JAN product info
         if (_nameController.text.isEmpty) {
           _nameController.text = info.title;
         }
-        // Auto-fill price only when still zero.
         if (info.price != null &&
             (int.tryParse(_priceController.text) ?? 0) == 0) {
           _priceController.text = info.price.toString();
@@ -111,6 +142,29 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       await _storePriceHistory(info);
     } finally {
       if (mounted) setState(() => _fetchingIsbn = false);
+    }
+  }
+
+  Future<void> _fetchProductInfo(String barcode) async {
+    if (IsbnLookupService.isIsbn(barcode)) return; // use ISBN path instead
+    setState(() {
+      _fetchingProduct = true;
+      _productInfo = null;
+    });
+    try {
+      final service = ref.read(productLookupServiceProvider);
+      final info = await service.lookup(barcode);
+      if (!mounted) return;
+      if (info == null) return;
+      setState(() {
+        _productInfo = info;
+        _bookInfo = null; // clear any ISBN book info
+        if (_nameController.text.isEmpty) {
+          _nameController.text = info.displayName;
+        }
+      });
+    } finally {
+      if (mounted) setState(() => _fetchingProduct = false);
     }
   }
 
@@ -174,8 +228,19 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     });
 
     final name = _nameController.text.trim();
-    final janCode =
+    final rawCode =
         _janController.text.trim().isEmpty ? null : _janController.text.trim();
+    // Route the scanned code to the correct field: ISBN-13/10 → isbnCode,
+    // everything else (JAN/EAN) → janCode.
+    final bool codeIsIsbn =
+        rawCode != null && IsbnLookupService.isIsbn(rawCode);
+    final String? isbn =
+        codeIsIsbn ? IsbnLookupService.normalize(rawCode) : null;
+    final String? janCode = codeIsIsbn ? null : rawCode;
+    final String? labelCode =
+        _labelCodeController.text.trim().isEmpty
+            ? null
+            : _labelCodeController.text.trim();
     final price = int.tryParse(_priceController.text) ?? 0;
     final stock = int.tryParse(_stockController.text) ?? 0;
 
@@ -226,8 +291,10 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
         final draft = await restClient.createItemDraftWithAi(
           itemName: name,
           janCode: janCode,
+          isbn: isbn,
+          labelCode: labelCode,
           price: '$price',
-          barcodeHint: janCode,
+          barcodeHint: rawCode,
           image: _capturedImage,
         );
         item = McpItemModel(
@@ -327,16 +394,40 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
+            const SizedBox(height: 12),
+
+            // ── Label code field ───────────────────────────────────────────
+            TextFormField(
+              controller: _labelCodeController,
+              decoration: InputDecoration(
+                labelText: 'ラベルコード (任意)',
+                hintText: '例: SHF-001-A',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.label_outline),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'ラベルをスキャン',
+                  onPressed:
+                      () => context.push('/scanner/jan').then((code) {
+                        if (code is String) _labelCodeController.text = code;
+                      }),
+                ),
+              ),
+            ),
             const SizedBox(height: 8),
 
-            // ── ISBN auto-fill banner ──────────────────────────────────────
-            if (_janIsIsbn && _bookInfo == null)
-              _IsbnFetchBanner(
-                fetching: _fetchingIsbn,
-                onFetch: _fetchIsbnInfo,
+            // ── ISBN auto-fill banner (tap to fetch, hidden while loading) ──
+            if (_janIsIsbn && _bookInfo == null && !_fetchingIsbn)
+              _IsbnFetchBanner(onFetch: _fetchIsbnInfo),
+
+            // ── Loading indicator shared by ISBN + JAN lookups ─────────────
+            if (_fetchingIsbn || _fetchingProduct)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: LinearProgressIndicator(),
               ),
 
-            // ── Book info card ──────────────────────────────────────────────
+            // ── Book info card ─────────────────────────────────────────────
             if (_bookInfo != null) ...[
               _BookInfoCard(
                 book: _bookInfo!,
@@ -345,7 +436,11 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
               const SizedBox(height: 4),
             ],
 
-            const SizedBox(height: 4),
+            // ── JAN product info card ──────────────────────────────────────
+            if (_productInfo != null) ...[
+              _ProductInfoCard(product: _productInfo!),
+              const SizedBox(height: 4),
+            ],
 
             // Category picker
             _CategoryPickerTile(
@@ -414,13 +509,59 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
 }
 
 // ---------------------------------------------------------------------------
+// JAN/EAN product info card  (shown after AI autofill lookup)
+// ---------------------------------------------------------------------------
+
+class _ProductInfoCard extends StatelessWidget {
+  const _ProductInfoCard({required this.product});
+
+  final ProductInfoModel product;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading:
+            product.imageUrl != null
+                ? ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(
+                    product.imageUrl!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) =>
+                            const Icon(Icons.inventory_2_outlined, size: 32),
+                  ),
+                )
+                : const Icon(Icons.inventory_2_outlined, size: 32),
+        title: Text(
+          product.displayName,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          [
+            if (product.quantity != null) product.quantity!,
+            product.source,
+          ].join(' · '),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        trailing: const Icon(Icons.auto_awesome, size: 16, color: Colors.amber),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // ISBN fetch banner
 // ---------------------------------------------------------------------------
 
 class _IsbnFetchBanner extends StatelessWidget {
-  const _IsbnFetchBanner({required this.fetching, required this.onFetch});
+  const _IsbnFetchBanner({required this.onFetch});
 
-  final bool fetching;
   final VoidCallback onFetch;
 
   @override
@@ -432,17 +573,10 @@ class _IsbnFetchBanner extends StatelessWidget {
         leading: const Icon(Icons.menu_book_outlined),
         title: const Text('ISBNを検出しました'),
         subtitle: const Text('書籍情報を自動取得できます'),
-        trailing:
-            fetching
-                ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-                : FilledButton.tonal(
-                  onPressed: onFetch,
-                  child: const Text('取得'),
-                ),
+        trailing: FilledButton.tonal(
+          onPressed: onFetch,
+          child: const Text('取得'),
+        ),
       ),
     );
   }

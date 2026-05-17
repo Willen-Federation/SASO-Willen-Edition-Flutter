@@ -45,6 +45,9 @@ abstract class ItemModel with _$ItemModel {
     required String categoryId,
     String? categoryName,
     @Default([]) List<FeatureModel> features,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
     required String registeredAt,
     String? updatedAt,
   }) = _ItemModel;
@@ -63,6 +66,9 @@ abstract class ItemModel with _$ItemModel {
       description: description,
       category: cat,
       features: features.map((f) => f.toDomain()).toList(),
+      janCode: janCode,
+      isbnCode: isbnCode,
+      labelCode: labelCode,
       registeredAt: DateTime.parse(registeredAt),
       updatedAt: updatedAt != null ? DateTime.parse(updatedAt!) : null,
     );

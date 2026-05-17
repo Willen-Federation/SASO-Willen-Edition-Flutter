@@ -142,7 +142,7 @@ class _ItemByIdProviderElement extends AutoDisposeFutureProviderElement<Item>
   String get id => (origin as ItemByIdProvider).id;
 }
 
-String _$itemSearchHash() => r'470cbfa98b843e21ddc453ac8f3c3f5ffaef13fb';
+String _$itemSearchHash() => r'5909107bffcaee8b40440d3c12a003815fd91680';
 
 /// See also [itemSearch].
 @ProviderFor(itemSearch)
@@ -154,15 +154,33 @@ class ItemSearchFamily extends Family<AsyncValue<List<Item>>> {
   const ItemSearchFamily();
 
   /// See also [itemSearch].
-  ItemSearchProvider call({String? query, String? categoryId}) {
-    return ItemSearchProvider(query: query, categoryId: categoryId);
+  ItemSearchProvider call({
+    String? query,
+    String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
+  }) {
+    return ItemSearchProvider(
+      query: query,
+      categoryId: categoryId,
+      barcode: barcode,
+      isbn: isbn,
+      labelCode: labelCode,
+    );
   }
 
   @override
   ItemSearchProvider getProviderOverride(
     covariant ItemSearchProvider provider,
   ) {
-    return call(query: provider.query, categoryId: provider.categoryId);
+    return call(
+      query: provider.query,
+      categoryId: provider.categoryId,
+      barcode: provider.barcode,
+      isbn: provider.isbn,
+      labelCode: provider.labelCode,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -183,24 +201,35 @@ class ItemSearchFamily extends Family<AsyncValue<List<Item>>> {
 /// See also [itemSearch].
 class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
   /// See also [itemSearch].
-  ItemSearchProvider({String? query, String? categoryId})
-    : this._internal(
-        (ref) => itemSearch(
-          ref as ItemSearchRef,
-          query: query,
-          categoryId: categoryId,
-        ),
-        from: itemSearchProvider,
-        name: r'itemSearchProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$itemSearchHash,
-        dependencies: ItemSearchFamily._dependencies,
-        allTransitiveDependencies: ItemSearchFamily._allTransitiveDependencies,
-        query: query,
-        categoryId: categoryId,
-      );
+  ItemSearchProvider({
+    String? query,
+    String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
+  }) : this._internal(
+         (ref) => itemSearch(
+           ref as ItemSearchRef,
+           query: query,
+           categoryId: categoryId,
+           barcode: barcode,
+           isbn: isbn,
+           labelCode: labelCode,
+         ),
+         from: itemSearchProvider,
+         name: r'itemSearchProvider',
+         debugGetCreateSourceHash:
+             const bool.fromEnvironment('dart.vm.product')
+                 ? null
+                 : _$itemSearchHash,
+         dependencies: ItemSearchFamily._dependencies,
+         allTransitiveDependencies: ItemSearchFamily._allTransitiveDependencies,
+         query: query,
+         categoryId: categoryId,
+         barcode: barcode,
+         isbn: isbn,
+         labelCode: labelCode,
+       );
 
   ItemSearchProvider._internal(
     super._createNotifier, {
@@ -211,10 +240,16 @@ class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
     required super.from,
     required this.query,
     required this.categoryId,
+    required this.barcode,
+    required this.isbn,
+    required this.labelCode,
   }) : super.internal();
 
   final String? query;
   final String? categoryId;
+  final String? barcode;
+  final String? isbn;
+  final String? labelCode;
 
   @override
   Override overrideWith(
@@ -231,6 +266,9 @@ class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
         debugGetCreateSourceHash: null,
         query: query,
         categoryId: categoryId,
+        barcode: barcode,
+        isbn: isbn,
+        labelCode: labelCode,
       ),
     );
   }
@@ -244,7 +282,10 @@ class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
   bool operator ==(Object other) {
     return other is ItemSearchProvider &&
         other.query == query &&
-        other.categoryId == categoryId;
+        other.categoryId == categoryId &&
+        other.barcode == barcode &&
+        other.isbn == isbn &&
+        other.labelCode == labelCode;
   }
 
   @override
@@ -252,6 +293,9 @@ class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, query.hashCode);
     hash = _SystemHash.combine(hash, categoryId.hashCode);
+    hash = _SystemHash.combine(hash, barcode.hashCode);
+    hash = _SystemHash.combine(hash, isbn.hashCode);
+    hash = _SystemHash.combine(hash, labelCode.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -265,6 +309,15 @@ mixin ItemSearchRef on AutoDisposeFutureProviderRef<List<Item>> {
 
   /// The parameter `categoryId` of this provider.
   String? get categoryId;
+
+  /// The parameter `barcode` of this provider.
+  String? get barcode;
+
+  /// The parameter `isbn` of this provider.
+  String? get isbn;
+
+  /// The parameter `labelCode` of this provider.
+  String? get labelCode;
 }
 
 class _ItemSearchProviderElement
@@ -276,6 +329,12 @@ class _ItemSearchProviderElement
   String? get query => (origin as ItemSearchProvider).query;
   @override
   String? get categoryId => (origin as ItemSearchProvider).categoryId;
+  @override
+  String? get barcode => (origin as ItemSearchProvider).barcode;
+  @override
+  String? get isbn => (origin as ItemSearchProvider).isbn;
+  @override
+  String? get labelCode => (origin as ItemSearchProvider).labelCode;
 }
 
 // ignore_for_file: type=lint

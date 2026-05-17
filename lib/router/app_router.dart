@@ -12,6 +12,7 @@ import '../presentation/pages/item/item_detail_page.dart';
 import '../presentation/pages/item/item_register_page.dart';
 import '../presentation/pages/item/item_search_page.dart';
 import '../presentation/pages/location/location_list_page.dart';
+import '../presentation/pages/onboarding/getting_started_page.dart';
 import '../presentation/pages/outbox/outbox_page.dart';
 import '../presentation/pages/scanner/barcode_scanner_page.dart';
 import '../presentation/pages/settings/server_settings_page.dart';
@@ -24,7 +25,7 @@ import 'navigator_key.dart';
 part 'app_router.g.dart';
 
 /// Routes that are always accessible regardless of auth state.
-const _publicPrefixes = ['/splash', '/auth/', '/settings'];
+const _publicPrefixes = ['/splash', '/auth/', '/settings', '/onboarding'];
 
 /// ChangeNotifier that notifies GoRouter when auth state or server config
 /// changes, triggering a re-evaluation of the redirect callback.
@@ -54,8 +55,8 @@ GoRouter appRouter(Ref ref) {
       // Mock mode never requires authentication.
       if (serverConfig.apiMode == ApiMode.mock) return null;
 
-      // No server URL configured → force settings.
-      if (serverConfig.baseUrl.isEmpty) return '/settings';
+      // No server URL configured → show Getting Started onboarding.
+      if (serverConfig.baseUrl.isEmpty) return '/onboarding';
 
       // Not authenticated → login.
       final authState = ref.read(authStateNotifierProvider);
@@ -65,6 +66,10 @@ GoRouter appRouter(Ref ref) {
     },
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashPage()),
+      GoRoute(
+        path: '/onboarding',
+        builder: (_, __) => const GettingStartedPage(),
+      ),
       GoRoute(path: '/auth/login', builder: (_, __) => const LoginPage()),
       GoRoute(path: '/auth/qr', builder: (_, __) => const QrPairingPage()),
       GoRoute(

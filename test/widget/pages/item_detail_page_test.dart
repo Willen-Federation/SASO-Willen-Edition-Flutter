@@ -22,6 +22,9 @@ class _StubItemRepository implements ItemRepository {
   Future<List<Item>> search({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
     int limit = 20,
   }) async => [item];
 

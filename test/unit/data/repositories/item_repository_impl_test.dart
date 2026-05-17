@@ -35,6 +35,9 @@ class _FakeApiClient implements SasoApiClient {
   Future<List<ItemModel>> searchItems({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
   }) async {
     searchCallCount++;
     return [_item];
