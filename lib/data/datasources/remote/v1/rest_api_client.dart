@@ -153,7 +153,9 @@ class RestV1ApiClient implements SasoApiClient {
     final request = http.Request('PATCH', uri);
     request.headers.addAll(headers);
     request.body = jsonEncode(patch);
-    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final streamed = await _http
+        .send(request)
+        .timeout(AppConstants.httpTimeout);
     final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return ItemModel.fromJson(
@@ -198,10 +200,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
@@ -225,10 +224,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
