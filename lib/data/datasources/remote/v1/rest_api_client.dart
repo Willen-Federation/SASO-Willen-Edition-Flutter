@@ -153,7 +153,9 @@ class RestV1ApiClient implements SasoApiClient {
     final request = http.Request('PATCH', uri);
     request.headers.addAll(headers);
     request.body = jsonEncode(patch);
-    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final streamed = await _http
+        .send(request)
+        .timeout(AppConstants.httpTimeout);
     final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return ItemModel.fromJson(
@@ -198,10 +200,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
@@ -225,10 +224,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
@@ -290,6 +286,36 @@ class RestV1ApiClient implements SasoApiClient {
     final response = await _http
         .delete(uri, headers: _headers)
         .timeout(AppConstants.httpTimeout);
+    _handleErrors(response);
+  }
+
+  /// Register an FCM / APNs push token with the SASO backend so the
+  /// server can fan out notifications to this device.
+  ///
+  /// Issue #19 — Flutter side ships this method ahead of the backend
+  /// `POST /api/v1/mobile/devices/push-token` endpoint. While the
+  /// backend rollout is in flight the server may answer:
+  ///   * 404 — endpoint not yet deployed at all
+  ///   * 501 — endpoint reserved but `device_push_token` table missing
+  /// Both are treated as a no-op so the auth flow doesn't regress.
+  /// Any other failure is surfaced via `_handleErrors`.
+  ///
+  /// `platform`: `'fcm'` on Android, `'apns'` on iOS. Server is the
+  /// authority on the enumeration; this method passes the value
+  /// through unmodified.
+  Future<void> registerPushToken({
+    required String token,
+    required String platform,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/devices/push-token');
+    final response = await _http
+        .post(
+          uri,
+          headers: _headers,
+          body: jsonEncode({'token': token, 'platform': platform}),
+        )
+        .timeout(AppConstants.httpTimeout);
+    if (response.statusCode == 404 || response.statusCode == 501) return;
     _handleErrors(response);
   }
 
