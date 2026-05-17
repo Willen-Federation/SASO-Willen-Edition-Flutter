@@ -40,6 +40,27 @@
   "username": "Username",
   "password": "Password",
   "loginFailed": "Login failed",
+
+  "loginScreenTitle": "Login",
+  "loginWithBrowser": "Login with Browser",
+  "loginWithSso": "Login with SSO",
+  "loginWithQr": "Pair via QR code",
+  "loginStandard": "Standard login",
+
+  "samlLoginTitle": "SSO Login",
+  "samlLoginCancelled": "SAML login was cancelled",
+  "samlLoginInvalidUrl": "Invalid SSO login URL: {detail}",
+
+  "qrPairingTitle": "QR Pairing",
+  "qrPairingInProgress": "Pairing...",
+  "qrPairingFailed": "Pairing failed (HTTP {statusCode})",
+  "qrPairingUrlMismatch": "QR server URL does not match the configured URL",
+  "qrPairingUrlInvalid": "Server URL must use HTTPS",
+
+  "authLegacyHttpsRequired": "Server URL must use HTTPS: {detail}",
+
+  "authSessionExpired": "Your session has expired. Please log in again.",
+  "authNetworkError": "Network error: {detail}",
   "featureFlags": "Feature Flags",
   "flagRestApi": "REST API v1",
   "flagPushFcm": "FCM Push Notifications",

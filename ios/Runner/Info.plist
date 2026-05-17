@@ -64,9 +64,24 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!--
+	  Issue #35 — UIBackgroundModes is the iOS declaration of *which*
+	  background capabilities the app intends to use. App Store review
+	  rejects (or asks for justification for) any mode the app doesn't
+	  actually exercise.
+
+	  `remote-notification` is required for FCM silent push (silent
+	  content-available notifications) — this is the channel SASO uses
+	  to wake the app for inventory updates / pairing events.
+
+	  `fetch` (background fetch via
+	  `application:performFetchWithCompletionHandler:`) was previously
+	  declared but never wired up — no background-fetch handler exists
+	  on the Flutter or native side. Dropping it removes a declared
+	  capability we don't use.
+	-->
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

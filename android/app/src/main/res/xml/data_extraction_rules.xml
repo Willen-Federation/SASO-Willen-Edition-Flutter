@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Issue #26-MED-003 — explicit data-extraction policy for Android 12+
+  (API 31+). On older Android `android:allowBackup="false"` is enough,
+  but on API 31+ the system also reads this file to decide what goes
+  into:
+    * cloud-backup  (Google Drive / device-to-device cloud restore)
+    * device-transfer (Android 12 "device transfer" feature)
+
+  Both sections explicitly exclude *everything*: there is nothing this
+  app holds that should leave the device automatically. The user can
+  still re-pair / re-login when restoring to a new device.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root"/>
+        <exclude domain="file"/>
+        <exclude domain="database"/>
+        <exclude domain="sharedpref"/>
+        <exclude domain="external"/>
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root"/>
+        <exclude domain="file"/>
+        <exclude domain="database"/>
+        <exclude domain="sharedpref"/>
+        <exclude domain="external"/>
+    </device-transfer>
+</data-extraction-rules>

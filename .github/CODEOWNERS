@@ -1,0 +1,37 @@
+# Issue #26-MED-009 — codified review ownership.
+#
+# CODEOWNERS turns the implicit "ask the maintainer" review pattern
+# into an enforced GitHub Branch Protection rule. Any PR touching a
+# path below auto-requests review from the listed owner(s); branch
+# protection rejects merges without that approval.
+#
+# All paths default to the @Willen-Federation maintainer set. As the
+# project grows, narrow paths to specific owners (e.g. iOS engineers
+# for ios/**, backend reviewer for any future server-shared schema).
+#
+# Format: <path>  <owner1> [owner2] ...
+# Owners can be @org/team or @username. See:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Catch-all — every PR requests review from the maintainer set.
+*                                @Willen-Federation/maintainers
+
+# Native + entitlement files are particularly sensitive. Keep an
+# explicit second owner / native engineer reviewer here once a
+# native-only sub-team exists.
+/android/**                      @Willen-Federation/maintainers
+/ios/**                          @Willen-Federation/maintainers
+/ios/Runner/Runner.entitlements  @Willen-Federation/maintainers
+/android/app/src/main/AndroidManifest.xml  @Willen-Federation/maintainers
+
+# CI / workflow changes touch the supply chain — extra eyes.
+/.github/                        @Willen-Federation/maintainers
+/.github/workflows/              @Willen-Federation/maintainers
+/.github/dependabot.yml          @Willen-Federation/maintainers
+/.github/CODEOWNERS              @Willen-Federation/maintainers
+
+# Auth & security surfaces — always require maintainer review.
+/lib/core/auth/                  @Willen-Federation/maintainers
+/lib/core/network/url_validator.dart       @Willen-Federation/maintainers
+/lib/core/network/pinned_http_client.dart  @Willen-Federation/maintainers
+/lib/core/storage/secure_storage.dart      @Willen-Federation/maintainers
