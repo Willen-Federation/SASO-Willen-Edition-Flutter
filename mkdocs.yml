@@ -90,19 +90,22 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.tabbed:
       alternate_style: true
-  # Issue #26-MED-007 — emoji configuration swap.
-  # Pre-fix used the `!!python/name:` YAML tag which requires the
-  # `yaml.unsafe_load` family of loaders. mkdocs-material 9.6+
-  # registers its own safe-load constructor (so the previous form was
-  # not actually arbitrary code execution at parse time), but the bare
-  # tag was flagged by static YAML scanners and trips audit pipelines
-  # that compare against the public CWE-502 (unsafe deserialization)
-  # pattern. Swap to the colon-delimited string syntax which the
-  # mkdocs-material `EmojiSelector` accepts as plain YAML, so the
-  # config parses cleanly under `yaml.safe_load` as well.
+  # Issue #26-MED-007 — emoji configuration.
+  # pymdownx.emoji requires emoji_index / emoji_generator to be Python
+  # callables, not plain strings. The colon-delimited string format
+  # introduced in the #84 security-audit PR caused a TypeError
+  # ("unsupported callable") in pymdownx 10.x and broke every Netlify
+  # deploy since then.
+  #
+  # The `!!python/name:` YAML tag is the only supported format.
+  # mkdocs-material 9.6+ registers a custom safe-load YAML constructor
+  # for this tag, so it does NOT require yaml.unsafe_load and is not
+  # susceptible to CWE-502 deserialization. Static scanners that flag
+  # it as unsafe are producing a false-positive for this specific,
+  # controlled use inside the mkdocs config file.
   - pymdownx.emoji:
-      emoji_index: material.extensions.emoji:twemoji
-      emoji_generator: material.extensions.emoji:to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - attr_list
   - md_in_html
   - tables
