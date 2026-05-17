@@ -6,27 +6,61 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
-  # Allow manual trigger from the Actions tab
+  # Allow manual trigger from the Actions tab — gated below so only
+  # users with admin/maintain permission on this repo can dispatch.
   workflow_dispatch:
 
-# Allow gh-pages branch to be written by this workflow
+# Workflow-level default: read-only. The deploy job elevates to
+# `contents: write` (gh-pages push) and `pages: write` (Pages API)
+# locally.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   deploy:
     name: Build and deploy MkDocs
     runs-on: ubuntu-latest
+    # Job-level elevation: only this job needs write access.
+    permissions:
+      contents: write
+      pages: write
 
     steps:
+      # Issue #33 — authz guard for workflow_dispatch.
+      # Push events from `main` are always trusted (already protected by
+      # branch protection). For manual dispatch we query the GitHub API
+      # for the actor's repo permission and fail unless they have
+      # `admin` or `maintain`. This prevents a user with `write` access
+      # (enough to push to a feature branch) from also triggering a
+      # production docs deploy by hand.
+      - name: Authorize manual trigger
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          permission=$(gh api \
+            "/repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission" \
+            --jq '.permission')
+          case "$permission" in
+            admin|maintain)
+              echo "User ${{ github.actor }} authorized (permission=$permission)"
+              ;;
+            *)
+              echo "::error::User ${{ github.actor }} (permission=$permission) is not authorized to dispatch this workflow. admin or maintain required."
+              exit 1
+              ;;
+          esac
+
+      # Issue #26-MED-004 — third-party actions SHA-pinned. Dependabot
+      # tracks these via .github/dependabot.yml (github-actions ecosystem).
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           # Full history required for git-revision-date-localized plugin (if added later)
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.x'
           cache: pip
@@ -35,7 +69,10 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --clean --verbose
+        # Note: `--verbose` was removed (issue #37) — the flag leaks
+        # plugin-internal paths and absolute repo paths into the public
+        # CI log. Re-enable only when actively debugging a deploy.
+        run: mkdocs gh-deploy --force --clean
         env:
           # Ensures git config is set for the deploy commit
           GIT_AUTHOR_NAME: github-actions[bot]

@@ -51,6 +51,43 @@
   "password": "パスワード",
   "loginFailed": "ログインに失敗しました",
 
+  "loginScreenTitle": "ログイン",
+  "loginWithBrowser": "ブラウザでログイン",
+  "loginWithSso": "SSOでログイン",
+  "loginWithQr": "QRコードでペアリング",
+  "loginStandard": "標準ログイン",
+
+  "samlLoginTitle": "SSOログイン",
+  "samlLoginCancelled": "SAMLログインがキャンセルされました",
+  "samlLoginInvalidUrl": "SSOログインURLが無効です: {detail}",
+  "@samlLoginInvalidUrl": {
+    "description": "Shown in the SAML WebView when the IdP URL fails UrlValidator.ensureHttpsOrLoopback. The placeholder is the validator's reason string.",
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
+  "qrPairingTitle": "QRペアリング",
+  "qrPairingInProgress": "ペアリング中...",
+  "qrPairingFailed": "ペアリング失敗 (HTTP {statusCode})",
+  "@qrPairingFailed": {
+    "description": "Shown after the /api/v1/mobile/connect endpoint rejects the pairing token. Placeholder is the HTTP status code.",
+    "placeholders": { "statusCode": { "type": "int" } }
+  },
+  "qrPairingUrlMismatch": "QRコードのサーバーURLが設定と一致しません",
+  "qrPairingUrlInvalid": "サーバーURLはHTTPSである必要があります",
+
+  "authLegacyHttpsRequired": "サーバーURLはHTTPSである必要があります: {detail}",
+  "@authLegacyHttpsRequired": {
+    "description": "Legacy login HTTPS guard (#36). Surfaced when the user typed an http:// or invalid URL.",
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
+  "authSessionExpired": "セッションの有効期限が切れました。再度ログインしてください。",
+  "authNetworkError": "ネットワークエラー: {detail}",
+  "@authNetworkError": {
+    "description": "Surfaced when the HTTP layer rejects the call (timeout / connection refused). Placeholder is the underlying exception's toString().",
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
   "featureFlags": "機能フラグ",
   "flagRestApi": "REST API v1",
   "flagPushFcm": "FCMプッシュ通知",

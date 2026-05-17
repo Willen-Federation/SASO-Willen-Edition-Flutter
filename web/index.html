@@ -20,6 +20,37 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
 
+  <!--
+    Issue #26-MED-010 — Content Security Policy.
+
+    Flutter's web renderer requires:
+      * `script-src 'self' 'wasm-unsafe-eval'` — CanvasKit / Skia run
+        in WASM, which needs the dedicated `'wasm-unsafe-eval'` source.
+        We do NOT include `'unsafe-eval'` or `'unsafe-inline'` — those
+        are the high-risk sources XSS payloads need.
+      * `connect-src 'self' https:` — the app calls the SASO REST API
+        over HTTPS, plus Firebase / Amplify endpoints. The wildcard
+        scheme is intentionally broad here; tighten to specific hosts
+        once the production API origin is finalised.
+      * `img-src 'self' data: https:` — product images come from
+        signed S3 URLs, and inline data: URIs back the
+        cached_network_image placeholders.
+      * `style-src 'self' 'unsafe-inline'` — Flutter web emits inline
+        styles for layout. `'unsafe-inline'` is unavoidable for
+        Flutter web today; tracked upstream in flutter/flutter#117987.
+      * `frame-ancestors 'none'` — never allow this app to be framed.
+        Defends against clickjacking attacks that overlay a
+        legitimate-looking UI on top of our authenticated session.
+      * `base-uri 'self'` — prevents `<base href>` injection.
+      * `object-src 'none'` — no Flash / plugin embeds.
+
+    TODO(infra): once the production API origin is finalised, replace
+    `connect-src 'self' https:` with explicit hosts to narrow the
+    exfiltration surface for any future stored-XSS payload that
+    bypasses the script-src.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
