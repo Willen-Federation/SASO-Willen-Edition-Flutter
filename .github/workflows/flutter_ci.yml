@@ -87,7 +87,7 @@ jobs:
         run: flutter test test/widget/ --coverage
 
       - name: Upload coverage
-        uses: codecov/codecov-action@0da7aa657d958d32c117fc47c1f192d4c10a4477 # v4.6.0
+        uses: codecov/codecov-action@0f8570b1a125f4937846a11fcfa3bcd548bd8c97 # v4.6.0
         with:
           files: coverage/lcov.info
         continue-on-error: true
