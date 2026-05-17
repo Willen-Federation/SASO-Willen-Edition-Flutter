@@ -1,0 +1,64 @@
+# Issue #26-MED-009 — automated dependency tracking.
+#
+# Dependabot opens PRs against this repo when an upstream version
+# bump is available. The three ecosystems mapped below cover every
+# external surface this repo pulls from:
+#
+#   * github-actions — pinned-by-SHA actions in .github/workflows/
+#     stay current automatically (#26-MED-004 pin). Without
+#     Dependabot the SHAs would drift to long-unmaintained versions.
+#   * pub — Flutter / Dart packages declared in pubspec.yaml.
+#   * pip (docs-only) — mkdocs-material is install-on-the-fly in
+#     docs.yml; pin the version once the docs PR lands so
+#     Dependabot can update it.
+#
+# All schedules are weekly to keep PR volume manageable. Critical
+# security advisories ignore the schedule and dispatch immediately.
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - flutter
+    commit-message:
+      prefix: chore
+      include: scope
+    # Group Riverpod / Firebase / Amplify update spam into one PR
+    # each — these tend to release together and a 5-PR storm every
+    # week is noise.
+    groups:
+      riverpod:
+        patterns:
+          - 'flutter_riverpod'
+          - 'riverpod_*'
+          - 'hooks_riverpod'
+      firebase:
+        patterns:
+          - 'firebase_*'
+      amplify:
+        patterns:
+          - 'amplify_*'
+      build-runners:
+        patterns:
+          - 'build_runner'
+          - 'freezed*'
+          - 'json_*'

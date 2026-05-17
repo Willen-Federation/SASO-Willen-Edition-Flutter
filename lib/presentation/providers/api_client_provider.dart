@@ -26,6 +26,19 @@ SasoApiClient sasoApiClient(Ref ref) {
     ApiMode.rest => RestV1ApiClient(
       serverUrl: config.baseUrl,
       jwtToken: config.jwtToken ?? '',
+      refreshToken: config.refreshToken,
+      onTokenRefreshed: ({required accessToken, required refreshToken}) {
+        final deviceId = config.deviceId;
+        if (deviceId == null) return;
+        // Persist the rotated pair so the next client rebuild sees them.
+        ref
+            .read(serverConfigNotifierProvider.notifier)
+            .updateTokenPair(
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              deviceId: deviceId,
+            );
+      },
       httpClient: RetryClient(http.Client()),
     ),
   };
