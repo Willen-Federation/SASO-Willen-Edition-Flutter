@@ -27,13 +27,29 @@
             </intent-filter>
         </activity>
 
-        <!-- flutter_web_auth_2 callback receiver: catches the
-             jp.willen.saso://callback redirect from the SASO server's
-             mobile pairing flow. -->
+        <!-- flutter_web_auth_2 callback receiver.
+             - The verified App Link filter (autoVerify=true) is the primary
+               channel: Android queries
+               https://auth.willen.jp/.well-known/assetlinks.json on install
+               and only routes /callback URLs from that host to this
+               activity. Co-installed apps cannot claim verified App Links.
+             - The custom-scheme filter is kept as a compatibility fallback
+               until the assetlinks.json is published.
+             TODO(infra): publish assetlinks.json at auth.willen.jp before
+             retiring the custom-scheme filter. -->
         <activity
             android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
             android:exported="true">
-            <intent-filter android:label="flutter_web_auth_2">
+            <intent-filter android:label="flutter_web_auth_2"
+                           android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="auth.willen.jp"
+                      android:pathPrefix="/callback"/>
+            </intent-filter>
+            <intent-filter android:label="flutter_web_auth_2 (compat)">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>

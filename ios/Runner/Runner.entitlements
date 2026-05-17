@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Universal Links for OAuth/SAML callbacks. Instead of the public
+	  custom URL scheme (jp.willen.saso://) which any installed app can
+	  claim, the IdP/auth host issues an https:// callback that iOS
+	  verifies against an apple-app-site-association (AASA) JSON hosted
+	  at https://auth.willen.jp/.well-known/apple-app-site-association.
+
+	  TODO(infra): publish the AASA file at the IdP host with this app's
+	  Team ID + bundle identifier before flipping the SSO flow to use
+	  https callbacks. Until then, the custom scheme in Info.plist is the
+	  only callback path that works — kept as compatibility fallback.
+	-->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:auth.willen.jp</string>
+	</array>
+</dict>
+</plist>
