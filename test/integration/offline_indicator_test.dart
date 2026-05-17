@@ -5,8 +5,9 @@ import 'package:saso_willen_edition/l10n/app_localizations.dart';
 import 'package:saso_willen_edition/presentation/widgets/common/offline_indicator.dart';
 
 void main() {
-  testWidgets('Offline indicator is invisible while connectivity is unknown',
-      (tester) async {
+  testWidgets('Offline indicator is invisible while connectivity is unknown', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         localizationsDelegates: [
@@ -16,9 +17,7 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: [Locale('ja'), Locale('en')],
-        home: Scaffold(
-          body: Center(child: OfflineIndicator()),
-        ),
+        home: Scaffold(body: Center(child: OfflineIndicator())),
       ),
     );
 

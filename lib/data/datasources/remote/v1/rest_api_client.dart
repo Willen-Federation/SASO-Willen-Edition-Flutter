@@ -475,8 +475,8 @@ class RestV1ApiClient implements SasoApiClient {
     );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = (body['data'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>();
+    final data =
+        (body['data'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
     final nextCursor = body['next_cursor'] as int?;
     return (items: data, nextCursor: nextCursor);
   }

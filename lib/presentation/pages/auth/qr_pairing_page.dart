@@ -275,4 +275,3 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     );
   }
 }
-

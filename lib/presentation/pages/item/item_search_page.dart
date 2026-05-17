@@ -136,18 +136,14 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
         _onSearch(raw);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'バーコードが検出できませんでした。キーワードで検索してください。',
-            ),
-          ),
+          const SnackBar(content: Text('バーコードが検出できませんでした。キーワードで検索してください。')),
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('画像解析エラー: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('画像解析エラー: $e')));
     } finally {
       if (mounted) setState(() => _analyzingPhoto = false);
     }
@@ -220,14 +216,15 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
           _PhotoSearchBanner(
             photo: _searchPhoto!,
             analysing: _analyzingPhoto,
-            onClear: () => setState(() {
-              _searchPhoto = null;
-              _query = '';
-              _barcode = null;
-              _isbn = null;
-              _labelCode = null;
-              _controller.clear();
-            }),
+            onClear:
+                () => setState(() {
+                  _searchPhoto = null;
+                  _query = '';
+                  _barcode = null;
+                  _isbn = null;
+                  _labelCode = null;
+                  _controller.clear();
+                }),
           ),
 
         // ── Results ──────────────────────────────────────────────────────

@@ -232,12 +232,15 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
         _janController.text.trim().isEmpty ? null : _janController.text.trim();
     // Route the scanned code to the correct field: ISBN-13/10 → isbnCode,
     // everything else (JAN/EAN) → janCode.
-    final bool codeIsIsbn = rawCode != null && IsbnLookupService.isIsbn(rawCode);
-    final String? isbn = codeIsIsbn ? IsbnLookupService.normalize(rawCode) : null;
+    final bool codeIsIsbn =
+        rawCode != null && IsbnLookupService.isIsbn(rawCode);
+    final String? isbn =
+        codeIsIsbn ? IsbnLookupService.normalize(rawCode) : null;
     final String? janCode = codeIsIsbn ? null : rawCode;
-    final String? labelCode = _labelCodeController.text.trim().isEmpty
-        ? null
-        : _labelCodeController.text.trim();
+    final String? labelCode =
+        _labelCodeController.text.trim().isEmpty
+            ? null
+            : _labelCodeController.text.trim();
     final price = int.tryParse(_priceController.text) ?? 0;
     final stock = int.tryParse(_stockController.text) ?? 0;
 
@@ -404,8 +407,8 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'ラベルをスキャン',
-                  onPressed: () =>
-                      context.push('/scanner/jan').then((code) {
+                  onPressed:
+                      () => context.push('/scanner/jan').then((code) {
                         if (code is String) _labelCodeController.text = code;
                       }),
                 ),
@@ -519,19 +522,21 @@ class _ProductInfoCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: product.imageUrl != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  product.imageUrl!,
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const Icon(Icons.inventory_2_outlined, size: 32),
-                ),
-              )
-            : const Icon(Icons.inventory_2_outlined, size: 32),
+        leading:
+            product.imageUrl != null
+                ? ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(
+                    product.imageUrl!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) =>
+                            const Icon(Icons.inventory_2_outlined, size: 32),
+                  ),
+                )
+                : const Icon(Icons.inventory_2_outlined, size: 32),
         title: Text(
           product.displayName,
           maxLines: 2,

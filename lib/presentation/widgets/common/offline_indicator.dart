@@ -28,8 +28,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
 
   void _apply(List<ConnectivityResult> results) {
     final hasNet = results.any(
-      (r) =>
-          r != ConnectivityResult.none && r != ConnectivityResult.bluetooth,
+      (r) => r != ConnectivityResult.none && r != ConnectivityResult.bluetooth,
     );
     if (!mounted) return;
     setState(() => _offline = !hasNet);

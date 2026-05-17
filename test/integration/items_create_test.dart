@@ -11,8 +11,8 @@ void main() {
     String? observedKey;
     final backend = FakeBackend({
       'POST /api/v1/items': (http.Request req) {
-        observedKey = req.headers['Idempotency-Key'] ??
-            req.headers['idempotency-key'];
+        observedKey =
+            req.headers['Idempotency-Key'] ?? req.headers['idempotency-key'];
         return http.Response(
           jsonEncode({
             'id': '24050001',
@@ -34,10 +34,10 @@ void main() {
       httpClient: backend.toClient(),
     );
 
-    await client.createItem(
-      {'name': 'Test', 'categoryId': 1},
-      idempotencyKey: 'deadbeef-1234-4abc-9def-1234567890ab',
-    );
+    await client.createItem({
+      'name': 'Test',
+      'categoryId': 1,
+    }, idempotencyKey: 'deadbeef-1234-4abc-9def-1234567890ab');
 
     expect(observedKey, 'deadbeef-1234-4abc-9def-1234567890ab');
   });

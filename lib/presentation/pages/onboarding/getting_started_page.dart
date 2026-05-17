@@ -90,10 +90,9 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
       final normalized = UrlValidator.ensureHttpsOrLoopback(urlRaw).toString();
 
       // Quick health check before committing.
-      final config = ref.read(serverConfigNotifierProvider).copyWith(
-        baseUrl: normalized,
-        apiMode: ApiMode.rest,
-      );
+      final config = ref
+          .read(serverConfigNotifierProvider)
+          .copyWith(baseUrl: normalized, apiMode: ApiMode.rest);
       final result = await ConnectionTester().test(config);
 
       if (!mounted) return;
@@ -110,10 +109,9 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
 
       // Save URL + REST mode; the GoRouter redirect will take the user to
       // /auth/login automatically once the state changes.
-      await ref.read(serverConfigNotifierProvider.notifier).save(
-        url: normalized,
-        mode: ApiMode.rest,
-      );
+      await ref
+          .read(serverConfigNotifierProvider.notifier)
+          .save(url: normalized, mode: ApiMode.rest);
 
       if (!mounted) return;
       context.go('/auth/login');
@@ -272,13 +270,14 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                 // ── Connect button ─────────────────────────────────────────
                 FilledButton.icon(
                   onPressed: _connecting ? null : _connect,
-                  icon: _connecting
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.link),
+                  icon:
+                      _connecting
+                          ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.link),
                   label: Text(_connecting ? '接続中…' : '接続して始める'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
