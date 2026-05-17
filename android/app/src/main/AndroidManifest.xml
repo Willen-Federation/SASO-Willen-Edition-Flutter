@@ -4,10 +4,26 @@
     <!-- Required for FCM background delivery on some devices -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <!--
+      Issue #26-MED-003 — disable Android backup channels.
+      `allowBackup="false"` covers Android <= 11 (Auto Backup and
+      key/value backup). `fullBackupContent="false"` is the legacy
+      paired attribute. `dataExtractionRules` is the Android 12+ (API
+      31) replacement and is consulted independently — see
+      res/xml/data_extraction_rules.xml.
+
+      Rationale: the app holds secret-storage entries (JWTs, refresh
+      tokens) and a sqlite cache of inventory data. None of this
+      should be exfiltrated to Google Drive / a device-transfer cable
+      automatically. Re-pairing on a new device is cheap.
+    -->
     <application
         android:label="saso_willen_edition"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="false">
         <activity
@@ -29,13 +45,45 @@
             </intent-filter>
         </activity>
 
-        <!-- flutter_web_auth_2 callback receiver: catches the
-             jp.willen.saso://callback redirect from the SASO server's
-             mobile pairing flow. -->
+        <!-- flutter_web_auth_2 callback receiver.
+             - The verified App Link filter (autoVerify=true) is the primary
+               channel: Android queries
+               https://auth.willen.jp/.well-known/assetlinks.json on install
+               and only routes /callback URLs from that host to this
+               activity. Co-installed apps cannot claim verified App Links.
+             - The custom-scheme filter is kept as a compatibility fallback
+               until the assetlinks.json is published.
+             TODO(infra): publish assetlinks.json at auth.willen.jp before
+             retiring the custom-scheme filter.
+
+             Issue #26-MED-002 — hardening:
+             * `launchMode="singleTask"` ensures only one CallbackActivity
+               instance ever exists. Without this, parallel custom-tab
+               redirects could spawn duplicate activities and the auth
+               handoff would race.
+             * `taskAffinity=""` opts the activity out of the default
+               task affinity. Together with `excludeFromRecents="true"`
+               this prevents another app from declaring the same task
+               affinity and intercepting the redirect via task hijacking.
+             * `excludeFromRecents="true"` keeps the bare callback
+               activity out of the recents UI — it has no meaningful
+               UI of its own, only a brief hand-off back to MainActivity. -->
         <activity
             android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
-            android:exported="true">
-            <intent-filter android:label="flutter_web_auth_2">
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
+            <intent-filter android:label="flutter_web_auth_2"
+                           android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="auth.willen.jp"
+                      android:pathPrefix="/callback"/>
+            </intent-filter>
+            <intent-filter android:label="flutter_web_auth_2 (compat)">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>

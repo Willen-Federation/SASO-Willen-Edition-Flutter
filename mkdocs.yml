@@ -88,9 +88,19 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.tabbed:
       alternate_style: true
+  # Issue #26-MED-007 — emoji configuration swap.
+  # Pre-fix used the `!!python/name:` YAML tag which requires the
+  # `yaml.unsafe_load` family of loaders. mkdocs-material 9.6+
+  # registers its own safe-load constructor (so the previous form was
+  # not actually arbitrary code execution at parse time), but the bare
+  # tag was flagged by static YAML scanners and trips audit pipelines
+  # that compare against the public CWE-502 (unsafe deserialization)
+  # pattern. Swap to the colon-delimited string syntax which the
+  # mkdocs-material `EmojiSelector` accepts as plain YAML, so the
+  # config parses cleanly under `yaml.safe_load` as well.
   - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: material.extensions.emoji:twemoji
+      emoji_generator: material.extensions.emoji:to_svg
   - attr_list
   - md_in_html
   - tables
