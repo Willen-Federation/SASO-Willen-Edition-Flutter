@@ -11,6 +11,13 @@ abstract final class AppConstants {
   static const String offlineModeKey = 'offline_mode';
   static const String authProviderKey = 'auth_provider_cache';
 
+  // OIDC session persistence (see issue #31). Stored in SecureStorage so
+  // the session survives an app kill / device reboot without ever holding
+  // an expired-but-considered-valid access token in memory.
+  static const String oidcRefreshTokenKey = 'oidc_refresh_token';
+  static const String oidcExpiresAtKey = 'oidc_expires_at';
+  static const String oidcUserIdKey = 'oidc_user_id';
+
   static const Duration httpTimeout = Duration(seconds: 30);
   static const Duration cacheMaxAge = Duration(hours: 24);
 }
