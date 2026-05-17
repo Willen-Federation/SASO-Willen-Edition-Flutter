@@ -4,10 +4,26 @@
     <!-- Required for FCM background delivery on some devices -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <!--
+      Issue #26-MED-003 — disable Android backup channels.
+      `allowBackup="false"` covers Android <= 11 (Auto Backup and
+      key/value backup). `fullBackupContent="false"` is the legacy
+      paired attribute. `dataExtractionRules` is the Android 12+ (API
+      31) replacement and is consulted independently — see
+      res/xml/data_extraction_rules.xml.
+
+      Rationale: the app holds secret-storage entries (JWTs, refresh
+      tokens) and a sqlite cache of inventory data. None of this
+      should be exfiltrated to Google Drive / a device-transfer cable
+      automatically. Re-pairing on a new device is cheap.
+    -->
     <application
         android:label="saso_willen_edition"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules">
         <activity
             android:name=".MainActivity"
             android:exported="true"
