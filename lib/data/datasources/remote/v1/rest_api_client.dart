@@ -17,31 +17,84 @@ import '../../../models/shelf_model.dart';
 import '../../../models/token_pair_model.dart';
 import '../saso_api_client.dart';
 
+/// Callback invoked when an auto-refresh on 401 produces a new token pair.
+///
+/// The owning Riverpod notifier should persist the rotated pair so that
+/// subsequent client rebuilds see the fresh tokens.
+typedef OnTokenRefreshed =
+    void Function({required String accessToken, required String refreshToken});
+
 /// SASO M3 REST API v1 client.
 /// Activated when ff_rest_api_v1 = true.
 ///
 /// All endpoints: /api/v1/*
 /// Auth: Bearer JWT HS256 (1h expiry) + opaque refresh token (~1yr, rotated)
 /// Errors: RFC 7807 Problem Details (SASO-DOMAIN-NNNN)
+///
+/// When [refreshToken] is supplied, the client transparently retries any
+/// authenticated request once on a 401: it calls `refreshAccessToken`,
+/// updates its in-memory access/refresh tokens, notifies [onTokenRefreshed],
+/// then re-issues the original request with the fresh access token.
 class RestV1ApiClient implements SasoApiClient {
   RestV1ApiClient({
     required this.serverUrl,
-    required this.jwtToken,
+    required String jwtToken,
+    String? refreshToken,
+    OnTokenRefreshed? onTokenRefreshed,
     http.Client? httpClient,
-  }) : _http = httpClient ?? http.Client();
+  }) : _accessToken = jwtToken,
+       _refreshToken = refreshToken,
+       _onTokenRefreshed = onTokenRefreshed,
+       _http = httpClient ?? http.Client();
 
   final String serverUrl;
-  final String jwtToken;
+  String _accessToken;
+  String? _refreshToken;
+  final OnTokenRefreshed? _onTokenRefreshed;
   final http.Client _http;
+
+  /// Snapshot of the active access token; updated when the client
+  /// auto-refreshes after a 401.
+  String get jwtToken => _accessToken;
 
   @override
   bool get isMock => false;
 
   Map<String, String> get _headers => {
-    'Authorization': 'Bearer $jwtToken',
+    'Authorization': 'Bearer $_accessToken',
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
+  /// Wrap an HTTP send closure with single-shot 401 → refresh → retry.
+  ///
+  /// The [send] closure must rebuild the request on each invocation so it
+  /// can be safely re-issued after the access token rotates.
+  Future<http.Response> _authenticatedRequest(
+    Future<http.Response> Function() send,
+  ) async {
+    final response = await send();
+    if (response.statusCode != 401) return response;
+
+    final refresh = _refreshToken;
+    if (refresh == null) return response;
+
+    final TokenPairModel pair;
+    try {
+      pair = await refreshAccessToken(refresh);
+    } catch (_) {
+      // Refresh failed (revoked / expired / network) — surface the original 401.
+      return response;
+    }
+    _accessToken = pair.accessToken;
+    _refreshToken = pair.refreshToken;
+    _onTokenRefreshed?.call(
+      accessToken: pair.accessToken,
+      refreshToken: pair.refreshToken,
+    );
+
+    return send();
+  }
 
   // ---------------------------------------------------------------------------
   // Existing inventory endpoints
@@ -50,9 +103,9 @@ class RestV1ApiClient implements SasoApiClient {
   @override
   Future<ItemModel> fetchItem(String itemId) async {
     final uri = Uri.parse('$serverUrl/api/v1/items/$itemId');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return ItemModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -72,9 +125,9 @@ class RestV1ApiClient implements SasoApiClient {
     final uri = Uri.parse(
       '$serverUrl/api/v1/items',
     ).replace(queryParameters: params);
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
@@ -84,9 +137,9 @@ class RestV1ApiClient implements SasoApiClient {
   @override
   Future<List<CategoryModel>> fetchCategories() async {
     final uri = Uri.parse('$serverUrl/api/v1/categories');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
@@ -99,9 +152,9 @@ class RestV1ApiClient implements SasoApiClient {
   @override
   Future<ShelfModel> fetchShelf(String shelfId) async {
     final uri = Uri.parse('$serverUrl/api/v1/storage-locations/$shelfId');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return ShelfModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -111,9 +164,9 @@ class RestV1ApiClient implements SasoApiClient {
   @override
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId) async {
     final uri = Uri.parse('$serverUrl/api/v1/storage-locations/$shelfId/items');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
@@ -126,13 +179,15 @@ class RestV1ApiClient implements SasoApiClient {
     String? idempotencyKey,
   }) async {
     final uri = Uri.parse('$serverUrl/api/v1/items');
-    final headers = {
-      ..._headers,
-      if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
-    };
-    final response = await _http
-        .post(uri, headers: headers, body: jsonEncode(body))
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(() {
+      final headers = {
+        ..._headers,
+        if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
+      };
+      return _http
+          .post(uri, headers: headers, body: jsonEncode(body))
+          .timeout(AppConstants.httpTimeout);
+    });
     _handleErrors(response);
     return ItemModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -146,6 +201,19 @@ class RestV1ApiClient implements SasoApiClient {
     String? idempotencyKey,
   }) async {
     final uri = Uri.parse('$serverUrl/api/v1/items/$itemId');
+    final response = await _authenticatedRequest(() async {
+      final headers = {
+        ..._headers,
+        if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
+      };
+      final request = http.Request('PATCH', uri);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(patch);
+      final streamed = await _http
+          .send(request)
+          .timeout(AppConstants.httpTimeout);
+      return http.Response.fromStream(streamed);
+    });
     final headers = {
       ..._headers,
       if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
@@ -153,7 +221,9 @@ class RestV1ApiClient implements SasoApiClient {
     final request = http.Request('PATCH', uri);
     request.headers.addAll(headers);
     request.body = jsonEncode(patch);
-    final streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+    final streamed = await _http
+        .send(request)
+        .timeout(AppConstants.httpTimeout);
     final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return ItemModel.fromJson(
@@ -172,9 +242,10 @@ class RestV1ApiClient implements SasoApiClient {
   /// data URI image (data:image/png;base64,...).
   Future<PairingCodeModel> createPairingCode() async {
     final uri = Uri.parse('$serverUrl/api/v1/mobile/pairing-codes');
-    final response = await _http
-        .post(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () =>
+          _http.post(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return PairingCodeModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -198,10 +269,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
@@ -225,10 +293,7 @@ class RestV1ApiClient implements SasoApiClient {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: jsonEncode({
-            'token': pairingToken,
-            'deviceName': deviceName,
-          }),
+          body: jsonEncode({'token': pairingToken, 'deviceName': deviceName}),
         )
         .timeout(AppConstants.httpTimeout);
     _handleErrors(response);
@@ -260,9 +325,9 @@ class RestV1ApiClient implements SasoApiClient {
   /// Fetch the offline config bundle — contains server-managed feature flags.
   Future<ConfigBundleModel> fetchConfigBundle() async {
     final uri = Uri.parse('$serverUrl/api/v1/mobile/config');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return ConfigBundleModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -272,9 +337,9 @@ class RestV1ApiClient implements SasoApiClient {
   /// List all device tokens registered for the current account.
   Future<List<DeviceTokenModel>> fetchDeviceTokens() async {
     final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
@@ -287,9 +352,11 @@ class RestV1ApiClient implements SasoApiClient {
   /// Revoke a device token by its ID (remote logout for a specific device).
   Future<void> revokeDeviceToken(int tokenId) async {
     final uri = Uri.parse('$serverUrl/api/v1/mobile/tokens/$tokenId');
-    final response = await _http
-        .delete(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http
+          .delete(uri, headers: _headers)
+          .timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
   }
 
@@ -300,9 +367,9 @@ class RestV1ApiClient implements SasoApiClient {
   /// List all feature flags defined on the server.
   Future<List<FeatureFlagModel>> fetchFeatureFlags() async {
     final uri = Uri.parse('$serverUrl/api/v1/feature-flags');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>;
@@ -315,9 +382,11 @@ class RestV1ApiClient implements SasoApiClient {
   /// Create a new feature flag.
   Future<FeatureFlagModel> createFeatureFlag(FeatureFlagModel flag) async {
     final uri = Uri.parse('$serverUrl/api/v1/feature-flags');
-    final response = await _http
-        .post(uri, headers: _headers, body: jsonEncode(flag.toJson()))
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http
+          .post(uri, headers: _headers, body: jsonEncode(flag.toJson()))
+          .timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return FeatureFlagModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -327,9 +396,9 @@ class RestV1ApiClient implements SasoApiClient {
   /// Fetch a single feature flag by key.
   Future<FeatureFlagModel> fetchFeatureFlag(String key) async {
     final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     return FeatureFlagModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -342,13 +411,15 @@ class RestV1ApiClient implements SasoApiClient {
     Map<String, dynamic> patch,
   ) async {
     final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
-    final request = http.Request('PATCH', uri);
-    request.headers.addAll(_headers);
-    request.body = jsonEncode(patch);
-    final streamed = await _http
-        .send(request)
-        .timeout(AppConstants.httpTimeout);
-    final response = await http.Response.fromStream(streamed);
+    final response = await _authenticatedRequest(() async {
+      final request = http.Request('PATCH', uri);
+      request.headers.addAll(_headers);
+      request.body = jsonEncode(patch);
+      final streamed = await _http
+          .send(request)
+          .timeout(AppConstants.httpTimeout);
+      return http.Response.fromStream(streamed);
+    });
     _handleErrors(response);
     return FeatureFlagModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -358,9 +429,11 @@ class RestV1ApiClient implements SasoApiClient {
   /// Delete a feature flag by key.
   Future<void> deleteFeatureFlag(String key) async {
     final uri = Uri.parse('$serverUrl/api/v1/feature-flags/$key');
-    final response = await _http
-        .delete(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http
+          .delete(uri, headers: _headers)
+          .timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
   }
 
@@ -386,33 +459,39 @@ class RestV1ApiClient implements SasoApiClient {
     String? draftId,
   }) async {
     final uri = Uri.parse('$serverUrl/api/v1/items/register-with-ai');
-    final request =
-        http.MultipartRequest('POST', uri)
-          ..headers['Authorization'] = 'Bearer $jwtToken'
-          ..headers['Accept'] = 'application/json';
-
-    if (name != null && name.isNotEmpty) request.fields['name'] = name;
-    if (janCode != null && janCode.isNotEmpty) {
-      request.fields['janCode'] = janCode;
-    }
-    if (categoryId != null) request.fields['categoryId'] = '$categoryId';
-    request.fields['price'] = '$price';
-    request.fields['stock'] = '$stock';
-    if (draftId != null && draftId.isNotEmpty) {
-      request.fields['draftId'] = draftId;
-    }
-
-    if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath('image', image.path));
-    }
-
-    http.StreamedResponse streamed;
+    final http.Response response;
     try {
-      streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+      response = await _authenticatedRequest(() async {
+        final request =
+            http.MultipartRequest('POST', uri)
+              ..headers['Authorization'] = 'Bearer $_accessToken'
+              ..headers['Accept'] = 'application/json';
+
+        if (name != null && name.isNotEmpty) request.fields['name'] = name;
+        if (janCode != null && janCode.isNotEmpty) {
+          request.fields['janCode'] = janCode;
+        }
+        if (categoryId != null) request.fields['categoryId'] = '$categoryId';
+        request.fields['price'] = '$price';
+        request.fields['stock'] = '$stock';
+        if (draftId != null && draftId.isNotEmpty) {
+          request.fields['draftId'] = draftId;
+        }
+
+        if (image != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath('image', image.path),
+          );
+        }
+
+        final streamed = await _http
+            .send(request)
+            .timeout(AppConstants.httpTimeout);
+        return http.Response.fromStream(streamed);
+      });
     } catch (e) {
       throw Exception('registerItemWithAi network error: $e');
     }
-    final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return McpItemModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -431,29 +510,35 @@ class RestV1ApiClient implements SasoApiClient {
     int? price,
   }) async {
     final uri = Uri.parse('$serverUrl/api/v1/images/analyze-and-draft');
-    final request =
-        http.MultipartRequest('POST', uri)
-          ..headers['Authorization'] = 'Bearer $jwtToken'
-          ..headers['Accept'] = 'application/json';
-
-    if (name != null && name.isNotEmpty) request.fields['name'] = name;
-    if (janCode != null && janCode.isNotEmpty) {
-      request.fields['janCode'] = janCode;
-    }
-    if (categoryId != null) request.fields['categoryId'] = '$categoryId';
-    if (price != null) request.fields['price'] = '$price';
-
-    if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath('image', image.path));
-    }
-
-    http.StreamedResponse streamed;
+    final http.Response response;
     try {
-      streamed = await _http.send(request).timeout(AppConstants.httpTimeout);
+      response = await _authenticatedRequest(() async {
+        final request =
+            http.MultipartRequest('POST', uri)
+              ..headers['Authorization'] = 'Bearer $_accessToken'
+              ..headers['Accept'] = 'application/json';
+
+        if (name != null && name.isNotEmpty) request.fields['name'] = name;
+        if (janCode != null && janCode.isNotEmpty) {
+          request.fields['janCode'] = janCode;
+        }
+        if (categoryId != null) request.fields['categoryId'] = '$categoryId';
+        if (price != null) request.fields['price'] = '$price';
+
+        if (image != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath('image', image.path),
+          );
+        }
+
+        final streamed = await _http
+            .send(request)
+            .timeout(AppConstants.httpTimeout);
+        return http.Response.fromStream(streamed);
+      });
     } catch (e) {
       throw Exception('analyzeAndDraftImage network error: $e');
     }
-    final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return AiAnalysisModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -473,9 +558,9 @@ class RestV1ApiClient implements SasoApiClient {
     final uri = Uri.parse(
       '$serverUrl/api/v1/items',
     ).replace(queryParameters: {'limit': '$limit', 'page': '$page'});
-    final response = await _http
-        .get(uri, headers: _headers)
-        .timeout(AppConstants.httpTimeout);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>? ?? [];
