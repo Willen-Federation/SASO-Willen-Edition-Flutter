@@ -18,7 +18,7 @@ void main() {
     client = _MockHttpClient();
   });
 
-  Map<String, dynamic> _itemJson(String id) => {
+  Map<String, dynamic> itemJson(String id) => {
     'id': id,
     'name': 'sample',
     'categoryId': '1',
@@ -37,7 +37,7 @@ void main() {
       if (auth == 'Bearer expired') {
         return http.Response('{}', 401);
       }
-      return http.Response(jsonEncode(_itemJson('I1')), 200);
+      return http.Response(jsonEncode(itemJson('I1')), 200);
     });
 
     when(
