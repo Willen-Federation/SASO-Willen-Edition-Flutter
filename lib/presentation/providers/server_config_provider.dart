@@ -2,6 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/network/url_validator.dart';
+import '../../core/storage/secure_storage.dart';
 
 part 'server_config_provider.freezed.dart';
 part 'server_config_provider.g.dart';
@@ -28,9 +30,20 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
+    final secureStorage = ref.read(secureStorageProvider);
+
+    final legacyRefreshToken = prefs.getString(AppConstants.refreshTokenKey);
+    if (legacyRefreshToken != null) {
+      await secureStorage.write(
+        AppConstants.refreshTokenKey,
+        legacyRefreshToken,
+      );
+      await prefs.remove(AppConstants.refreshTokenKey);
+    }
+
     final url = prefs.getString(AppConstants.serverUrlKey) ?? '';
     final modeIndex = prefs.getInt(AppConstants.apiModeKey) ?? 0;
-    final refreshToken = prefs.getString(AppConstants.refreshTokenKey);
+    final refreshToken = await secureStorage.read(AppConstants.refreshTokenKey);
     final deviceId = prefs.getInt(AppConstants.deviceIdKey);
     final offlineMode = prefs.getBool(AppConstants.offlineModeKey) ?? false;
     state = ServerConfig(
@@ -43,10 +56,11 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
   }
 
   Future<void> save({required String url, required ApiMode mode}) async {
+    final normalized = UrlValidator.ensureHttpsOrLoopback(url).toString();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AppConstants.serverUrlKey, url);
+    await prefs.setString(AppConstants.serverUrlKey, normalized);
     await prefs.setInt(AppConstants.apiModeKey, mode.index);
-    state = state.copyWith(baseUrl: url, apiMode: mode);
+    state = state.copyWith(baseUrl: normalized, apiMode: mode);
   }
 
   void updateToken(String token) {
@@ -63,7 +77,8 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     required int deviceId,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AppConstants.refreshTokenKey, refreshToken);
+    final secureStorage = ref.read(secureStorageProvider);
+    await secureStorage.write(AppConstants.refreshTokenKey, refreshToken);
     await prefs.setInt(AppConstants.deviceIdKey, deviceId);
     state = state.copyWith(
       jwtToken: accessToken,
@@ -80,6 +95,8 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
 
   Future<void> clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
+    final secureStorage = ref.read(secureStorageProvider);
+    await secureStorage.delete(AppConstants.refreshTokenKey);
     await prefs.remove(AppConstants.refreshTokenKey);
     await prefs.remove(AppConstants.deviceIdKey);
     state = state.copyWith(jwtToken: null, refreshToken: null, deviceId: null);

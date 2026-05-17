@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/auth/auth_service.dart';
+import '../../../core/network/url_validator.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 
@@ -50,15 +52,14 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     final parts = payload.split('|');
     final pairingToken = parts.first;
 
-    // Server URL from QR takes precedence; fall back to configured URL.
+    // Security: the configured server URL is the source of truth. If the
+    // QR claims a different host, we reject — see #24. An attacker-printed
+    // QR that points the device at evil.example.com could otherwise phish
+    // the pairing token.
     final qrServerUrl = parts.length > 1 ? parts[1] : null;
     final configuredUrl = ref.read(serverConfigNotifierProvider).baseUrl;
-    final serverUrl =
-        (qrServerUrl != null && qrServerUrl.isNotEmpty)
-            ? qrServerUrl
-            : configuredUrl;
 
-    if (serverUrl.isEmpty) {
+    if (configuredUrl.isEmpty) {
       setState(() {
         _processing = false;
         _errorMessage = 'サーバーURLが設定されていません。設定画面から入力してください。';
@@ -66,6 +67,44 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
       await _controller.start();
       return;
     }
+
+    final Uri configured;
+    try {
+      configured = UrlValidator.ensureHttpsOrLoopback(configuredUrl);
+    } on ArgumentError catch (e) {
+      setState(() {
+        _processing = false;
+        _errorMessage = '設定済みのサーバーURLが不正です: ${e.message}';
+      });
+      await _controller.start();
+      return;
+    }
+
+    if (qrServerUrl != null && qrServerUrl.isNotEmpty) {
+      final Uri claimed;
+      try {
+        claimed = UrlValidator.ensureHttpsOrLoopback(qrServerUrl);
+      } on ArgumentError {
+        setState(() {
+          _processing = false;
+          _errorMessage = 'QRコードに含まれるサーバーURLが不正です。';
+        });
+        await _controller.start();
+        return;
+      }
+      if (claimed.host != configured.host ||
+          claimed.scheme != configured.scheme ||
+          claimed.port != configured.port) {
+        setState(() {
+          _processing = false;
+          _errorMessage = 'QRコードのサーバーURLが設定と一致しません。安全のため取り消されました。';
+        });
+        await _controller.start();
+        return;
+      }
+    }
+
+    final serverUrl = configured.toString();
 
     final result = await ref
         .read(authStateNotifierProvider.notifier)
@@ -87,9 +126,14 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Issue #21 — i18n adoption. The title is the first proof-of-wire
+    // call site; the rest of this page's hardcoded strings are TODO
+    // for a follow-up sweep once the i18n PR has merged and the
+    // generated AppLocalizations is in `flutter pub get` output.
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QRペアリング'),
+        title: Text(l10n.qrPairingTitle),
         actions: [
           IconButton(
             icon: ValueListenableBuilder(
