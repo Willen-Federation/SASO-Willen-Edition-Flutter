@@ -122,16 +122,14 @@ class LegacyApiClient implements SasoApiClient {
   Future<ItemModel> createItem(
     Map<String, dynamic> body, {
     String? idempotencyKey,
-  }) =>
-      throw UnsupportedError('createItem is not supported by the legacy API');
+  }) => throw UnsupportedError('createItem is not supported by the legacy API');
 
   @override
   Future<ItemModel> updateItem(
     String itemId,
     Map<String, dynamic> patch, {
     String? idempotencyKey,
-  }) =>
-      throw UnsupportedError('updateItem is not supported by the legacy API');
+  }) => throw UnsupportedError('updateItem is not supported by the legacy API');
 
   void _assertOk(http.Response response) {
     if (response.statusCode >= 400) {
