@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SASO Network Security Configuration.
+
+  base-config: every release/profile build is HTTPS only. The system
+  trust anchors are still honoured (we do not pin a CA chain here —
+  SPKI pinning lives in lib/core/network/pinned_http_client.dart and
+  is tracked separately in #27).
+
+  debug-overrides: lets developer machines use a user-installed CA
+  (Charles / mitmproxy / locally trusted dev cert) without weakening
+  release-mode behaviour.
+
+  TODO(team): once auth.willen.jp's primary + backup SPKI hashes are
+  decided, add a <domain-config> block with <pin-set> entries here so
+  the OS enforces the pin at the platform level in addition to the
+  Dart-level PinnedHttpClient.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
