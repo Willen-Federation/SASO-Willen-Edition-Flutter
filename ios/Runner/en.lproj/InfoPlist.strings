@@ -1,0 +1,4 @@
+/* Localized Info.plist strings — English */
+
+"NSCameraUsageDescription" = "Used to scan barcodes during inventory work.";
+"CFBundleDisplayName" = "SASO Willen";

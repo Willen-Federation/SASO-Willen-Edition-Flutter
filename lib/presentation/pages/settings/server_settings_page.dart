@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:saso_willen_edition/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
@@ -53,10 +55,47 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
         .read(serverConfigNotifierProvider.notifier)
         .save(url: _urlController.text.trim(), mode: _selectedMode);
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('設定を保存しました')));
+    ).showSnackBar(SnackBar(content: Text(l10n.settingsSaved)));
     context.pop();
+  }
+
+  Future<void> _openMyPage() async {
+    final base = _urlController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+    if (base.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.qrPairingNoServerUrl)),
+      );
+      return;
+    }
+    Uri uri;
+    try {
+      uri = Uri.parse('$base/mypage/');
+    } on FormatException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.openWebPortalFailed(e.message))),
+      );
+      return;
+    }
+    try {
+      final ok = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.openWebPortalFailed(uri.toString()))),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.openWebPortalFailed(e.toString()))),
+      );
+    }
   }
 
   Future<void> _testConnection() async {
@@ -75,12 +114,30 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     });
   }
 
-  String _resultLabel(ConnectionTestResult result) => switch (result) {
-    ConnectionTestSuccess(:final latency, :final statusCode) =>
-      '接続成功 (HTTP $statusCode, ${latency.inMilliseconds}ms)',
-    ConnectionTestFailure(:final message) => message,
-    ConnectionTestTimeout(:final timeout) => 'タイムアウト (${timeout.inSeconds}秒)',
-  };
+  String _resultLabel(ConnectionTestResult result) {
+    final l10n = AppLocalizations.of(context)!;
+    if (result is ConnectionTestSuccess) {
+      return '${l10n.connectionSuccess} (HTTP ${result.statusCode}, ${result.latency.inMilliseconds}ms)';
+    }
+    if (result is ConnectionTestTimeout) {
+      return '${l10n.connectionFailed} (${result.timeout.inSeconds}s)';
+    }
+    if (result is ConnectionTestFailure) {
+      final msg = result.message;
+      if (msg == 'URL_MISSING') return l10n.connectionTestUrlMissing;
+      if (msg == 'URL_INVALID') return l10n.connectionTestUrlInvalid;
+      if (msg == 'HTTP_ERROR') {
+        return l10n.connectionTestHttpError(result.statusCode ?? 0);
+      }
+      if (msg.startsWith('NETWORK_ERROR:')) {
+        return l10n.connectionTestFailure(
+          msg.substring('NETWORK_ERROR:'.length),
+        );
+      }
+      return l10n.connectionTestFailure(msg);
+    }
+    return l10n.error;
+  }
 
   Color _resultColor(ConnectionTestResult result) => switch (result) {
     ConnectionTestSuccess() => Colors.green,
@@ -89,44 +146,120 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
   };
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('サーバー設定'),
-      actions: [TextButton(onPressed: _save, child: const Text('保存'))],
-    ),
-    body: ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // API Mode
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('APIモード', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                ...ApiMode.values.map(
-                  (mode) => RadioListTile<ApiMode>(
-                    value: mode,
-                    // ignore: deprecated_member_use
-                    groupValue: _selectedMode,
-                    title: Text(_modeLabel(mode)),
-                    subtitle: Text(_modeDescription(mode)),
-                    // ignore: deprecated_member_use
-                    onChanged: (v) {
-                      if (v != null) setState(() => _selectedMode = v);
-                    },
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final baseUrl = _urlController.text.trim();
+    final mypageUrl = baseUrl.isEmpty ? '<server>/mypage/' : '$baseUrl/mypage/';
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.settingsHeader),
+        actions: [TextButton(onPressed: _save, child: Text(l10n.save))],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // API Mode
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.apiMode,
+                      style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  ...ApiMode.values.map(
+                    (mode) => RadioListTile<ApiMode>(
+                      value: mode,
+                      // ignore: deprecated_member_use
+                      groupValue: _selectedMode,
+                      title: Text(_modeLabel(mode, l10n)),
+                      subtitle: Text(_modeDescription(mode, l10n)),
+                      // ignore: deprecated_member_use
+                      onChanged: (v) {
+                        if (v != null) setState(() => _selectedMode = v);
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Server URL
-        if (_selectedMode != ApiMode.mock)
+          // Server URL
+          if (_selectedMode != ApiMode.mock)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.serverUrl,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _urlController,
+                      decoration: InputDecoration(
+                        hintText: l10n.serverUrlHint,
+                        labelText: l10n.serverUrl,
+                      ),
+                      keyboardType: TextInputType.url,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          key: const Key('test_connection_button'),
+                          onPressed: _testing ? null : _testConnection,
+                          icon: _testing
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.network_check),
+                          label: Text(l10n.testConnection),
+                        ),
+                        const SizedBox(width: 12),
+                        if (_lastTestResult != null)
+                          Expanded(
+                            child: Text(
+                              _resultLabel(_lastTestResult!),
+                              style: TextStyle(
+                                color: _resultColor(_lastTestResult!),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
+
+          // Paired-devices section: redirects to the web /mypage portal.
+          // Mobile JWTs can't manage device tokens directly (admin session
+          // required) — see docs/api-endpoint-map.md.
+          if (_selectedMode != ApiMode.mock)
+            Card(
+              child: ListTile(
+                key: const Key('manage_devices_on_web_tile'),
+                leading: const Icon(Icons.devices_other_outlined),
+                title: Text(l10n.manageDevicesOnWeb),
+                subtitle: Text(l10n.manageDevicesOnWebSubtitle(mypageUrl)),
+                trailing: const Icon(Icons.open_in_new),
+                onTap: _openMyPage,
+              ),
+            ),
+          if (_selectedMode != ApiMode.mock) const SizedBox(height: 16),
+
+          // Offline / data sync section
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -134,183 +267,124 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'サーバーURL',
+                    l10n.offlineMode,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _urlController,
-                    decoration: const InputDecoration(
-                      hintText: 'https://saso.example.com',
-                      labelText: 'サーバーURL',
-                    ),
-                    keyboardType: TextInputType.url,
+                  SwitchListTile(
+                    title: Text(l10n.offlineMode),
+                    subtitle: Text(l10n.offlineModeDescription),
+                    value: _offlineMode,
+                    onChanged: (v) {
+                      setState(() => _offlineMode = v);
+                      ref
+                          .read(serverConfigNotifierProvider.notifier)
+                          .setOfflineMode(enabled: v);
+                    },
                   ),
-                  const SizedBox(height: 12),
-                  Row(
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Text('Data management',
+                      style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
-                        key: const Key('test_connection_button'),
-                        onPressed: _testing ? null : _testConnection,
-                        icon:
-                            _testing
-                                ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                                : const Icon(Icons.network_check),
-                        label: const Text('接続テスト'),
+                        icon: const Icon(Icons.cloud_download_outlined),
+                        label: Text(l10n.downloadAllData),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.featureNotReady)),
+                          );
+                        },
                       ),
-                      const SizedBox(width: 12),
-                      if (_lastTestResult != null)
-                        Expanded(
-                          child: Text(
-                            _resultLabel(_lastTestResult!),
-                            style: TextStyle(
-                              color: _resultColor(_lastTestResult!),
-                            ),
-                          ),
-                        ),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.sync_outlined),
+                        label: Text(l10n.sendPendingData),
+                        onPressed: () => context.push('/outbox'),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
           ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Offline / data sync section
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'オフラインモード',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                SwitchListTile(
-                  title: const Text('オフラインモード'),
-                  subtitle: const Text('ONにすると書き込みをキューに蓄積し、サーバーへ送らない'),
-                  value: _offlineMode,
-                  onChanged: (v) {
-                    setState(() => _offlineMode = v);
-                    ref
-                        .read(serverConfigNotifierProvider.notifier)
-                        .setOfflineMode(enabled: v);
-                  },
-                ),
-                const Divider(height: 1),
-                const SizedBox(height: 8),
-                Text('データ管理', style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.cloud_download_outlined),
-                      label: const Text('全データをダウンロード'),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('この機能は今後対応予定です')),
-                        );
+          // Feature Flags (debug only visible to users too for QA)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.featureFlags,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(width: 8),
+                      if (kDebugMode)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'DEBUG',
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  ..._flagOverrides.entries.map(
+                    (e) => SwitchListTile(
+                      title: Text(_flagLabel(e.key, l10n)),
+                      subtitle: Text(e.key),
+                      value: e.value,
+                      onChanged: (v) {
+                        setState(() => _flagOverrides[e.key] = v);
+                        _localFlags.setFlag(e.key, v);
                       },
                     ),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.sync_outlined),
-                      label: const Text('保留中データを送信'),
-                      onPressed: () => context.push('/outbox'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Feature Flags (debug only visible to users too for QA)
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      '機能フラグ',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(width: 8),
-                    if (kDebugMode)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'DEBUG: 全ON',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'インフラ側でリモート制御可能（Firebase Remote Config）',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 8),
-                ..._flagOverrides.entries.map(
-                  (e) => SwitchListTile(
-                    title: Text(_flagLabel(e.key)),
-                    subtitle: Text(e.key),
-                    value: e.value,
-                    onChanged: (v) {
-                      setState(() => _flagOverrides[e.key] = v);
-                      _localFlags.setFlag(e.key, v);
-                    },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 
-  String _modeLabel(ApiMode mode) => switch (mode) {
-    ApiMode.mock => 'モック（サーバー不要）',
-    ApiMode.legacy => 'レガシー（互換モード）',
-    ApiMode.rest => 'REST v1（M3以降）',
+  String _modeLabel(ApiMode mode, AppLocalizations l10n) => switch (mode) {
+    ApiMode.mock => l10n.apiModeMock,
+    ApiMode.legacy => l10n.apiModeLegacy,
+    ApiMode.rest => l10n.apiModeRest,
   };
 
-  String _modeDescription(ApiMode mode) => switch (mode) {
-    ApiMode.mock => 'テスト・開発用。実データは使用しない',
-    ApiMode.legacy => '既存SASAサーバーに接続。廃止予定エンドポイント使用',
-    ApiMode.rest => 'SASO M3以降のREST APIに接続（要M3サーバー）',
+  String _modeDescription(ApiMode mode, AppLocalizations l10n) => switch (mode) {
+    ApiMode.mock => l10n.apiModeMock,
+    ApiMode.legacy => l10n.apiModeLegacy,
+    ApiMode.rest => l10n.apiModeRest,
   };
 
-  String _flagLabel(String key) => switch (key) {
-    FeatureFlags.restApiV1 => 'REST API v1',
-    FeatureFlags.pushFcm => 'FCMプッシュ通知',
-    FeatureFlags.pushSns => 'Amazon SNSプッシュ通知',
-    FeatureFlags.authOidc => 'OIDC認証',
-    FeatureFlags.authFirebase => 'Firebase認証',
-    FeatureFlags.offlineMode => 'オフラインモード',
-    FeatureFlags.barcodeScanner => 'バーコードスキャン',
-    FeatureFlags.labelPrint => 'ラベル印刷',
+  String _flagLabel(String key, AppLocalizations l10n) => switch (key) {
+    FeatureFlags.restApiV1 => l10n.flagRestApi,
+    FeatureFlags.pushFcm => l10n.flagPushFcm,
+    FeatureFlags.pushSns => l10n.flagPushSns,
+    FeatureFlags.authOidc => l10n.flagAuthOidc,
+    FeatureFlags.authFirebase => l10n.flagAuthFirebase,
+    FeatureFlags.offlineMode => l10n.flagOfflineMode,
+    FeatureFlags.barcodeScanner => l10n.flagBarcodeScanner,
+    FeatureFlags.labelPrint => l10n.flagLabelPrint,
     _ => key,
   };
 }

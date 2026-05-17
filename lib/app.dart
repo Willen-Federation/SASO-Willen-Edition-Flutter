@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:saso_willen_edition/l10n/app_localizations.dart';
 import 'core/push/push_notification_startup.dart';
 import 'core/theme/app_theme.dart';
 import 'router/app_router.dart';

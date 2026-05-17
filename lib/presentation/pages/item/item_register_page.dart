@@ -218,14 +218,25 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
           serverUrl: config.baseUrl,
           jwtToken: config.jwtToken!,
         );
-        item = await restClient.registerItemWithAi(
-          name: name,
+        // The REST path enqueues a draft: server returns immediately with
+        // draft_id + status, and the worker enriches the row before promoting
+        // it to a real item (see docs/api-endpoint-map.md). Synthesise an
+        // McpItemModel from the user's inputs so the success view stays
+        // accurate; the displayed id is the draft id so the user can track it.
+        final draft = await restClient.createItemDraftWithAi(
+          itemName: name,
           janCode: janCode,
+          price: '$price',
+          barcodeHint: janCode,
+          image: _capturedImage,
+        );
+        item = McpItemModel(
+          id: draft.draftId,
+          name: name,
           categoryId: int.tryParse(_selectedCategory!.id),
           price: price,
           stock: stock,
-          image: _capturedImage,
-          draftId: _draftId,
+          janCode: janCode,
         );
       } else {
         final client = ref.read(mcpClientProvider);

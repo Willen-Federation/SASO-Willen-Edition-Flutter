@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/outbox_provider.dart';
 import '../../../presentation/providers/server_config_provider.dart';
+import '../../widgets/common/offline_indicator.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -23,6 +24,7 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('SASO Willen'),
         actions: [
+          const OfflineIndicator(),
           if (pendingCount > 0)
             Badge.count(
               count: pendingCount,

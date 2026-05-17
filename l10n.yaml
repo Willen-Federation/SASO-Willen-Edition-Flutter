@@ -1,5 +1,10 @@
 arb-dir: assets/l10n
 template-arb-file: app_ja.arb
+# Emit the generated files under lib/ so they can be imported with the
+# `package:saso_willen_edition/l10n/…` path. Flutter 3.30+ removed the
+# synthetic `package:flutter_gen` package, so emitting in-tree is the only
+# supported path forward.
+output-dir: lib/l10n
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 preferred-supported-locales:

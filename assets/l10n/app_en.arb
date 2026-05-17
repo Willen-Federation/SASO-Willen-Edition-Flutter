@@ -61,6 +61,59 @@
 
   "authSessionExpired": "Your session has expired. Please log in again.",
   "authNetworkError": "Network error: {detail}",
+  "pairedDevicesSection": "Paired devices",
+  "manageDevicesOnWeb": "Manage paired devices on web",
+  "manageDevicesOnWebSubtitle": "Opens {url} in your browser to revoke or rename this device.",
+  "@manageDevicesOnWebSubtitle": {
+    "placeholders": { "url": { "type": "String" } }
+  },
+  "openWebPortalFailed": "Could not open the web portal: {detail}",
+  "@openWebPortalFailed": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
+  "settingsSaved": "Settings saved",
+  "offlineBadge": "Offline",
+  "offlineMode": "Offline mode",
+  "offlineModeDescription": "When ON, writes are queued locally instead of being sent to the server.",
+  "downloadAllData": "Download all data",
+  "sendPendingData": "Send pending data",
+  "featureNotReady": "This feature is coming soon",
+  "settingsHeader": "Server settings",
+
+  "scopeInsufficientTitle": "This device cannot do that",
+  "scopeInsufficientDetail": "Your paired device is missing the {scope} permission. Re-pair from /mypage to get the right scopes.",
+  "@scopeInsufficientDetail": {
+    "placeholders": { "scope": { "type": "String" } }
+  },
+  "scopeInsufficientCta": "Re-pair device",
+
+  "qrPairingSuccessTitle": "Device paired",
+  "qrPairingSuccessBody": "{server} is now linked to this device.",
+  "@qrPairingSuccessBody": {
+    "placeholders": { "server": { "type": "String" } }
+  },
+  "qrPairingContinue": "Continue",
+  "qrPairingNoServerUrl": "No server URL is configured. Set it in Settings first.",
+  "qrPairingServerInvalid": "The configured server URL is invalid: {detail}",
+  "@qrPairingServerInvalid": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+  "qrPairingQrUrlInvalid": "The server URL in the QR code is not valid.",
+  "qrPairingUrlMismatchExplain": "The QR code's server URL doesn't match what's configured. Pairing was cancelled for your safety.",
+  "qrPairingInstruction": "Scan the QR code shown on the SASO admin screen.",
+
+  "connectionTestUrlMissing": "Server URL is empty.",
+  "connectionTestUrlInvalid": "Server URL is malformed.",
+  "connectionTestHttpError": "Server returned HTTP {statusCode}.",
+  "@connectionTestHttpError": {
+    "placeholders": { "statusCode": { "type": "int" } }
+  },
+  "connectionTestFailure": "Connection failed: {detail}",
+  "@connectionTestFailure": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
   "featureFlags": "Feature Flags",
   "flagRestApi": "REST API v1",
   "flagPushFcm": "FCM Push Notifications",

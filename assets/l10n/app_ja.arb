@@ -88,6 +88,59 @@
     "placeholders": { "detail": { "type": "String" } }
   },
 
+  "pairedDevicesSection": "ペアリング済み端末",
+  "manageDevicesOnWeb": "ペアリング端末をブラウザで管理",
+  "manageDevicesOnWebSubtitle": "{url} をブラウザで開いて、端末の取り消しや名前変更を行います。",
+  "@manageDevicesOnWebSubtitle": {
+    "placeholders": { "url": { "type": "String" } }
+  },
+  "openWebPortalFailed": "ブラウザを開けませんでした: {detail}",
+  "@openWebPortalFailed": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
+  "settingsSaved": "設定を保存しました",
+  "offlineBadge": "オフライン",
+  "offlineMode": "オフラインモード",
+  "offlineModeDescription": "ONにすると書き込みをキューに蓄積し、サーバーへ送らない",
+  "downloadAllData": "全データをダウンロード",
+  "sendPendingData": "保留中データを送信",
+  "featureNotReady": "この機能は今後対応予定です",
+  "settingsHeader": "サーバー設定",
+
+  "scopeInsufficientTitle": "この端末では操作できません",
+  "scopeInsufficientDetail": "ペアリング済み端末に「{scope}」の権限がありません。/mypage から再ペアリングしてください。",
+  "@scopeInsufficientDetail": {
+    "placeholders": { "scope": { "type": "String" } }
+  },
+  "scopeInsufficientCta": "端末を再ペアリング",
+
+  "qrPairingSuccessTitle": "ペアリング完了",
+  "qrPairingSuccessBody": "{server} とこの端末が連携しました。",
+  "@qrPairingSuccessBody": {
+    "placeholders": { "server": { "type": "String" } }
+  },
+  "qrPairingContinue": "続ける",
+  "qrPairingNoServerUrl": "サーバーURLが設定されていません。設定画面から入力してください。",
+  "qrPairingServerInvalid": "設定済みのサーバーURLが不正です: {detail}",
+  "@qrPairingServerInvalid": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+  "qrPairingQrUrlInvalid": "QRコードに含まれるサーバーURLが不正です。",
+  "qrPairingUrlMismatchExplain": "QRコードのサーバーURLが設定と一致しません。安全のため取り消されました。",
+  "qrPairingInstruction": "SASO管理画面に表示されたQRコードをスキャンしてください",
+
+  "connectionTestUrlMissing": "サーバーURLが未入力です",
+  "connectionTestUrlInvalid": "サーバーURLの形式が不正です",
+  "connectionTestHttpError": "サーバーが HTTP {statusCode} を返しました",
+  "@connectionTestHttpError": {
+    "placeholders": { "statusCode": { "type": "int" } }
+  },
+  "connectionTestFailure": "接続失敗: {detail}",
+  "@connectionTestFailure": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
   "featureFlags": "機能フラグ",
   "flagRestApi": "REST API v1",
   "flagPushFcm": "FCMプッシュ通知",

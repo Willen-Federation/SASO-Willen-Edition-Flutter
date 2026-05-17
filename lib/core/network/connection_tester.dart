@@ -46,12 +46,12 @@ class ConnectionTester {
     }
 
     if (config.baseUrl.isEmpty) {
-      return const ConnectionTestResult.failure(message: 'サーバーURLが未入力です');
+      return const ConnectionTestResult.failure(message: 'URL_MISSING');
     }
 
     final uri = _probeUri(config);
     if (uri == null) {
-      return const ConnectionTestResult.failure(message: 'サーバーURLの形式が不正です');
+      return const ConnectionTestResult.failure(message: 'URL_INVALID');
     }
 
     final headers = _headers(config);
@@ -66,13 +66,13 @@ class ConnectionTester {
         );
       }
       return ConnectionTestResult.failure(
-        message: 'サーバーが HTTP ${response.statusCode} を返しました',
+        message: 'HTTP_ERROR',
         statusCode: response.statusCode,
       );
     } on TimeoutException {
       return ConnectionTestResult.timeout(timeout: _timeout);
     } catch (e) {
-      return ConnectionTestResult.failure(message: '接続失敗: $e');
+      return ConnectionTestResult.failure(message: 'NETWORK_ERROR:$e');
     }
   }
 

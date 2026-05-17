@@ -42,6 +42,8 @@ enum SasoErrorDomain {
   shelf,
   install,
   infra,
+  draft,
+  mobile,
   unknown;
 
   static SasoErrorDomain fromString(String s) => switch (s.toUpperCase()) {
@@ -51,6 +53,15 @@ enum SasoErrorDomain {
     'SHELF' => SasoErrorDomain.shelf,
     'INSTALL' => SasoErrorDomain.install,
     'INFRA' => SasoErrorDomain.infra,
+    'DRAFT' => SasoErrorDomain.draft,
+    'MOBILE' => SasoErrorDomain.mobile,
     _ => SasoErrorDomain.unknown,
   };
+}
+
+extension SasoErrorScope on ProblemDetails {
+  /// True when this is the `SASO-MOBILE-2008` scope-insufficient response.
+  /// Mobile clients should surface a "re-pair this device" CTA in this case.
+  bool get isScopeInsufficient =>
+      sasoCode == 'SASO-MOBILE-2008' && status == 403;
 }

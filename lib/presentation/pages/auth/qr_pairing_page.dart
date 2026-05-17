@@ -1,8 +1,12 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:saso_willen_edition/l10n/app_localizations.dart';
 
 import '../../../core/auth/auth_service.dart';
 import '../../../core/network/url_validator.dart';
@@ -15,7 +19,8 @@ import '../../providers/server_config_provider.dart';
 ///   SASO1:{base64url_token}|{server_url}
 ///
 /// After a successful scan the pairing token is exchanged for a JWT via
-/// POST /api/v1/mobile/connect.  On success the app navigates to /home.
+/// POST /api/v1/mobile/connect. On success the user sees a brief
+/// confirmation dialog before being routed to /home.
 class QrPairingPage extends ConsumerStatefulWidget {
   const QrPairingPage({super.key});
 
@@ -41,6 +46,8 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     final raw = capture.barcodes.firstOrNull?.rawValue;
     if (raw == null || !raw.startsWith(_prefix)) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _processing = true;
       _errorMessage = null;
@@ -62,7 +69,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     if (configuredUrl.isEmpty) {
       setState(() {
         _processing = false;
-        _errorMessage = 'サーバーURLが設定されていません。設定画面から入力してください。';
+        _errorMessage = l10n.qrPairingNoServerUrl;
       });
       await _controller.start();
       return;
@@ -74,7 +81,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     } on ArgumentError catch (e) {
       setState(() {
         _processing = false;
-        _errorMessage = '設定済みのサーバーURLが不正です: ${e.message}';
+        _errorMessage = l10n.qrPairingServerInvalid(e.message.toString());
       });
       await _controller.start();
       return;
@@ -87,7 +94,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
       } on ArgumentError {
         setState(() {
           _processing = false;
-          _errorMessage = 'QRコードに含まれるサーバーURLが不正です。';
+          _errorMessage = l10n.qrPairingQrUrlInvalid;
         });
         await _controller.start();
         return;
@@ -97,7 +104,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
           claimed.port != configured.port) {
         setState(() {
           _processing = false;
-          _errorMessage = 'QRコードのサーバーURLが設定と一致しません。安全のため取り消されました。';
+          _errorMessage = l10n.qrPairingUrlMismatchExplain;
         });
         await _controller.start();
         return;
@@ -113,7 +120,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     if (!mounted) return;
 
     result.when(
-      success: (_, __, ___, ____) => context.go('/home'),
+      success: (_, __, ___, ____) => _showPairingSuccess(configured.host),
       failure: (msg, __) {
         setState(() {
           _processing = false;
@@ -124,12 +131,62 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     );
   }
 
+  /// Shows a brief success confirmation before navigating, using the
+  /// platform-native dialog style. iPhone 17 (iOS 26.5) gets a Cupertino
+  /// alert, Pixel 7a stays on Material — both with the same pictogram.
+  Future<void> _showPairingSuccess(String serverHost) async {
+    final l10n = AppLocalizations.of(context)!;
+    final navigator = GoRouter.of(context);
+    final useCupertino = !kIsWeb && Platform.isIOS;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) {
+        const successIcon = Icon(
+          Icons.check_circle_outline,
+          color: Colors.green,
+          size: 48,
+        );
+
+        if (useCupertino) {
+          return CupertinoAlertDialog(
+            title: Column(
+              children: [
+                successIcon,
+                const SizedBox(height: 8),
+                Text(l10n.qrPairingSuccessTitle),
+              ],
+            ),
+            content: Text(l10n.qrPairingSuccessBody(serverHost)),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () => Navigator.of(dialogCtx).pop(),
+                child: Text(l10n.qrPairingContinue),
+              ),
+            ],
+          );
+        }
+        return AlertDialog(
+          icon: successIcon,
+          title: Text(l10n.qrPairingSuccessTitle),
+          content: Text(l10n.qrPairingSuccessBody(serverHost)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text(l10n.qrPairingContinue),
+            ),
+          ],
+        );
+      },
+    );
+    if (!mounted) return;
+    navigator.go('/home');
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Issue #21 — i18n adoption. The title is the first proof-of-wire
-    // call site; the rest of this page's hardcoded strings are TODO
-    // for a follow-up sweep once the i18n PR has merged and the
-    // generated AppLocalizations is in `flutter pub get` output.
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
@@ -175,10 +232,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
               padding: const EdgeInsets.all(16),
               child:
                   _processing
-                      ? const Row(
+                      ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
@@ -186,10 +243,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                               color: Colors.white,
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Text(
-                            'ペアリング中...',
-                            style: TextStyle(color: Colors.white),
+                            l10n.qrPairingInProgress,
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       )
@@ -204,9 +261,9 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                             ),
                             const SizedBox(height: 8),
                           ],
-                          const Text(
-                            'SASO管理画面に表示されたQRコードをスキャンしてください',
-                            style: TextStyle(color: Colors.white70),
+                          Text(
+                            l10n.qrPairingInstruction,
+                            style: const TextStyle(color: Colors.white70),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -218,3 +275,4 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     );
   }
 }
+
