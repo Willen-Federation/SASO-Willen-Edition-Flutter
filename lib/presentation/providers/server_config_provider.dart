@@ -2,8 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/storage/secure_storage.dart';
 import '../../core/network/url_validator.dart';
+import '../../core/storage/secure_storage.dart';
 
 part 'server_config_provider.freezed.dart';
 part 'server_config_provider.g.dart';
