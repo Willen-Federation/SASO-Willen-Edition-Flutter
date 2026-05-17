@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Issue #26-MED-008 — APNs environment entitlement.
+
+      `aps-environment` is the Apple-required entitlement for push
+      notifications. Without it, APNs registration fails silently and
+      Firebase Messaging never receives a real token on iOS — the app
+      thinks it's registered but the OS strips the request at the
+      entitlement layer.
+
+      `development` value matches debug + TestFlight builds; the App
+      Store production build flips to `production` automatically when
+      the App ID's Push Notifications capability is enabled in
+      App Store Connect (Xcode build settings handle the swap).
+
+      TODO(release-eng): confirm the App ID has Push Notifications
+      enabled in the Apple Developer Portal. If not, this entitlement
+      will cause a code-signing failure at build time, which is the
+      right fail-loud behaviour — better than silent registration
+      failure at runtime.
+    -->
+    <key>aps-environment</key>
+    <string>development</string>
+</dict>
+</plist>
