@@ -82,10 +82,37 @@ class AuthStateNotifier extends _$AuthStateNotifier {
   AuthState build() => const AuthState.unauthenticated();
 
   /// Tries to restore credentials from secure storage on app start.
+  ///
+  /// Issue #31 — OIDC fast path is checked first: when an OIDC refresh
+  /// token is persisted, we route through `OidcAuthService.restoreSession()`
+  /// so the fail-closed expiry check runs (and a silent refresh fires
+  /// when the access token is dead but the refresh token is alive).
+  /// Falls back to the legacy raw-jwt path for non-OIDC providers.
   Future<void> loadStoredCredentials() async {
     state = const AuthState.loading();
     try {
       final secureStorage = ref.read(secureStorageProvider);
+
+      final oidcRefresh = await secureStorage.read(
+        AppConstants.oidcRefreshTokenKey,
+      );
+      if (oidcRefresh != null) {
+        final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+        final oidc = OidcAuthService(serverUrl, secureStorage);
+        final restored = await oidc.restoreSession();
+        if (restored) {
+          state = AuthState.authenticated(
+            userId: oidc.currentUserId ?? 'oidc',
+            token: oidc.currentToken,
+          );
+          return;
+        }
+        // restoreSession() returned false → session was unrecoverable
+        // (expired access token + dead refresh token). Fall through to
+        // the legacy path; in practice this will land on
+        // unauthenticated because restoreSession() cleared the keys.
+      }
+
       final token = await secureStorage.read(AppConstants.jwtTokenKey);
       if (token != null && token.isNotEmpty) {
         state = AuthState.authenticated(userId: 'restored', token: token);
