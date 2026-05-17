@@ -108,9 +108,10 @@ class MockApiClient implements SasoApiClient {
     if (existing == null) throw Exception('Item not found: $itemId');
     return existing.copyWith(
       name: (patch['name'] as String?) ?? existing.name,
-      description: patch.containsKey('description')
-          ? patch['description'] as String?
-          : existing.description,
+      description:
+          patch.containsKey('description')
+              ? patch['description'] as String?
+              : existing.description,
     );
   }
 }
