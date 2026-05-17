@@ -88,16 +88,10 @@
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
+		<!-- ATS strict: HTTPS only, TLS 1.2+, forward secrecy required.
+		     For local dev against an http://localhost backend, configure a
+		     Debug-only Info.plist (or xcconfig overlay) instead of relaxing
+		     production. See SECURITY.md. -->
 	</dict>
 </dict>
 </plist>
