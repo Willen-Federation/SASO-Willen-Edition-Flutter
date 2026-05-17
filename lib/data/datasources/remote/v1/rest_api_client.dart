@@ -360,6 +360,36 @@ class RestV1ApiClient implements SasoApiClient {
     _handleErrors(response);
   }
 
+  /// Register an FCM / APNs push token with the SASO backend so the
+  /// server can fan out notifications to this device.
+  ///
+  /// Issue #19 — Flutter side ships this method ahead of the backend
+  /// `POST /api/v1/mobile/devices/push-token` endpoint. While the
+  /// backend rollout is in flight the server may answer:
+  ///   * 404 — endpoint not yet deployed at all
+  ///   * 501 — endpoint reserved but `device_push_token` table missing
+  /// Both are treated as a no-op so the auth flow doesn't regress.
+  /// Any other failure is surfaced via `_handleErrors`.
+  ///
+  /// `platform`: `'fcm'` on Android, `'apns'` on iOS. Server is the
+  /// authority on the enumeration; this method passes the value
+  /// through unmodified.
+  Future<void> registerPushToken({
+    required String token,
+    required String platform,
+  }) async {
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/devices/push-token');
+    final response = await _http
+        .post(
+          uri,
+          headers: _headers,
+          body: jsonEncode({'token': token, 'platform': platform}),
+        )
+        .timeout(AppConstants.httpTimeout);
+    if (response.statusCode == 404 || response.statusCode == 501) return;
+    _handleErrors(response);
+  }
+
   // ---------------------------------------------------------------------------
   // Feature flags (admin / debug)
   // ---------------------------------------------------------------------------

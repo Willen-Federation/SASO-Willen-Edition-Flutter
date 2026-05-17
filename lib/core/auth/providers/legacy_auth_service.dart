@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../constants/app_constants.dart';
+import '../../network/url_validator.dart';
 import '../../storage/secure_storage.dart';
 import '../auth_service.dart';
 
@@ -30,8 +31,16 @@ class LegacyAuthService implements AuthService {
     required String username,
     required String password,
   }) async {
+    final Uri base;
     try {
-      final uri = Uri.parse('$serverUrl/auth/start');
+      base = UrlValidator.ensureHttpsOrLoopback(serverUrl);
+    } on ArgumentError catch (e) {
+      return AuthResult.failure(
+        message: 'Server URL must use HTTPS: ${e.message}',
+      );
+    }
+    try {
+      final uri = base.replace(path: '${base.path}/auth/start');
       final response = await http
           .post(
             uri,
