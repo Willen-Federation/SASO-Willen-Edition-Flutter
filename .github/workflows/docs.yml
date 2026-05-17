@@ -61,7 +61,10 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --clean --verbose
+        # Note: `--verbose` was removed (issue #37) — the flag leaks
+        # plugin-internal paths and absolute repo paths into the public
+        # CI log. Re-enable only when actively debugging a deploy.
+        run: mkdocs gh-deploy --force --clean
         env:
           # Ensures git config is set for the deploy commit
           GIT_AUTHOR_NAME: github-actions[bot]
