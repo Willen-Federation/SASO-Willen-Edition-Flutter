@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/storage/secure_storage.dart';
+import '../../core/network/url_validator.dart';
 
 part 'server_config_provider.freezed.dart';
 part 'server_config_provider.g.dart';
@@ -55,10 +56,11 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
   }
 
   Future<void> save({required String url, required ApiMode mode}) async {
+    final normalized = UrlValidator.ensureHttpsOrLoopback(url).toString();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AppConstants.serverUrlKey, url);
+    await prefs.setString(AppConstants.serverUrlKey, normalized);
     await prefs.setInt(AppConstants.apiModeKey, mode.index);
-    state = state.copyWith(baseUrl: url, apiMode: mode);
+    state = state.copyWith(baseUrl: normalized, apiMode: mode);
   }
 
   void updateToken(String token) {
