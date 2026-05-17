@@ -34,10 +34,11 @@ void main() {
       httpClient: backend.toClient(),
     );
 
-    await client.createItem({
-      'name': 'Test',
-      'categoryId': 1,
-    }, idempotencyKey: 'deadbeef-1234-4abc-9def-1234567890ab');
+    final body = <String, Object>{'name': 'Test', 'categoryId': 1};
+    await client.createItem(
+      body,
+      idempotencyKey: 'deadbeef-1234-4abc-9def-1234567890ab',
+    );
 
     expect(observedKey, 'deadbeef-1234-4abc-9def-1234567890ab');
   });
