@@ -214,17 +214,6 @@ class RestV1ApiClient implements SasoApiClient {
           .timeout(AppConstants.httpTimeout);
       return http.Response.fromStream(streamed);
     });
-    final headers = {
-      ..._headers,
-      if (idempotencyKey != null) 'Idempotency-Key': idempotencyKey,
-    };
-    final request = http.Request('PATCH', uri);
-    request.headers.addAll(headers);
-    request.body = jsonEncode(patch);
-    final streamed = await _http
-        .send(request)
-        .timeout(AppConstants.httpTimeout);
-    final response = await http.Response.fromStream(streamed);
     _handleErrors(response);
     return ItemModel.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
