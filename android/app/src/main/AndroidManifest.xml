@@ -29,10 +29,26 @@
 
         <!-- flutter_web_auth_2 callback receiver: catches the
              jp.willen.saso://callback redirect from the SASO server's
-             mobile pairing flow. -->
+             mobile pairing flow.
+
+             Issue #26-MED-002 — hardening:
+             * `launchMode="singleTask"` ensures only one CallbackActivity
+               instance ever exists. Without this, parallel custom-tab
+               redirects could spawn duplicate activities and the auth
+               handoff would race.
+             * `taskAffinity=""` opts the activity out of the default
+               task affinity. Together with `excludeFromRecents="true"`
+               this prevents another app from declaring the same task
+               affinity and intercepting the redirect via task hijacking.
+             * `excludeFromRecents="true"` keeps the bare callback
+               activity out of the recents UI — it has no meaningful
+               UI of its own, only a brief hand-off back to MainActivity. -->
         <activity
             android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
             <intent-filter android:label="flutter_web_auth_2">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
