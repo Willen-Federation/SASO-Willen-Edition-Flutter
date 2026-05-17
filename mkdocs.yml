@@ -75,6 +75,8 @@ plugins:
             レガシー API 接続: Legacy API
             REST API v1 リファレンス: REST API v1 reference
             Flutter 必要 API 要件定義: Flutter API Requirements
+            セキュリティ: Security
+            2026-05-17 Medium 監査クローズ: 2026-05-17 medium audit closure
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -124,6 +126,8 @@ nav:
     - レガシー API 接続: api/legacy.md
     - REST API v1 リファレンス: api/reference.md
     - Flutter 必要 API 要件定義: api/flutter-requirements.md
+  - セキュリティ:
+    - 2026-05-17 Medium 監査クローズ: security/medium-audit-2026-05-17.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
