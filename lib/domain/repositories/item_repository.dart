@@ -6,6 +6,9 @@ abstract interface class ItemRepository {
   Future<List<Item>> search({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
     int limit = 20,
   });
   Future<List<Item>> fetchByShelf(String shelfId);

@@ -22,6 +22,11 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Amplify SDK (push notifications, annotations, common-core) uses
+        // Java 8 API surface (java.time, etc.) that is not available below
+        // API 26 without desugaring. Enabling this lets D8/R8 rewrite those
+        // calls so they work down to minSdk 21.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -36,6 +41,15 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Manifest placeholders required by auth0_flutter and flutter_appauth /
+        // net.openid.appauth libraries. The actual Auth0 tenant domain is
+        // fetched from the server's /api/v1/auth/providers at runtime, so a
+        // build-time placeholder is sufficient for the manifest merger to pass.
+        // Override auth0Domain per build flavour / CI when publishing.
+        manifestPlaceholders["auth0Domain"] = "placeholder.auth0.com"
+        manifestPlaceholders["auth0Scheme"] = "jp.willen.saso"
+        manifestPlaceholders["appAuthRedirectScheme"] = "jp.willen.saso"
     }
 
     signingConfigs {
@@ -77,4 +91,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Required for Amplify SDK JARs that use java.time / java.util.function
+    // APIs on devices below API 26 (minSdk 21). Must be kept in sync with the
+    // AGP version — desugar_jdk_libs 2.x works with AGP 8.9.x.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

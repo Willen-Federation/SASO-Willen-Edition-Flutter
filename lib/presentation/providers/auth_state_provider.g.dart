@@ -45,7 +45,7 @@ final authProviderConfigNotifierProvider = AutoDisposeNotifierProvider<
 );
 
 typedef _$AuthProviderConfigNotifier = AutoDisposeNotifier<AuthProviderConfig>;
-String _$authStateNotifierHash() => r'89e5259de412fe1be1c4963d63a5244d350c6266';
+String _$authStateNotifierHash() => r'6b9d5a4ac75c856301ede052fc9ee3123f4f9c46';
 
 /// See also [AuthStateNotifier].
 @ProviderFor(AuthStateNotifier)

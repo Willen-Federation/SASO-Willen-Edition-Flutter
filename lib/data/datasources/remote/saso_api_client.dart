@@ -10,7 +10,13 @@ import '../../models/shelf_model.dart';
 ///   v1.0 → RestV1ApiClient (/api/v1/*)
 abstract interface class SasoApiClient {
   Future<ItemModel> fetchItem(String itemId);
-  Future<List<ItemModel>> searchItems({String? query, String? categoryId});
+  Future<List<ItemModel>> searchItems({
+    String? query,
+    String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
+  });
   Future<List<CategoryModel>> fetchCategories();
   Future<ShelfModel> fetchShelf(String shelfId);
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId);

@@ -47,11 +47,17 @@ class ItemRepositoryImpl implements ItemRepository {
   Future<List<Item>> search({
     String? query,
     String? categoryId,
+    String? barcode,
+    String? isbn,
+    String? labelCode,
     int limit = 20,
   }) async {
     final models = await _apiClient.searchItems(
       query: query,
       categoryId: categoryId,
+      barcode: barcode,
+      isbn: isbn,
+      labelCode: labelCode,
     );
     await _cache.writeAll(models);
     return models.map((m) => m.toDomain()).take(limit).toList();

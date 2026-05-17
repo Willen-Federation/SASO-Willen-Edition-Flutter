@@ -9,6 +9,7 @@ abstract final class AppConstants {
   static const String refreshTokenKey = 'refresh_token';
   static const String deviceIdKey = 'device_id';
   static const String offlineModeKey = 'offline_mode';
+  static const String aiAutofillKey = 'ai_autofill';
   static const String authProviderKey = 'auth_provider_cache';
 
   // OIDC session persistence (see issue #31). Stored in SecureStorage so

@@ -13,6 +13,9 @@ abstract class Item with _$Item {
     String? description,
     required Category category,
     @Default([]) List<Feature> features,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
     required DateTime registeredAt,
     DateTime? updatedAt,
   }) = _Item;

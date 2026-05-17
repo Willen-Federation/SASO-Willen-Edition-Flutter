@@ -39,6 +39,9 @@ _ItemModel _$ItemModelFromJson(Map<String, dynamic> json) => _ItemModel(
           ?.map((e) => FeatureModel.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  janCode: json['janCode'] as String?,
+  isbnCode: json['isbnCode'] as String?,
+  labelCode: json['labelCode'] as String?,
   registeredAt: json['registeredAt'] as String,
   updatedAt: json['updatedAt'] as String?,
 );
@@ -51,6 +54,9 @@ Map<String, dynamic> _$ItemModelToJson(_ItemModel instance) =>
       'categoryId': instance.categoryId,
       'categoryName': instance.categoryName,
       'features': instance.features,
+      'janCode': instance.janCode,
+      'isbnCode': instance.isbnCode,
+      'labelCode': instance.labelCode,
       'registeredAt': instance.registeredAt,
       'updatedAt': instance.updatedAt,
     };

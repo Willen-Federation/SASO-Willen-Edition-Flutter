@@ -81,6 +81,51 @@ class _ItemDetail extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
+        // Label code (custom shelf label)
+        if (item.labelCode != null) ...[
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.label_outline),
+              title: const Text('ラベルコード'),
+              subtitle: Text(
+                item.labelCode!,
+                style: const TextStyle(fontFamily: 'monospace'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        // JAN code
+        if (item.janCode != null) ...[
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.barcode_reader),
+              title: const Text('JANコード'),
+              subtitle: Text(
+                item.janCode!,
+                style: const TextStyle(fontFamily: 'monospace'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        // ISBN
+        if (item.isbnCode != null) ...[
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.menu_book_outlined),
+              title: const Text('ISBN'),
+              subtitle: Text(
+                item.isbnCode!,
+                style: const TextStyle(fontFamily: 'monospace'),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
         // Registration date
         Card(
           child: ListTile(

@@ -20,6 +20,7 @@ abstract class ServerConfig with _$ServerConfig {
     String? refreshToken,
     int? deviceId,
     @Default(false) bool offlineMode,
+    @Default(false) bool aiAutofillEnabled,
   }) = _ServerConfig;
 }
 
@@ -46,12 +47,14 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final refreshToken = await secureStorage.read(AppConstants.refreshTokenKey);
     final deviceId = prefs.getInt(AppConstants.deviceIdKey);
     final offlineMode = prefs.getBool(AppConstants.offlineModeKey) ?? false;
+    final aiAutofill = prefs.getBool(AppConstants.aiAutofillKey) ?? false;
     state = ServerConfig(
       baseUrl: url,
       apiMode: ApiMode.values[modeIndex],
       refreshToken: refreshToken,
       deviceId: deviceId,
       offlineMode: offlineMode,
+      aiAutofillEnabled: aiAutofill,
     );
   }
 
@@ -91,6 +94,12 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(AppConstants.offlineModeKey, enabled);
     state = state.copyWith(offlineMode: enabled);
+  }
+
+  Future<void> setAiAutofill({required bool enabled}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(AppConstants.aiAutofillKey, enabled);
+    state = state.copyWith(aiAutofillEnabled: enabled);
   }
 
   Future<void> clearTokens() async {

@@ -1,6 +1,6 @@
 FLUTTER     := flutter
 DART        := dart
-IOS26_DEVICE := 6220269A-82B9-4382-B652-952116BA7E80
+IOS26_DEVICE := E95411CE-1DAF-4FDD-98CB-ED4F0BE0111F
 
 .PHONY: setup gen fmt analyze test test-unit test-widget test-integration \
         test-all build-ios-sim run-ios clean help verify
