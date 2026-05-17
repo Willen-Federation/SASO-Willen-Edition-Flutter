@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -87,9 +88,14 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Issue #21 — i18n adoption. The title is the first proof-of-wire
+    // call site; the rest of this page's hardcoded strings are TODO
+    // for a follow-up sweep once the i18n PR has merged and the
+    // generated AppLocalizations is in `flutter pub get` output.
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QRペアリング'),
+        title: Text(l10n.qrPairingTitle),
         actions: [
           IconButton(
             icon: ValueListenableBuilder(
