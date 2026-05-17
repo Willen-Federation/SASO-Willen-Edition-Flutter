@@ -61,6 +61,16 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // R8 minification + resource shrinking. Removes unused
+            // classes / resources and renames symbols, lowering the
+            // cost of reverse engineering and shrinking the APK by
+            // several MB on this dep set.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
