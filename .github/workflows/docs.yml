@@ -6,7 +6,8 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
-  # Allow manual trigger from the Actions tab
+  # Allow manual trigger from the Actions tab — gated below so only
+  # users with admin/maintain permission on this repo can dispatch.
   workflow_dispatch:
 
 # Allow gh-pages branch to be written by this workflow
@@ -19,6 +20,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Issue #33 — authz guard for workflow_dispatch.
+      # Push events from `main` are always trusted (already protected by
+      # branch protection). For manual dispatch we query the GitHub API
+      # for the actor's repo permission and fail unless they have
+      # `admin` or `maintain`. This prevents a user with `write` access
+      # (enough to push to a feature branch) from also triggering a
+      # production docs deploy by hand.
+      - name: Authorize manual trigger
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          permission=$(gh api \
+            "/repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission" \
+            --jq '.permission')
+          case "$permission" in
+            admin|maintain)
+              echo "User ${{ github.actor }} authorized (permission=$permission)"
+              ;;
+            *)
+              echo "::error::User ${{ github.actor }} (permission=$permission) is not authorized to dispatch this workflow. admin or maintain required."
+              exit 1
+              ;;
+          esac
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
