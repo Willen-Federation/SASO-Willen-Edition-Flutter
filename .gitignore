@@ -1,6 +1,12 @@
 # Miscellaneous
 *.class
 *.lock
+# Issue #26-MED-006 — Dart application projects (publish_to: none)
+# must check in pubspec.lock so every developer + CI runner
+# resolves the exact same package graph. The `*.lock` rule above is
+# kept for everything else (editor swap locks, vendored lock files);
+# this is the narrow unignore.
+!pubspec.lock
 *.log
 *.pyc
 *.swp
