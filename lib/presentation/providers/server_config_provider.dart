@@ -13,7 +13,7 @@ enum ApiMode { mock, legacy, rest }
 @freezed
 abstract class ServerConfig with _$ServerConfig {
   const factory ServerConfig({
-    @Default('https://saso.sksl.jp') String baseUrl,
+    @Default('') String baseUrl,
     @Default(ApiMode.rest) ApiMode apiMode,
     String? sessionCookie,
     String? jwtToken,
@@ -42,8 +42,7 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
       await prefs.remove(AppConstants.refreshTokenKey);
     }
 
-    final url =
-        prefs.getString(AppConstants.serverUrlKey) ?? 'https://saso.sksl.jp';
+    final url = prefs.getString(AppConstants.serverUrlKey) ?? '';
     final modeIndex =
         prefs.getInt(AppConstants.apiModeKey) ?? ApiMode.rest.index;
     final refreshToken = await secureStorage.read(AppConstants.refreshTokenKey);
