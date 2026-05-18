@@ -108,23 +108,46 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _loginWithManualToken() async {
-    final token = _manualTokenController.text.trim();
-    if (token.isEmpty) {
-      setState(() => _errorMessage = 'トークンを入力してください');
+    final raw = _manualTokenController.text.trim();
+    if (raw.isEmpty) {
+      setState(() => _errorMessage = 'ペアリングトークンを入力してください');
       return;
     }
+    final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+    if (serverUrl.isEmpty) {
+      setState(() => _errorMessage = 'サーバーURLが設定されていません');
+      return;
+    }
+
+    // Accept either a raw pairing token, or the full `SASO1:{token}|{host}`
+    // payload (the same string a QR scan would produce). The token segment
+    // is whatever sits between `SASO1:` and `|`.
+    var pairingToken = raw;
+    if (pairingToken.startsWith('SASO1:')) {
+      pairingToken = pairingToken.substring('SASO1:'.length);
+    }
+    final pipe = pairingToken.indexOf('|');
+    if (pipe >= 0) {
+      pairingToken = pairingToken.substring(0, pipe);
+    }
+
     setState(() {
       _loading = true;
       _errorMessage = null;
     });
-    // Treat the manually entered token as a pre-issued JWT.
-    ref.read(serverConfigNotifierProvider.notifier).updateToken(token);
+
+    final result = await ref
+        .read(authStateNotifierProvider.notifier)
+        .loginWithQrToken(pairingToken: pairingToken, serverUrl: serverUrl);
+
     if (!mounted) return;
-    // Mark as authenticated — token validity is verified on first API call.
-    ref.read(authStateNotifierProvider.notifier);
-    await ref.read(authStateNotifierProvider.notifier).loadStoredCredentials();
-    if (!mounted) return;
-    context.go('/home');
+    result.when(
+      success: (_, __, ___, ____) => context.go('/home'),
+      failure: (msg, _) => setState(() {
+        _loading = false;
+        _errorMessage = msg;
+      }),
+    );
   }
 
   @override
@@ -233,12 +256,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                   if (_showManualToken) ...[
                     const SizedBox(height: 8),
+                    Text(
+                      'サーバー画面 (/mypage/devicePair) で発行したペアリングトークンを貼り付けてください。',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     TextField(
                       key: const Key('manual_token_field'),
                       controller: _manualTokenController,
                       decoration: const InputDecoration(
-                        labelText: 'アクセストークン',
-                        hintText: 'eyJ...',
+                        labelText: 'ペアリングトークン',
+                        hintText: 'SASO1:... もしくは生トークン',
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 3,
@@ -247,7 +277,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     FilledButton(
                       key: const Key('manual_token_submit'),
                       onPressed: _loginWithManualToken,
-                      child: const Text('このトークンで続行'),
+                      child: const Text('ペアリングを実行'),
                     ),
                   ],
                 ],

@@ -128,6 +128,19 @@ class _ItemDetail extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
 
+        if (item.note != null && item.note!.isNotEmpty) ...[
+          Card(
+            key: const Key('item_note_card'),
+            child: ListTile(
+              leading: const Icon(Icons.sticky_note_2_outlined),
+              title: const Text('備考'),
+              subtitle: Text(item.note!),
+              isThreeLine: item.note!.length > 40,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
         if (item.features.isNotEmpty) ...[
           Text('バリエーション', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
