@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/feature.dart';
 import '../../domain/entities/item.dart';
+import '../../domain/entities/item_status.dart';
 import '../../domain/value_objects/feature_code.dart';
 import '../../domain/value_objects/item_id.dart';
 
@@ -50,6 +51,7 @@ abstract class ItemModel with _$ItemModel {
     String? labelCode,
     required String registeredAt,
     String? updatedAt,
+    @Default('active') String status,
   }) = _ItemModel;
 
   factory ItemModel.fromJson(Map<String, dynamic> json) =>
@@ -71,6 +73,7 @@ abstract class ItemModel with _$ItemModel {
       labelCode: labelCode,
       registeredAt: DateTime.parse(registeredAt),
       updatedAt: updatedAt != null ? DateTime.parse(updatedAt!) : null,
+      status: ItemStatus.fromJsonValue(status),
     );
   }
 }

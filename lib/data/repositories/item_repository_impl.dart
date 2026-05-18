@@ -1,4 +1,5 @@
 import '../../domain/entities/item.dart';
+import '../../domain/entities/item_status.dart';
 import '../../domain/repositories/item_repository.dart';
 import '../../domain/value_objects/item_id.dart';
 import '../datasources/local/item_local_cache.dart';
@@ -81,6 +82,16 @@ class ItemRepositoryImpl implements ItemRepository {
     if (domainHit != null) return domainHit;
     final model = await _cache.read(id.value);
     return model?.toDomain();
+  }
+
+  @override
+  Future<Item> updateStatus(ItemId id, ItemStatus status) async {
+    final updated = await _apiClient.updateItem(id.value, {
+      'status': status.jsonValue,
+    });
+    await _cache.write(updated);
+    _domainCache.remove(id.value);
+    return updated.toDomain();
   }
 
   Future<void> clearCache() async {

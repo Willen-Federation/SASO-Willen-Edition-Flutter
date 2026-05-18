@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../value_objects/item_id.dart';
 import 'category.dart';
 import 'feature.dart';
+import 'item_status.dart';
 
 part 'item.freezed.dart';
 
@@ -18,6 +19,7 @@ abstract class Item with _$Item {
     String? labelCode,
     required DateTime registeredAt,
     DateTime? updatedAt,
+    @Default(ItemStatus.active) ItemStatus status,
   }) = _Item;
 
   const Item._();

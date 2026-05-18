@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Item {
 
- ItemId get id; String get name; String? get description; Category get category; List<Feature> get features; String? get janCode; String? get isbnCode; String? get labelCode; DateTime get registeredAt; DateTime? get updatedAt;
+ ItemId get id; String get name; String? get description; Category get category; List<Feature> get features; String? get janCode; String? get isbnCode; String? get labelCode; DateTime get registeredAt; DateTime? get updatedAt; ItemStatus get status;
 /// Create a copy of Item
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ItemCopyWith<Item> get copyWith => _$ItemCopyWithImpl<Item>(this as Item, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Item&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&const DeepCollectionEquality().equals(other.features, features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Item&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&const DeepCollectionEquality().equals(other.features, features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,category,const DeepCollectionEquality().hash(features),janCode,isbnCode,labelCode,registeredAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,category,const DeepCollectionEquality().hash(features),janCode,isbnCode,labelCode,registeredAt,updatedAt,status);
 
 @override
 String toString() {
-  return 'Item(id: $id, name: $name, description: $description, category: $category, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt)';
+  return 'Item(id: $id, name: $name, description: $description, category: $category, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt, status: $status)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $ItemCopyWith<$Res>  {
   factory $ItemCopyWith(Item value, $Res Function(Item) _then) = _$ItemCopyWithImpl;
 @useResult
 $Res call({
- ItemId id, String name, String? description, Category category, List<Feature> features, String? janCode, String? isbnCode, String? labelCode, DateTime registeredAt, DateTime? updatedAt
+ ItemId id, String name, String? description, Category category, List<Feature> features, String? janCode, String? isbnCode, String? labelCode, DateTime registeredAt, DateTime? updatedAt, ItemStatus status
 });
 
 
@@ -62,7 +62,7 @@ class _$ItemCopyWithImpl<$Res>
 
 /// Create a copy of Item
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? category = null,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? category = null,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,Object? status = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as ItemId,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as String?,isbnCode: freezed == isbnCode ? _self.isbnCode : isbnCode // ignore: 
 as String?,labelCode: freezed == labelCode ? _self.labelCode : labelCode // ignore: cast_nullable_to_non_nullable
 as String?,registeredAt: null == registeredAt ? _self.registeredAt : registeredAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ItemStatus,
   ));
 }
 /// Create a copy of Item
@@ -168,10 +169,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt,  ItemStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Item() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   return orElse();
 
 }
@@ -189,10 +190,10 @@ return $default(_that.id,_that.name,_that.description,_that.category,_that.featu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt,  ItemStatus status)  $default,) {final _that = this;
 switch (_that) {
 case _Item():
-return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +210,10 @@ return $default(_that.id,_that.name,_that.description,_that.category,_that.featu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ItemId id,  String name,  String? description,  Category category,  List<Feature> features,  String? janCode,  String? isbnCode,  String? labelCode,  DateTime registeredAt,  DateTime? updatedAt,  ItemStatus status)?  $default,) {final _that = this;
 switch (_that) {
 case _Item() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.category,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   return null;
 
 }
@@ -224,7 +225,7 @@ return $default(_that.id,_that.name,_that.description,_that.category,_that.featu
 
 
 class _Item extends Item {
-  const _Item({required this.id, required this.name, this.description, required this.category, final  List<Feature> features = const [], this.janCode, this.isbnCode, this.labelCode, required this.registeredAt, this.updatedAt}): _features = features,super._();
+  const _Item({required this.id, required this.name, this.description, required this.category, final  List<Feature> features = const [], this.janCode, this.isbnCode, this.labelCode, required this.registeredAt, this.updatedAt, this.status = ItemStatus.active}): _features = features,super._();
   
 
 @override final  ItemId id;
@@ -243,6 +244,7 @@ class _Item extends Item {
 @override final  String? labelCode;
 @override final  DateTime registeredAt;
 @override final  DateTime? updatedAt;
+@override@JsonKey() final  ItemStatus status;
 
 /// Create a copy of Item
 /// with the given fields replaced by the non-null parameter values.
@@ -254,16 +256,16 @@ _$ItemCopyWith<_Item> get copyWith => __$ItemCopyWithImpl<_Item>(this, _$identit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Item&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&const DeepCollectionEquality().equals(other._features, _features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Item&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.category, category) || other.category == category)&&const DeepCollectionEquality().equals(other._features, _features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,category,const DeepCollectionEquality().hash(_features),janCode,isbnCode,labelCode,registeredAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,category,const DeepCollectionEquality().hash(_features),janCode,isbnCode,labelCode,registeredAt,updatedAt,status);
 
 @override
 String toString() {
-  return 'Item(id: $id, name: $name, description: $description, category: $category, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt)';
+  return 'Item(id: $id, name: $name, description: $description, category: $category, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt, status: $status)';
 }
 
 
@@ -274,7 +276,7 @@ abstract mixin class _$ItemCopyWith<$Res> implements $ItemCopyWith<$Res> {
   factory _$ItemCopyWith(_Item value, $Res Function(_Item) _then) = __$ItemCopyWithImpl;
 @override @useResult
 $Res call({
- ItemId id, String name, String? description, Category category, List<Feature> features, String? janCode, String? isbnCode, String? labelCode, DateTime registeredAt, DateTime? updatedAt
+ ItemId id, String name, String? description, Category category, List<Feature> features, String? janCode, String? isbnCode, String? labelCode, DateTime registeredAt, DateTime? updatedAt, ItemStatus status
 });
 
 
@@ -291,7 +293,7 @@ class __$ItemCopyWithImpl<$Res>
 
 /// Create a copy of Item
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? category = null,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? category = null,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,Object? status = null,}) {
   return _then(_Item(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as ItemId,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -303,7 +305,8 @@ as String?,isbnCode: freezed == isbnCode ? _self.isbnCode : isbnCode // ignore: 
 as String?,labelCode: freezed == labelCode ? _self.labelCode : labelCode // ignore: cast_nullable_to_non_nullable
 as String?,registeredAt: null == registeredAt ? _self.registeredAt : registeredAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ItemStatus,
   ));
 }
 

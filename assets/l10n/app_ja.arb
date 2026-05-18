@@ -19,6 +19,24 @@
   "itemFeatures": "バリエーション",
   "itemRegisteredAt": "登録日",
 
+  "itemStatus": "ステータス",
+  "itemStatusActive": "アクティブ",
+  "itemStatusArchived": "アーカイブ",
+  "itemStatusDiscontinued": "廃盤",
+  "itemStatusPending": "保留中",
+  "itemStatusInStorage": "保管中",
+  "itemStatusInUse": "利用中",
+  "itemStatusForSale": "販売中",
+  "itemStatusReserved": "仮押さえ",
+  "itemStatusShipped": "発送済み",
+  "itemStatusChange": "ステータス変更",
+  "itemStatusUpdated": "ステータスを更新しました",
+  "itemStatusUpdateFailed": "ステータス変更に失敗しました: {detail}",
+  "@itemStatusUpdateFailed": {
+    "description": "SnackBar shown when an item status PATCH fails. Placeholder is the underlying error's toString().",
+    "placeholders": { "detail": { "type": "String" } }
+  },
+
   "categoryName": "カテゴリ名",
   "noChildren": "サブカテゴリなし",
 

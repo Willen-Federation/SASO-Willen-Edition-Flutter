@@ -51,6 +51,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itemRegisteredAt => 'Registered At';
 
   @override
+  String get itemStatus => 'Status';
+
+  @override
+  String get itemStatusActive => 'Active';
+
+  @override
+  String get itemStatusArchived => 'Archived';
+
+  @override
+  String get itemStatusDiscontinued => 'Discontinued';
+
+  @override
+  String get itemStatusPending => 'Pending';
+
+  @override
+  String get itemStatusInStorage => 'In storage';
+
+  @override
+  String get itemStatusInUse => 'In use';
+
+  @override
+  String get itemStatusForSale => 'For sale';
+
+  @override
+  String get itemStatusReserved => 'Reserved';
+
+  @override
+  String get itemStatusShipped => 'Shipped';
+
+  @override
+  String get itemStatusChange => 'Change status';
+
+  @override
+  String get itemStatusUpdated => 'Status updated';
+
+  @override
+  String itemStatusUpdateFailed(String detail) {
+    return 'Failed to update status: $detail';
+  }
+
+  @override
   String get categoryName => 'Category Name';
 
   @override

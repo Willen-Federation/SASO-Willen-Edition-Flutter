@@ -1,6 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
+import 'package:flutter_riverpod/flutter_riverpod.dart' show AsyncValue, Ref;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/item.dart';
+import '../../domain/entities/item_status.dart';
 import '../../domain/value_objects/item_id.dart';
 import 'api_client_provider.dart';
 
@@ -37,4 +38,23 @@ Future<List<Item>> itemSearch(
     isbn: isbn,
     labelCode: labelCode,
   );
+}
+
+/// AsyncNotifier that performs status updates on the server and refreshes
+/// the affected [itemByIdProvider]. The notifier itself holds no domain
+/// state — its `AsyncValue<void>` simply mirrors the in-flight request so
+/// callers can react to loading/error transitions.
+@riverpod
+class ItemStatusUpdater extends _$ItemStatusUpdater {
+  @override
+  Future<void> build() async {}
+
+  Future<void> changeStatus(String itemId, ItemStatus newStatus) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = await ref.read(itemRepositoryProvider.future);
+      await repo.updateStatus(ItemId.parse(itemId), newStatus);
+      ref.invalidate(itemByIdProvider(itemId));
+    });
+  }
 }

@@ -115,6 +115,7 @@ class MockApiClient implements SasoApiClient {
           patch.containsKey('description')
               ? patch['description'] as String?
               : existing.description,
+      status: (patch['status'] as String?) ?? existing.status,
     );
   }
 }
