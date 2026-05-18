@@ -17,6 +17,7 @@ abstract class Item with _$Item {
     String? janCode,
     String? isbnCode,
     String? labelCode,
+    String? note,
     required DateTime registeredAt,
     DateTime? updatedAt,
     @Default(ItemStatus.active) ItemStatus status,

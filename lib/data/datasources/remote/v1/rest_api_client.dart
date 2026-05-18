@@ -366,33 +366,6 @@ class RestV1ApiClient implements SasoApiClient {
   }
 
   // ---------------------------------------------------------------------------
-  // Push notification registration
-  // ---------------------------------------------------------------------------
-
-  /// Register the device's push notification token with the backend so the
-  /// server can deliver pushes to this device. Issue #19.
-  ///
-  /// Silent-degrades on 404 and 501 — the endpoint may not yet be deployed
-  /// against older backends. Any other 4xx/5xx surfaces as an exception.
-  Future<void> registerPushToken({
-    required String token,
-    required String platform,
-  }) async {
-    final uri = Uri.parse('$serverUrl/api/v1/mobile/devices/push-token');
-    final response = await _authenticatedRequest(
-      () => _http
-          .post(
-            uri,
-            headers: _headers,
-            body: jsonEncode({'token': token, 'platform': platform}),
-          )
-          .timeout(AppConstants.httpTimeout),
-    );
-    if (response.statusCode == 404 || response.statusCode == 501) return;
-    _handleErrors(response);
-  }
-
-  // ---------------------------------------------------------------------------
   // Item-draft upload (replaces the /items/register-with-ai path).
   // ---------------------------------------------------------------------------
 

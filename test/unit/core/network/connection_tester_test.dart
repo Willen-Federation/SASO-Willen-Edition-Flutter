@@ -23,7 +23,9 @@ void main() {
   });
 
   test('mock mode short-circuits without HTTP', () async {
-    final result = await tester.test(const ServerConfig());
+    final result = await tester.test(
+      const ServerConfig(apiMode: ApiMode.mock),
+    );
     expect(result, isA<ConnectionTestSuccess>());
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
@@ -85,7 +87,7 @@ void main() {
 
   test('non-mock mode with empty url returns failure without HTTP', () async {
     final result = await tester.test(
-      const ServerConfig(apiMode: ApiMode.legacy),
+      const ServerConfig(apiMode: ApiMode.legacy, baseUrl: ''),
     );
     expect(result, isA<ConnectionTestFailure>());
     expect((result as ConnectionTestFailure).message, 'URL_MISSING');

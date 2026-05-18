@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,9 +14,7 @@ import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/auth/providers/saml_auth_service.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/push/push_notification_router.dart';
 import '../../core/storage/secure_storage.dart';
-import '../../data/datasources/remote/v1/rest_api_client.dart';
 import 'server_config_provider.dart';
 
 part 'auth_state_provider.g.dart';
@@ -195,17 +191,20 @@ class AuthStateNotifier extends _$AuthStateNotifier {
               'Accept': 'application/json',
             },
             body: jsonEncode({
-              'pairing_token': pairingToken,
-              'device_name': _deviceName(),
+              'token': pairingToken,
+              'deviceName': _deviceName(),
             }),
           )
           .timeout(AppConstants.httpTimeout);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         final accessToken = json['access_token'] as String;
         final refreshToken = json['refresh_token'] as String;
-        final deviceId = json['device_id'] as int;
+        final deviceIdRaw = json['device_id'];
+        final deviceId = deviceIdRaw is int
+            ? deviceIdRaw
+            : int.parse(deviceIdRaw.toString());
 
         await ref
             .read(serverConfigNotifierProvider.notifier)
@@ -219,8 +218,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
           userId: 'qr-device',
           token: accessToken,
         );
-        // Issue #19 — best-effort push-token registration after QR pairing.
-        unawaited(_registerPushTokenAfterAuth(accessToken));
         return AuthResult.success(userId: 'qr-device', token: accessToken);
       }
       state = const AuthState.unauthenticated();
@@ -249,62 +246,9 @@ class AuthStateNotifier extends _$AuthStateNotifier {
           token: token,
           expiresAt: expiresAt,
         );
-        // Issue #19 — best-effort push token registration after every
-        // successful login. Fire-and-forget; never block the auth flow.
-        if (token != null && token.isNotEmpty) {
-          unawaited(_registerPushTokenAfterAuth(token));
-        }
       },
       failure: (_, __) => state = const AuthState.unauthenticated(),
     );
-  }
-
-  /// Push-token registration hook called after successful authentication.
-  ///
-  /// Issue #19 — pairs an FCM/APNs token with the SASO backend so the
-  /// server can fan out notifications to this device. The backend
-  /// endpoint is in a separate repo and may not yet be deployed; the
-  /// `RestV1ApiClient.registerPushToken` helper swallows 404/501 so
-  /// rollout order doesn't break the mobile auth UX.
-  ///
-  /// All errors are caught here as well — push registration is
-  /// strictly best-effort; failures must never bubble up and break a
-  /// logged-in session.
-  Future<void> _registerPushTokenAfterAuth(String accessToken) async {
-    try {
-      final pushService = ref.read(pushNotificationServiceProvider);
-      if (!pushService.isSupported) return;
-
-      final pushToken = await pushService.getDeviceToken();
-      if (pushToken == null || pushToken.isEmpty) return;
-
-      final platform = _detectPushPlatform();
-      if (platform == null) return;
-
-      final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
-      if (serverUrl.isEmpty) return;
-
-      final client = RestV1ApiClient(
-        serverUrl: serverUrl,
-        jwtToken: accessToken,
-      );
-      await client.registerPushToken(token: pushToken, platform: platform);
-    } catch (_) {
-      // Best-effort: never let push-token registration fail auth.
-    }
-  }
-
-  String? _detectPushPlatform() {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'fcm';
-      case TargetPlatform.iOS:
-        return 'apns';
-      default:
-        // Other platforms (Linux/macOS/Windows/Fuchsia/web) have no
-        // mobile push channel — skip registration entirely.
-        return null;
-    }
   }
 
   String _deviceName() {
