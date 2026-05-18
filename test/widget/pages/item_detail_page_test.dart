@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:saso_willen_edition/domain/entities/category.dart';
 import 'package:saso_willen_edition/domain/entities/feature.dart';
 import 'package:saso_willen_edition/domain/entities/item.dart';
+import 'package:saso_willen_edition/domain/entities/item_status.dart';
 import 'package:saso_willen_edition/domain/repositories/item_repository.dart';
 import 'package:saso_willen_edition/domain/value_objects/feature_code.dart';
 import 'package:saso_willen_edition/domain/value_objects/item_id.dart';
+import 'package:saso_willen_edition/l10n/app_localizations.dart';
 import 'package:saso_willen_edition/presentation/pages/item/item_detail_page.dart';
 import 'package:saso_willen_edition/presentation/providers/api_client_provider.dart';
 
 class _StubItemRepository implements ItemRepository {
-  final Item item;
+  _StubItemRepository({required this.item});
 
-  const _StubItemRepository({required this.item});
+  Item item;
+  final List<({ItemId id, ItemStatus status})> statusCalls = [];
 
   @override
   Future<Item> fetchById(ItemId id) async => item;
@@ -36,6 +40,13 @@ class _StubItemRepository implements ItemRepository {
 
   @override
   Future<Item?> getCached(ItemId id) async => null;
+
+  @override
+  Future<Item> updateStatus(ItemId id, ItemStatus status) async {
+    statusCalls.add((id: id, status: status));
+    item = item.copyWith(status: status);
+    return item;
+  }
 }
 
 final _testItem = Item(
@@ -55,50 +66,92 @@ final _testItem = Item(
   ],
 );
 
-Widget _buildPage({required String itemId}) => ProviderScope(
+Widget _buildPage({_StubItemRepository? repo}) => ProviderScope(
   overrides: [
     itemRepositoryProvider.overrideWith(
-      (_) => _StubItemRepository(item: _testItem),
+      (_) => repo ?? _StubItemRepository(item: _testItem),
     ),
   ],
-  child: const MaterialApp(home: ItemDetailPage(itemId: '24010001')),
+  child: const MaterialApp(
+    locale: Locale('ja'),
+    localizationsDelegates: [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: [Locale('ja'), Locale('en')],
+    home: ItemDetailPage(itemId: '24010001'),
+  ),
 );
 
 void main() {
   group('ItemDetailPage', () {
     testWidgets('shows loading indicator initially', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('shows item name after load', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
       expect(find.text('テスト商品'), findsOneWidget);
     });
 
     testWidgets('item name widget has correct key', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('item_name')), findsOneWidget);
     });
 
     testWidgets('shows item ID', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
       expect(find.text('24010001'), findsWidgets);
     });
 
     testWidgets('shows feature variant', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
       expect(find.text('レッド / M'), findsOneWidget);
     });
 
     testWidgets('shows stock count badge', (tester) async {
-      await tester.pumpWidget(_buildPage(itemId: '24010001'));
+      await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
       expect(find.text('在庫 5'), findsOneWidget);
+    });
+
+    testWidgets('renders status badge with current status', (tester) async {
+      await tester.pumpWidget(_buildPage());
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('item_status_badge_button')),
+        findsOneWidget,
+      );
+      expect(find.text('アクティブ'), findsOneWidget);
+    });
+
+    testWidgets('tapping badge opens picker and selecting a status invokes '
+        'repository.updateStatus', (tester) async {
+      final repo = _StubItemRepository(item: _testItem);
+      await tester.pumpWidget(_buildPage(repo: repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('item_status_badge_button')));
+      await tester.pumpAndSettle();
+
+      // Confirm the picker actually rendered.
+      expect(find.byKey(const Key('status_option_active')), findsOneWidget);
+
+      final option = find.byKey(const Key('status_option_in_storage'));
+      await tester.ensureVisible(option);
+      await tester.pumpAndSettle();
+      await tester.tap(option);
+      await tester.pumpAndSettle();
+
+      expect(repo.statusCalls, hasLength(1));
+      expect(repo.statusCalls.single.status, ItemStatus.inStorage);
     });
   });
 }

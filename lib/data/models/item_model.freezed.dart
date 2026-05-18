@@ -296,7 +296,7 @@ as String?,
 /// @nodoc
 mixin _$ItemModel {
 
- String get id; String get name; String? get description; String get categoryId; String? get categoryName; List<FeatureModel> get features; String? get janCode; String? get isbnCode; String? get labelCode; String get registeredAt; String? get updatedAt;
+ String get id; String get name; String? get description; String get categoryId; String? get categoryName; List<FeatureModel> get features; String? get janCode; String? get isbnCode; String? get labelCode; String get registeredAt; String? get updatedAt; String get status;
 /// Create a copy of ItemModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -309,16 +309,16 @@ $ItemModelCopyWith<ItemModel> get copyWith => _$ItemModelCopyWithImpl<ItemModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&const DeepCollectionEquality().equals(other.features, features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ItemModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&const DeepCollectionEquality().equals(other.features, features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,categoryName,const DeepCollectionEquality().hash(features),janCode,isbnCode,labelCode,registeredAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,categoryName,const DeepCollectionEquality().hash(features),janCode,isbnCode,labelCode,registeredAt,updatedAt,status);
 
 @override
 String toString() {
-  return 'ItemModel(id: $id, name: $name, description: $description, categoryId: $categoryId, categoryName: $categoryName, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt)';
+  return 'ItemModel(id: $id, name: $name, description: $description, categoryId: $categoryId, categoryName: $categoryName, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt, status: $status)';
 }
 
 
@@ -329,7 +329,7 @@ abstract mixin class $ItemModelCopyWith<$Res>  {
   factory $ItemModelCopyWith(ItemModel value, $Res Function(ItemModel) _then) = _$ItemModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? description, String categoryId, String? categoryName, List<FeatureModel> features, String? janCode, String? isbnCode, String? labelCode, String registeredAt, String? updatedAt
+ String id, String name, String? description, String categoryId, String? categoryName, List<FeatureModel> features, String? janCode, String? isbnCode, String? labelCode, String registeredAt, String? updatedAt, String status
 });
 
 
@@ -346,7 +346,7 @@ class _$ItemModelCopyWithImpl<$Res>
 
 /// Create a copy of ItemModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = null,Object? categoryName = freezed,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = null,Object? categoryName = freezed,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,Object? status = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -359,7 +359,8 @@ as String?,isbnCode: freezed == isbnCode ? _self.isbnCode : isbnCode // ignore: 
 as String?,labelCode: freezed == labelCode ? _self.labelCode : labelCode // ignore: cast_nullable_to_non_nullable
 as String?,registeredAt: null == registeredAt ? _self.registeredAt : registeredAt // ignore: cast_nullable_to_non_nullable
 as String,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -444,10 +445,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ItemModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   return orElse();
 
 }
@@ -465,10 +466,10 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.cat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt,  String status)  $default,) {final _that = this;
 switch (_that) {
 case _ItemModel():
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -485,10 +486,10 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.cat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? description,  String categoryId,  String? categoryName,  List<FeatureModel> features,  String? janCode,  String? isbnCode,  String? labelCode,  String registeredAt,  String? updatedAt,  String status)?  $default,) {final _that = this;
 switch (_that) {
 case _ItemModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.categoryName,_that.features,_that.janCode,_that.isbnCode,_that.labelCode,_that.registeredAt,_that.updatedAt,_that.status);case _:
   return null;
 
 }
@@ -500,7 +501,7 @@ return $default(_that.id,_that.name,_that.description,_that.categoryId,_that.cat
 @JsonSerializable()
 
 class _ItemModel extends ItemModel {
-  const _ItemModel({required this.id, required this.name, this.description, required this.categoryId, this.categoryName, final  List<FeatureModel> features = const [], this.janCode, this.isbnCode, this.labelCode, required this.registeredAt, this.updatedAt}): _features = features,super._();
+  const _ItemModel({required this.id, required this.name, this.description, required this.categoryId, this.categoryName, final  List<FeatureModel> features = const [], this.janCode, this.isbnCode, this.labelCode, required this.registeredAt, this.updatedAt, this.status = 'active'}): _features = features,super._();
   factory _ItemModel.fromJson(Map<String, dynamic> json) => _$ItemModelFromJson(json);
 
 @override final  String id;
@@ -520,6 +521,7 @@ class _ItemModel extends ItemModel {
 @override final  String? labelCode;
 @override final  String registeredAt;
 @override final  String? updatedAt;
+@override@JsonKey() final  String status;
 
 /// Create a copy of ItemModel
 /// with the given fields replaced by the non-null parameter values.
@@ -534,16 +536,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&const DeepCollectionEquality().equals(other._features, _features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ItemModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&const DeepCollectionEquality().equals(other._features, _features)&&(identical(other.janCode, janCode) || other.janCode == janCode)&&(identical(other.isbnCode, isbnCode) || other.isbnCode == isbnCode)&&(identical(other.labelCode, labelCode) || other.labelCode == labelCode)&&(identical(other.registeredAt, registeredAt) || other.registeredAt == registeredAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,categoryName,const DeepCollectionEquality().hash(_features),janCode,isbnCode,labelCode,registeredAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,categoryId,categoryName,const DeepCollectionEquality().hash(_features),janCode,isbnCode,labelCode,registeredAt,updatedAt,status);
 
 @override
 String toString() {
-  return 'ItemModel(id: $id, name: $name, description: $description, categoryId: $categoryId, categoryName: $categoryName, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt)';
+  return 'ItemModel(id: $id, name: $name, description: $description, categoryId: $categoryId, categoryName: $categoryName, features: $features, janCode: $janCode, isbnCode: $isbnCode, labelCode: $labelCode, registeredAt: $registeredAt, updatedAt: $updatedAt, status: $status)';
 }
 
 
@@ -554,7 +556,7 @@ abstract mixin class _$ItemModelCopyWith<$Res> implements $ItemModelCopyWith<$Re
   factory _$ItemModelCopyWith(_ItemModel value, $Res Function(_ItemModel) _then) = __$ItemModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? description, String categoryId, String? categoryName, List<FeatureModel> features, String? janCode, String? isbnCode, String? labelCode, String registeredAt, String? updatedAt
+ String id, String name, String? description, String categoryId, String? categoryName, List<FeatureModel> features, String? janCode, String? isbnCode, String? labelCode, String registeredAt, String? updatedAt, String status
 });
 
 
@@ -571,7 +573,7 @@ class __$ItemModelCopyWithImpl<$Res>
 
 /// Create a copy of ItemModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = null,Object? categoryName = freezed,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? categoryId = null,Object? categoryName = freezed,Object? features = null,Object? janCode = freezed,Object? isbnCode = freezed,Object? labelCode = freezed,Object? registeredAt = null,Object? updatedAt = freezed,Object? status = null,}) {
   return _then(_ItemModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -584,7 +586,8 @@ as String?,isbnCode: freezed == isbnCode ? _self.isbnCode : isbnCode // ignore: 
 as String?,labelCode: freezed == labelCode ? _self.labelCode : labelCode // ignore: cast_nullable_to_non_nullable
 as String?,registeredAt: null == registeredAt ? _self.registeredAt : registeredAt // ignore: cast_nullable_to_non_nullable
 as String,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/entities/item.dart';
+import '../../../domain/entities/item_status.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../providers/item_provider.dart';
 import '../../widgets/common/error_display_widget.dart';
 import '../../widgets/common/loading_widget.dart';
+import '../../widgets/item/item_status_badge.dart';
 
 class ItemDetailPage extends ConsumerWidget {
   const ItemDetailPage({super.key, required this.itemId});
@@ -13,6 +16,27 @@ class ItemDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final itemAsync = ref.watch(itemByIdProvider(itemId));
+    final l10n = AppLocalizations.of(context)!;
+
+    ref.listen<AsyncValue<void>>(itemStatusUpdaterProvider, (prev, next) {
+      next.whenOrNull(
+        data: (_) {
+          if (prev is AsyncLoading) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.itemStatusUpdated)),
+            );
+          }
+        },
+        error: (e, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.itemStatusUpdateFailed(e.toString())),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
 
     return Scaffold(
       appBar: AppBar(title: Text(itemId)),
@@ -29,28 +53,41 @@ class ItemDetailPage extends ConsumerWidget {
   }
 }
 
-class _ItemDetail extends StatelessWidget {
+class _ItemDetail extends ConsumerWidget {
   const _ItemDetail({required this.item});
 
   final Item item;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Header card
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.name,
-                  style: theme.textTheme.headlineSmall,
-                  key: const Key('item_name'),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        style: theme.textTheme.headlineSmall,
+                        key: const Key('item_name'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      key: const Key('item_status_badge_button'),
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => _pickStatus(context, ref),
+                      child: ItemStatusBadge(status: item.status),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -71,7 +108,6 @@ class _ItemDetail extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Category
         Card(
           child: ListTile(
             leading: const Icon(Icons.category_outlined),
@@ -81,52 +117,6 @@ class _ItemDetail extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Label code (custom shelf label)
-        if (item.labelCode != null) ...[
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.label_outline),
-              title: const Text('ラベルコード'),
-              subtitle: Text(
-                item.labelCode!,
-                style: const TextStyle(fontFamily: 'monospace'),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        // JAN code
-        if (item.janCode != null) ...[
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.barcode_reader),
-              title: const Text('JANコード'),
-              subtitle: Text(
-                item.janCode!,
-                style: const TextStyle(fontFamily: 'monospace'),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        // ISBN
-        if (item.isbnCode != null) ...[
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.menu_book_outlined),
-              title: const Text('ISBN'),
-              subtitle: Text(
-                item.isbnCode!,
-                style: const TextStyle(fontFamily: 'monospace'),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        // Registration date
         Card(
           child: ListTile(
             leading: const Icon(Icons.calendar_today_outlined),
@@ -138,7 +128,6 @@ class _ItemDetail extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Features
         if (item.features.isNotEmpty) ...[
           Text('バリエーション', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
@@ -158,6 +147,69 @@ class _ItemDetail extends StatelessWidget {
         const SizedBox(height: 80),
       ],
     );
+  }
+
+  Future<void> _pickStatus(BuildContext context, WidgetRef ref) async {
+    final picked = await showModalBottomSheet<ItemStatus>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetCtx) {
+        final l10n = AppLocalizations.of(sheetCtx)!;
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+                child: Text(
+                  l10n.itemStatusChange,
+                  style: Theme.of(sheetCtx).textTheme.titleMedium,
+                ),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final s in ItemStatus.values)
+                      ListTile(
+                        key: Key('status_option_${s.jsonValue}'),
+                        leading: Icon(
+                          s == item.status
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          color:
+                              s == item.status
+                                  ? Theme.of(sheetCtx).colorScheme.primary
+                                  : Theme.of(sheetCtx).colorScheme.outline,
+                        ),
+                        title: Row(
+                          children: [
+                            ItemStatusBadge(status: s, compact: true),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                ItemStatusBadge.labelFor(s, sheetCtx),
+                              ),
+                            ),
+                          ],
+                        ),
+                        onTap: () => Navigator.of(sheetCtx).pop(s),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (picked == null || picked == item.status) return;
+    await ref
+        .read(itemStatusUpdaterProvider.notifier)
+        .changeStatus(item.id.value, picked);
   }
 }
 

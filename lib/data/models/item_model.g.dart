@@ -44,6 +44,7 @@ _ItemModel _$ItemModelFromJson(Map<String, dynamic> json) => _ItemModel(
   labelCode: json['labelCode'] as String?,
   registeredAt: json['registeredAt'] as String,
   updatedAt: json['updatedAt'] as String?,
+  status: json['status'] as String? ?? 'active',
 );
 
 Map<String, dynamic> _$ItemModelToJson(_ItemModel instance) =>
@@ -59,4 +60,5 @@ Map<String, dynamic> _$ItemModelToJson(_ItemModel instance) =>
       'labelCode': instance.labelCode,
       'registeredAt': instance.registeredAt,
       'updatedAt': instance.updatedAt,
+      'status': instance.status,
     };

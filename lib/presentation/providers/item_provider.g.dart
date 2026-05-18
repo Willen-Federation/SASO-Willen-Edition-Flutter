@@ -337,5 +337,27 @@ class _ItemSearchProviderElement
   String? get labelCode => (origin as ItemSearchProvider).labelCode;
 }
 
+String _$itemStatusUpdaterHash() => r'02dd3618da267e7d7dd7ab661a8561867780df99';
+
+/// AsyncNotifier that performs status updates on the server and refreshes
+/// the affected [itemByIdProvider]. The notifier itself holds no domain
+/// state — its `AsyncValue<void>` simply mirrors the in-flight request so
+/// callers can react to loading/error transitions.
+///
+/// Copied from [ItemStatusUpdater].
+@ProviderFor(ItemStatusUpdater)
+final itemStatusUpdaterProvider =
+    AutoDisposeAsyncNotifierProvider<ItemStatusUpdater, void>.internal(
+      ItemStatusUpdater.new,
+      name: r'itemStatusUpdaterProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$itemStatusUpdaterHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ItemStatusUpdater = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

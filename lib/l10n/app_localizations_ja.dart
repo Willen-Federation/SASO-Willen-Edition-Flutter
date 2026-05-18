@@ -51,6 +51,47 @@ class AppLocalizationsJa extends AppLocalizations {
   String get itemRegisteredAt => '登録日';
 
   @override
+  String get itemStatus => 'ステータス';
+
+  @override
+  String get itemStatusActive => 'アクティブ';
+
+  @override
+  String get itemStatusArchived => 'アーカイブ';
+
+  @override
+  String get itemStatusDiscontinued => '廃盤';
+
+  @override
+  String get itemStatusPending => '保留中';
+
+  @override
+  String get itemStatusInStorage => '保管中';
+
+  @override
+  String get itemStatusInUse => '利用中';
+
+  @override
+  String get itemStatusForSale => '販売中';
+
+  @override
+  String get itemStatusReserved => '仮押さえ';
+
+  @override
+  String get itemStatusShipped => '発送済み';
+
+  @override
+  String get itemStatusChange => 'ステータス変更';
+
+  @override
+  String get itemStatusUpdated => 'ステータスを更新しました';
+
+  @override
+  String itemStatusUpdateFailed(String detail) {
+    return 'ステータス変更に失敗しました: $detail';
+  }
+
+  @override
   String get categoryName => 'カテゴリ名';
 
   @override

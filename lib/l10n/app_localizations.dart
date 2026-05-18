@@ -182,6 +182,84 @@ abstract class AppLocalizations {
   /// **'登録日'**
   String get itemRegisteredAt;
 
+  /// No description provided for @itemStatus.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス'**
+  String get itemStatus;
+
+  /// No description provided for @itemStatusActive.
+  ///
+  /// In ja, this message translates to:
+  /// **'アクティブ'**
+  String get itemStatusActive;
+
+  /// No description provided for @itemStatusArchived.
+  ///
+  /// In ja, this message translates to:
+  /// **'アーカイブ'**
+  String get itemStatusArchived;
+
+  /// No description provided for @itemStatusDiscontinued.
+  ///
+  /// In ja, this message translates to:
+  /// **'廃盤'**
+  String get itemStatusDiscontinued;
+
+  /// No description provided for @itemStatusPending.
+  ///
+  /// In ja, this message translates to:
+  /// **'保留中'**
+  String get itemStatusPending;
+
+  /// No description provided for @itemStatusInStorage.
+  ///
+  /// In ja, this message translates to:
+  /// **'保管中'**
+  String get itemStatusInStorage;
+
+  /// No description provided for @itemStatusInUse.
+  ///
+  /// In ja, this message translates to:
+  /// **'利用中'**
+  String get itemStatusInUse;
+
+  /// No description provided for @itemStatusForSale.
+  ///
+  /// In ja, this message translates to:
+  /// **'販売中'**
+  String get itemStatusForSale;
+
+  /// No description provided for @itemStatusReserved.
+  ///
+  /// In ja, this message translates to:
+  /// **'仮押さえ'**
+  String get itemStatusReserved;
+
+  /// No description provided for @itemStatusShipped.
+  ///
+  /// In ja, this message translates to:
+  /// **'発送済み'**
+  String get itemStatusShipped;
+
+  /// No description provided for @itemStatusChange.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス変更'**
+  String get itemStatusChange;
+
+  /// No description provided for @itemStatusUpdated.
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータスを更新しました'**
+  String get itemStatusUpdated;
+
+  /// SnackBar shown when an item status PATCH fails. Placeholder is the underlying error's toString().
+  ///
+  /// In ja, this message translates to:
+  /// **'ステータス変更に失敗しました: {detail}'**
+  String itemStatusUpdateFailed(String detail);
+
   /// No description provided for @categoryName.
   ///
   /// In ja, this message translates to:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../domain/entities/item.dart';
+import 'item_status_badge.dart';
 
 class ItemListTile extends StatelessWidget {
   const ItemListTile({super.key, required this.item, this.onTap});
@@ -32,6 +33,8 @@ class ItemListTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            ItemStatusBadge(status: item.status, compact: true),
+            const SizedBox(height: 2),
             Text(
               '${item.features.length} バリエーション',
               style: theme.textTheme.bodySmall,

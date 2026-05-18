@@ -1,4 +1,5 @@
 import '../entities/item.dart';
+import '../entities/item_status.dart';
 import '../value_objects/item_id.dart';
 
 abstract interface class ItemRepository {
@@ -14,4 +15,9 @@ abstract interface class ItemRepository {
   Future<List<Item>> fetchByShelf(String shelfId);
   Future<void> cacheItem(Item item);
   Future<Item?> getCached(ItemId id);
+
+  /// Updates the operational status of an item and returns the refreshed
+  /// domain entity. Implementations are expected to keep the local cache
+  /// in sync (or invalidate it) so subsequent reads observe the new value.
+  Future<Item> updateStatus(ItemId id, ItemStatus status);
 }
