@@ -7,7 +7,7 @@ part of 'server_config_provider.dart';
 // **************************************************************************
 
 String _$serverConfigNotifierHash() =>
-    r'fe7f9abbf8705fc7c8807f5fdd6629ad0f3df2fb';
+    r'd8a791fac8908a523513c82a0490274f9185b6fb';
 
 /// See also [ServerConfigNotifier].
 @ProviderFor(ServerConfigNotifier)

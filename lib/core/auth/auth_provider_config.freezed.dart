@@ -12,6 +12,550 @@ part of 'auth_provider_config.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$AuthProviderSummary {
+
+ int get id; String get name; AuthProviderType get type; bool get isDefault; bool get enabled;
+/// Create a copy of AuthProviderSummary
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AuthProviderSummaryCopyWith<AuthProviderSummary> get copyWith => _$AuthProviderSummaryCopyWithImpl<AuthProviderSummary>(this as AuthProviderSummary, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled);
+
+@override
+String toString() {
+  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AuthProviderSummaryCopyWith<$Res>  {
+  factory $AuthProviderSummaryCopyWith(AuthProviderSummary value, $Res Function(AuthProviderSummary) _then) = _$AuthProviderSummaryCopyWithImpl;
+@useResult
+$Res call({
+ int id, String name, AuthProviderType type, bool isDefault, bool enabled
+});
+
+
+
+
+}
+/// @nodoc
+class _$AuthProviderSummaryCopyWithImpl<$Res>
+    implements $AuthProviderSummaryCopyWith<$Res> {
+  _$AuthProviderSummaryCopyWithImpl(this._self, this._then);
+
+  final AuthProviderSummary _self;
+  final $Res Function(AuthProviderSummary) _then;
+
+/// Create a copy of AuthProviderSummary
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as AuthProviderType,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [AuthProviderSummary].
+extension AuthProviderSummaryPatterns on AuthProviderSummary {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AuthProviderSummary value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AuthProviderSummary() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AuthProviderSummary value)  $default,){
+final _that = this;
+switch (_that) {
+case _AuthProviderSummary():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AuthProviderSummary value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AuthProviderSummary() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AuthProviderSummary() when $default != null:
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)  $default,) {final _that = this;
+switch (_that) {
+case _AuthProviderSummary():
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)?  $default,) {final _that = this;
+switch (_that) {
+case _AuthProviderSummary() when $default != null:
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _AuthProviderSummary implements AuthProviderSummary {
+  const _AuthProviderSummary({required this.id, required this.name, required this.type, required this.isDefault, required this.enabled});
+  
+
+@override final  int id;
+@override final  String name;
+@override final  AuthProviderType type;
+@override final  bool isDefault;
+@override final  bool enabled;
+
+/// Create a copy of AuthProviderSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AuthProviderSummaryCopyWith<_AuthProviderSummary> get copyWith => __$AuthProviderSummaryCopyWithImpl<_AuthProviderSummary>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled);
+
+@override
+String toString() {
+  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AuthProviderSummaryCopyWith<$Res> implements $AuthProviderSummaryCopyWith<$Res> {
+  factory _$AuthProviderSummaryCopyWith(_AuthProviderSummary value, $Res Function(_AuthProviderSummary) _then) = __$AuthProviderSummaryCopyWithImpl;
+@override @useResult
+$Res call({
+ int id, String name, AuthProviderType type, bool isDefault, bool enabled
+});
+
+
+
+
+}
+/// @nodoc
+class __$AuthProviderSummaryCopyWithImpl<$Res>
+    implements _$AuthProviderSummaryCopyWith<$Res> {
+  __$AuthProviderSummaryCopyWithImpl(this._self, this._then);
+
+  final _AuthProviderSummary _self;
+  final $Res Function(_AuthProviderSummary) _then;
+
+/// Create a copy of AuthProviderSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,}) {
+  return _then(_AuthProviderSummary(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as AuthProviderType,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+/// @nodoc
+mixin _$ServerAuthDiscovery {
+
+ String get serverName; String get version; String get mobileSetupUrl; AuthStrategy get authStrategy; List<AuthProviderSummary> get providers;
+/// Create a copy of ServerAuthDiscovery
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ServerAuthDiscoveryCopyWith<ServerAuthDiscovery> get copyWith => _$ServerAuthDiscoveryCopyWithImpl<ServerAuthDiscovery>(this as ServerAuthDiscovery, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerAuthDiscovery&&(identical(other.serverName, serverName) || other.serverName == serverName)&&(identical(other.version, version) || other.version == version)&&(identical(other.mobileSetupUrl, mobileSetupUrl) || other.mobileSetupUrl == mobileSetupUrl)&&(identical(other.authStrategy, authStrategy) || other.authStrategy == authStrategy)&&const DeepCollectionEquality().equals(other.providers, providers));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,serverName,version,mobileSetupUrl,authStrategy,const DeepCollectionEquality().hash(providers));
+
+@override
+String toString() {
+  return 'ServerAuthDiscovery(serverName: $serverName, version: $version, mobileSetupUrl: $mobileSetupUrl, authStrategy: $authStrategy, providers: $providers)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ServerAuthDiscoveryCopyWith<$Res>  {
+  factory $ServerAuthDiscoveryCopyWith(ServerAuthDiscovery value, $Res Function(ServerAuthDiscovery) _then) = _$ServerAuthDiscoveryCopyWithImpl;
+@useResult
+$Res call({
+ String serverName, String version, String mobileSetupUrl, AuthStrategy authStrategy, List<AuthProviderSummary> providers
+});
+
+
+
+
+}
+/// @nodoc
+class _$ServerAuthDiscoveryCopyWithImpl<$Res>
+    implements $ServerAuthDiscoveryCopyWith<$Res> {
+  _$ServerAuthDiscoveryCopyWithImpl(this._self, this._then);
+
+  final ServerAuthDiscovery _self;
+  final $Res Function(ServerAuthDiscovery) _then;
+
+/// Create a copy of ServerAuthDiscovery
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? serverName = null,Object? version = null,Object? mobileSetupUrl = null,Object? authStrategy = null,Object? providers = null,}) {
+  return _then(_self.copyWith(
+serverName: null == serverName ? _self.serverName : serverName // ignore: cast_nullable_to_non_nullable
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as String,mobileSetupUrl: null == mobileSetupUrl ? _self.mobileSetupUrl : mobileSetupUrl // ignore: cast_nullable_to_non_nullable
+as String,authStrategy: null == authStrategy ? _self.authStrategy : authStrategy // ignore: cast_nullable_to_non_nullable
+as AuthStrategy,providers: null == providers ? _self.providers : providers // ignore: cast_nullable_to_non_nullable
+as List<AuthProviderSummary>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ServerAuthDiscovery].
+extension ServerAuthDiscoveryPatterns on ServerAuthDiscovery {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ServerAuthDiscovery value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ServerAuthDiscovery value)  $default,){
+final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ServerAuthDiscovery value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String serverName,  String version,  String mobileSetupUrl,  AuthStrategy authStrategy,  List<AuthProviderSummary> providers)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery() when $default != null:
+return $default(_that.serverName,_that.version,_that.mobileSetupUrl,_that.authStrategy,_that.providers);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String serverName,  String version,  String mobileSetupUrl,  AuthStrategy authStrategy,  List<AuthProviderSummary> providers)  $default,) {final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery():
+return $default(_that.serverName,_that.version,_that.mobileSetupUrl,_that.authStrategy,_that.providers);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String serverName,  String version,  String mobileSetupUrl,  AuthStrategy authStrategy,  List<AuthProviderSummary> providers)?  $default,) {final _that = this;
+switch (_that) {
+case _ServerAuthDiscovery() when $default != null:
+return $default(_that.serverName,_that.version,_that.mobileSetupUrl,_that.authStrategy,_that.providers);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _ServerAuthDiscovery implements ServerAuthDiscovery {
+  const _ServerAuthDiscovery({this.serverName = '', this.version = '', this.mobileSetupUrl = '', this.authStrategy = AuthStrategy.localOnly, final  List<AuthProviderSummary> providers = const <AuthProviderSummary>[]}): _providers = providers;
+  
+
+@override@JsonKey() final  String serverName;
+@override@JsonKey() final  String version;
+@override@JsonKey() final  String mobileSetupUrl;
+@override@JsonKey() final  AuthStrategy authStrategy;
+ final  List<AuthProviderSummary> _providers;
+@override@JsonKey() List<AuthProviderSummary> get providers {
+  if (_providers is EqualUnmodifiableListView) return _providers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_providers);
+}
+
+
+/// Create a copy of ServerAuthDiscovery
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ServerAuthDiscoveryCopyWith<_ServerAuthDiscovery> get copyWith => __$ServerAuthDiscoveryCopyWithImpl<_ServerAuthDiscovery>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServerAuthDiscovery&&(identical(other.serverName, serverName) || other.serverName == serverName)&&(identical(other.version, version) || other.version == version)&&(identical(other.mobileSetupUrl, mobileSetupUrl) || other.mobileSetupUrl == mobileSetupUrl)&&(identical(other.authStrategy, authStrategy) || other.authStrategy == authStrategy)&&const DeepCollectionEquality().equals(other._providers, _providers));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,serverName,version,mobileSetupUrl,authStrategy,const DeepCollectionEquality().hash(_providers));
+
+@override
+String toString() {
+  return 'ServerAuthDiscovery(serverName: $serverName, version: $version, mobileSetupUrl: $mobileSetupUrl, authStrategy: $authStrategy, providers: $providers)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ServerAuthDiscoveryCopyWith<$Res> implements $ServerAuthDiscoveryCopyWith<$Res> {
+  factory _$ServerAuthDiscoveryCopyWith(_ServerAuthDiscovery value, $Res Function(_ServerAuthDiscovery) _then) = __$ServerAuthDiscoveryCopyWithImpl;
+@override @useResult
+$Res call({
+ String serverName, String version, String mobileSetupUrl, AuthStrategy authStrategy, List<AuthProviderSummary> providers
+});
+
+
+
+
+}
+/// @nodoc
+class __$ServerAuthDiscoveryCopyWithImpl<$Res>
+    implements _$ServerAuthDiscoveryCopyWith<$Res> {
+  __$ServerAuthDiscoveryCopyWithImpl(this._self, this._then);
+
+  final _ServerAuthDiscovery _self;
+  final $Res Function(_ServerAuthDiscovery) _then;
+
+/// Create a copy of ServerAuthDiscovery
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? serverName = null,Object? version = null,Object? mobileSetupUrl = null,Object? authStrategy = null,Object? providers = null,}) {
+  return _then(_ServerAuthDiscovery(
+serverName: null == serverName ? _self.serverName : serverName // ignore: cast_nullable_to_non_nullable
+as String,version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
+as String,mobileSetupUrl: null == mobileSetupUrl ? _self.mobileSetupUrl : mobileSetupUrl // ignore: cast_nullable_to_non_nullable
+as String,authStrategy: null == authStrategy ? _self.authStrategy : authStrategy // ignore: cast_nullable_to_non_nullable
+as AuthStrategy,providers: null == providers ? _self._providers : providers // ignore: cast_nullable_to_non_nullable
+as List<AuthProviderSummary>,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$AuthProviderConfig {
 
 
