@@ -6,8 +6,20 @@ import '../../../core/auth/auth_provider_config.dart';
 import '../../../core/auth/auth_service.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
-import 'saml_webview_page.dart';
+import 'mobile_setup_webview_page.dart';
 
+/// Unified login page.
+///
+/// Renders three independent sections back-to-back, each gated on what the
+/// server's `/api/v1/auth/providers` discovery returned:
+///   1. Username / password form — shown when the server has the built-in
+///      `local` provider enabled.
+///   2. Server-configured providers — one button per enabled non-local
+///      provider (OIDC / SAML / Auth0 / Cognito / Firebase). Tapping opens
+///      the server's `/m/setup?provider_id=…` flow in an in-app WebView and
+///      exchanges the returned pairing token for a JWT.
+///   3. QR pairing + manual token entry — always available regardless of
+///      discovery, since the pairing tokens come from `/mypage/devicePair`.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -49,62 +61,35 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure:
-          (msg, __) => setState(() {
-            _loading = false;
-            _errorMessage = msg;
-          }),
+      failure: (msg, _) => setState(() {
+        _loading = false;
+        _errorMessage = msg;
+      }),
     );
   }
 
-  Future<void> _loginWithBrowser() async {
-    setState(() {
-      _loading = true;
-      _errorMessage = null;
-    });
-    final result =
-        await ref.read(authStateNotifierProvider.notifier).loginWithBrowser();
-    if (!mounted) return;
-    result.when(
-      success: (_, __, ___, ____) => context.go('/home'),
-      failure:
-          (msg, __) => setState(() {
-            _loading = false;
-            _errorMessage = msg;
-          }),
-    );
-  }
+  Future<void> _loginWithProvider(AuthProviderSummary provider) async {
+    final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+    if (serverUrl.isEmpty) {
+      setState(() => _errorMessage = 'サーバーURLが設定されていません');
+      return;
+    }
 
-  Future<void> _loginWithSaml() async {
-    final providerConfig = ref.read(authProviderConfigNotifierProvider);
-    if (providerConfig is! SamlAuthConfig) return;
-
-    final token = await Navigator.of(context).push<String>(
+    final token = await Navigator.of(context).push<String?>(
       MaterialPageRoute(
-        builder: (_) => SamlWebViewPage(loginUrl: providerConfig.loginUrl),
+        builder: (_) => MobileSetupWebViewPage(
+          serverUrl: serverUrl,
+          providerId: provider.id,
+          providerName: provider.name,
+        ),
       ),
     );
     if (!mounted) return;
     if (token == null || token.isEmpty) {
-      setState(() => _errorMessage = 'SAMLログインがキャンセルされました');
+      setState(() => _errorMessage = 'ログインがキャンセルされました');
       return;
     }
-    setState(() {
-      _loading = true;
-      _errorMessage = null;
-    });
-    final result = await ref
-        .read(authStateNotifierProvider.notifier)
-        .loginWithSamlToken(token);
-    if (!mounted) return;
-    result.when(
-      success: (_, __, ___, ____) => context.go('/home'),
-      failure:
-          (msg, __) => setState(() {
-            _loading = false;
-            _errorMessage = msg;
-          }),
-    );
+    await _exchangePairingToken(token, serverUrl);
   }
 
   Future<void> _loginWithManualToken() async {
@@ -131,6 +116,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       pairingToken = pairingToken.substring(0, pipe);
     }
 
+    await _exchangePairingToken(pairingToken, serverUrl);
+  }
+
+  Future<void> _exchangePairingToken(
+    String pairingToken,
+    String serverUrl,
+  ) async {
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -153,7 +145,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final config = ref.watch(serverConfigNotifierProvider);
-    final providerConfig = ref.watch(authProviderConfigNotifierProvider);
+    final discovery = ref.watch(serverAuthDiscoveryNotifierProvider);
+    final theme = Theme.of(context);
+
+    final hasLocal = discovery.hasLocalLogin;
+    final externalProviders = discovery.externalProviders;
 
     return Scaffold(
       appBar: AppBar(
@@ -165,123 +161,133 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ],
       ),
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
-                  // Server URL display
-                  if (config.baseUrl.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        config.baseUrl,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-
-                  // Provider badge
-                  Center(child: _ProviderBadge(providerConfig)),
-                  const SizedBox(height: 32),
-
-                  // Error message
-                  if (_errorMessage != null)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.errorContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
-                        ),
-                      ),
-                    ),
-
-                  // Adaptive login UI
-                  switch (providerConfig) {
-                    LegacyAuthConfig() ||
-                    FirebaseAuthConfig() => _CredentialForm(
-                      usernameController: _usernameController,
-                      passwordController: _passwordController,
-                      obscurePassword: _obscurePassword,
-                      onTogglePassword:
-                          () => setState(
-                            () => _obscurePassword = !_obscurePassword,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                if (config.baseUrl.isNotEmpty || discovery.serverName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      children: [
+                        if (discovery.serverName.isNotEmpty)
+                          Text(
+                            discovery.serverName,
+                            style: theme.textTheme.titleMedium,
+                            textAlign: TextAlign.center,
                           ),
-                      onSubmit: _loginWithCredentials,
+                        if (config.baseUrl.isNotEmpty)
+                          Text(
+                            config.baseUrl,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
                     ),
-                    OidcAuthConfig() ||
-                    Auth0AuthConfig() ||
-                    CognitoAuthConfig() => _BrowserLoginButton(
-                      label: 'ブラウザでログイン',
-                      onPressed: _loginWithBrowser,
-                    ),
-                    SamlAuthConfig() => _BrowserLoginButton(
-                      label: 'SSOでログイン',
-                      onPressed: _loginWithSaml,
-                    ),
-                  },
-
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 8),
-
-                  // QR pairing link
-                  OutlinedButton.icon(
-                    key: const Key('qr_pairing_button'),
-                    onPressed: () => context.push('/auth/qr'),
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('QRコードでペアリング'),
                   ),
 
-                  const SizedBox(height: 8),
-
-                  // Manual token entry (collapsible)
-                  TextButton(
-                    key: const Key('manual_token_toggle'),
-                    onPressed:
-                        () => setState(
-                          () => _showManualToken = !_showManualToken,
-                        ),
-                    child: Text(_showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力'),
+                if (_errorMessage != null)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
                   ),
 
-                  if (_showManualToken) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      'サーバー画面 (/mypage/devicePair) で発行したペアリングトークンを貼り付けてください。',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
+                // ── 2-a. Username / password ─────────────────────────────
+                if (hasLocal) ...[
+                  const _SectionHeader(
+                    icon: Icons.lock_outline,
+                    label: 'ユーザー名でログイン',
+                  ),
+                  const SizedBox(height: 12),
+                  _CredentialForm(
+                    usernameController: _usernameController,
+                    passwordController: _passwordController,
+                    obscurePassword: _obscurePassword,
+                    onTogglePassword: () => setState(
+                      () => _obscurePassword = !_obscurePassword,
+                    ),
+                    onSubmit: _loginWithCredentials,
+                  ),
+                ],
+
+                // ── 2-c. Server-configured providers ─────────────────────
+                if (externalProviders.isNotEmpty) ...[
+                  if (hasLocal) const SizedBox(height: 24),
+                  const _SectionHeader(
+                    icon: Icons.open_in_browser,
+                    label: 'サーバー設定のログイン方法',
+                  ),
+                  const SizedBox(height: 12),
+                  for (final provider in externalProviders) ...[
+                    _ProviderButton(
+                      provider: provider,
+                      onPressed: () => _loginWithProvider(provider),
                     ),
                     const SizedBox(height: 8),
-                    TextField(
-                      key: const Key('manual_token_field'),
-                      controller: _manualTokenController,
-                      decoration: const InputDecoration(
-                        labelText: 'ペアリングトークン',
-                        hintText: 'SASO1:... もしくは生トークン',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      key: const Key('manual_token_submit'),
-                      onPressed: _loginWithManualToken,
-                      child: const Text('ペアリングを実行'),
-                    ),
                   ],
                 ],
-              ),
+
+                // ── 2-b. QR / manual pairing token ───────────────────────
+                const SizedBox(height: 24),
+                const _SectionHeader(
+                  icon: Icons.qr_code_scanner,
+                  label: 'QRコード / 手動トークン',
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  key: const Key('qr_pairing_button'),
+                  onPressed: () => context.push('/auth/qr'),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('QRコードでペアリング'),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  key: const Key('manual_token_toggle'),
+                  onPressed: () =>
+                      setState(() => _showManualToken = !_showManualToken),
+                  child: Text(_showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力'),
+                ),
+                if (_showManualToken) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'サーバー画面 (/mypage/devicePair) で発行したペアリングトークンを貼り付けてください。',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.outline,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    key: const Key('manual_token_field'),
+                    controller: _manualTokenController,
+                    decoration: const InputDecoration(
+                      labelText: 'ペアリングトークン',
+                      hintText: 'SASO1:... もしくは生トークン',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton(
+                    key: const Key('manual_token_submit'),
+                    onPressed: _loginWithManualToken,
+                    child: const Text('ペアリングを実行'),
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }
@@ -290,23 +296,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 // Sub-widgets
 // ---------------------------------------------------------------------------
 
-class _ProviderBadge extends StatelessWidget {
-  const _ProviderBadge(this.config);
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.icon, required this.label});
 
-  final AuthProviderConfig config;
+  final IconData icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final (label, icon) = switch (config) {
-      LegacyAuthConfig() => ('標準ログイン', Icons.lock_outline),
-      OidcAuthConfig() => ('OIDC / SSO', Icons.open_in_browser),
-      SamlAuthConfig() => ('SAML SSO', Icons.security),
-      FirebaseAuthConfig() => ('Firebase 認証', Icons.local_fire_department),
-      Auth0AuthConfig() => ('Auth0', Icons.verified_user),
-      CognitoAuthConfig() => ('Amazon Cognito', Icons.cloud),
-    };
-
-    return Chip(avatar: Icon(icon, size: 18), label: Text(label));
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -343,7 +353,7 @@ class _CredentialForm extends StatelessWidget {
           autofillHints: const [AutofillHints.username],
           textInputAction: TextInputAction.next,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         TextField(
           key: const Key('password_field'),
           controller: passwordController,
@@ -363,7 +373,7 @@ class _CredentialForm extends StatelessWidget {
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => onSubmit(),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: FilledButton(
@@ -377,21 +387,29 @@ class _CredentialForm extends StatelessWidget {
   }
 }
 
-class _BrowserLoginButton extends StatelessWidget {
-  const _BrowserLoginButton({required this.label, required this.onPressed});
+class _ProviderButton extends StatelessWidget {
+  const _ProviderButton({required this.provider, required this.onPressed});
 
-  final String label;
+  final AuthProviderSummary provider;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final icon = switch (provider.type) {
+      AuthProviderType.oidc => Icons.open_in_browser,
+      AuthProviderType.saml => Icons.security,
+      AuthProviderType.firebase => Icons.local_fire_department,
+      AuthProviderType.auth0 => Icons.verified_user,
+      AuthProviderType.cognito => Icons.cloud,
+      _ => Icons.login,
+    };
     return SizedBox(
       width: double.infinity,
-      child: FilledButton.icon(
-        key: const Key('browser_login_button'),
+      child: OutlinedButton.icon(
+        key: Key('provider_button_${provider.id}'),
         onPressed: onPressed,
-        icon: const Icon(Icons.open_in_browser),
-        label: Text(label),
+        icon: Icon(icon),
+        label: Text(provider.name),
       ),
     );
   }

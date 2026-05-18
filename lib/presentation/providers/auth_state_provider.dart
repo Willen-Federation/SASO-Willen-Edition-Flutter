@@ -7,12 +7,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/auth/auth_provider_config.dart';
 import '../../core/auth/auth_service.dart';
-import '../../core/auth/providers/auth0_auth_service.dart';
-import '../../core/auth/providers/cognito_auth_service.dart';
-import '../../core/auth/providers/firebase_auth_service.dart';
 import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
-import '../../core/auth/providers/saml_auth_service.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/storage/secure_storage.dart';
 import 'server_config_provider.dart';
@@ -20,57 +16,36 @@ import 'server_config_provider.dart';
 part 'auth_state_provider.g.dart';
 
 // ---------------------------------------------------------------------------
-// Detected auth provider config
+// Detected server discovery
 // ---------------------------------------------------------------------------
 
+/// Holds the latest [ServerAuthDiscovery] document received from the server.
+///
+/// The splash page populates this after calling [AuthDiscoveryService]; the
+/// login page reads from it to decide which sections to render (credential
+/// form / per-provider buttons / QR + manual token).
 @riverpod
-class AuthProviderConfigNotifier extends _$AuthProviderConfigNotifier {
+class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
   @override
-  AuthProviderConfig build() => const AuthProviderConfig.legacy();
+  ServerAuthDiscovery build() => ServerAuthDiscovery.localOnly;
 
-  void set(AuthProviderConfig config) => state = config;
+  void set(ServerAuthDiscovery discovery) => state = discovery;
 }
 
 // ---------------------------------------------------------------------------
-// Auth service selector
+// Local auth service (username/password) — always available
 // ---------------------------------------------------------------------------
 
-/// Selects and instantiates the appropriate [AuthService] based on the
-/// currently detected provider config and server URL.
+/// Returns the local credential-based auth service that talks to the
+/// server's `/auth/start` endpoint with `{id, password}`.
+///
+/// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
+/// through the server's `/m/setup` browser flow rather than a per-provider
+/// native SDK, so this provider does not depend on discovery.
 @riverpod
 AuthService authService(Ref ref) {
-  final config = ref.watch(serverConfigNotifierProvider);
-  final providerConfig = ref.watch(authProviderConfigNotifierProvider);
   final secureStorage = ref.watch(secureStorageProvider);
-  final serverUrl = config.baseUrl;
-
-  return switch (providerConfig) {
-    OidcAuthConfig() => OidcAuthService(serverUrl, secureStorage),
-    SamlAuthConfig(:final loginUrl) => SamlAuthService(
-      loginUrl: loginUrl,
-      secureStorage: secureStorage,
-    ),
-    FirebaseAuthConfig() => FirebaseAuthService(secureStorage),
-    Auth0AuthConfig(:final domain, :final clientId) => Auth0AuthService(
-      domain: domain,
-      clientId: clientId,
-      secureStorage: secureStorage,
-    ),
-    CognitoAuthConfig(
-      :final userPoolId,
-      :final clientId,
-      :final region,
-      :final hostedUiDomain,
-    ) =>
-      CognitoAuthService(
-        userPoolId: userPoolId,
-        clientId: clientId,
-        region: region,
-        hostedUiDomain: hostedUiDomain,
-        secureStorage: secureStorage,
-      ),
-    _ => LegacyAuthService(secureStorage),
-  };
+  return LegacyAuthService(secureStorage);
 }
 
 // ---------------------------------------------------------------------------
@@ -123,7 +98,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     state = const AuthState.unauthenticated();
   }
 
-  /// Credential-based login (legacy / firebase / cognito user+pass).
+  /// Credential-based login against the server's `/auth/start` endpoint.
   Future<AuthResult> loginWithCredentials({
     required String username,
     required String password,
@@ -142,40 +117,8 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     return result;
   }
 
-  /// Browser-based login (OIDC / Auth0 / Cognito hosted UI).
-  Future<AuthResult> loginWithBrowser() async {
-    state = const AuthState.loading();
-    final service = ref.read(authServiceProvider);
-    final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
-
-    final result = await service.login(
-      serverUrl: serverUrl,
-      username: '',
-      password: '',
-    );
-
-    _applyResult(result, service);
-    return result;
-  }
-
-  /// Called after SAML WebView captures the token from the callback URL.
-  Future<AuthResult> loginWithSamlToken(String token) async {
-    state = const AuthState.loading();
-    final service = ref.read(authServiceProvider);
-    if (service is SamlAuthService) {
-      final result = await service.completeWithToken(token);
-      _applyResult(result, service);
-      return result;
-    }
-    const err = AuthResult.failure(
-      message: 'SAML service not active',
-      code: 'wrong_provider',
-    );
-    state = const AuthState.unauthenticated();
-    return err;
-  }
-
-  /// Exchanges a QR pairing token for access+refresh tokens via the REST API.
+  /// Exchanges a QR / setup-flow pairing token for access+refresh tokens
+  /// via `POST /api/v1/mobile/connect`.
   Future<AuthResult> loginWithQrToken({
     required String pairingToken,
     required String serverUrl,

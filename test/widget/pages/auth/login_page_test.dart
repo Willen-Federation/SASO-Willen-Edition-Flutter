@@ -11,13 +11,43 @@ Widget _wrap(Widget child, List<Override> overrides) {
   return ProviderScope(overrides: overrides, child: MaterialApp(home: child));
 }
 
+ServerAuthDiscovery _discovery({
+  required AuthStrategy strategy,
+  required List<AuthProviderSummary> providers,
+  String serverName = 'Test Server',
+  String mobileSetupUrl = 'https://saso.example.com/m/setup',
+}) =>
+    ServerAuthDiscovery(
+      serverName: serverName,
+      version: '0.0.0',
+      mobileSetupUrl: mobileSetupUrl,
+      authStrategy: strategy,
+      providers: providers,
+    );
+
+const _localProvider = AuthProviderSummary(
+  id: 1,
+  name: 'Local',
+  type: AuthProviderType.local,
+  isDefault: true,
+  enabled: true,
+);
+
 void main() {
-  group('LoginPage — provider badge and UI variants', () {
-    testWidgets('shows credential form for legacy provider', (tester) async {
+  group('LoginPage — discovery-driven layout', () {
+    testWidgets('shows credential form when local is enabled', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 1400));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(
         _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          serverAuthDiscoveryNotifierProvider.overrideWith(
+            () => _FakeDiscoveryNotifier(
+              _discovery(
+                strategy: AuthStrategy.localOnly,
+                providers: const [_localProvider],
+              ),
+            ),
           ),
           serverConfigNotifierProvider.overrideWith(
             () => _FakeServerConfigNotifier(),
@@ -32,15 +62,29 @@ void main() {
       expect(find.byKey(const Key('username_field')), findsOneWidget);
       expect(find.byKey(const Key('password_field')), findsOneWidget);
       expect(find.byKey(const Key('login_submit_button')), findsOneWidget);
-      expect(find.text('標準ログイン'), findsOneWidget);
+      expect(find.text('ユーザー名でログイン'), findsOneWidget);
     });
 
-    testWidgets('shows browser button for oidc provider', (tester) async {
+    testWidgets('hides credential form when local is absent', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 1400));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(
         _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(
-              const AuthProviderConfig.oidc(issuer: 'https://sso.example.com'),
+          serverAuthDiscoveryNotifierProvider.overrideWith(
+            () => _FakeDiscoveryNotifier(
+              _discovery(
+                strategy: AuthStrategy.defaultOnly,
+                providers: const [
+                  AuthProviderSummary(
+                    id: 5,
+                    name: 'Corporate SSO',
+                    type: AuthProviderType.oidc,
+                    isDefault: true,
+                    enabled: true,
+                  ),
+                ],
+              ),
             ),
           ),
           serverConfigNotifierProvider.overrideWith(
@@ -53,67 +97,41 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('browser_login_button')), findsOneWidget);
       expect(find.byKey(const Key('username_field')), findsNothing);
-      expect(find.text('OIDC / SSO'), findsOneWidget);
+      expect(find.byKey(const Key('provider_button_5')), findsOneWidget);
+      expect(find.text('Corporate SSO'), findsOneWidget);
     });
 
-    testWidgets('shows browser button for auth0 provider', (tester) async {
+    testWidgets('shows both credential form and provider buttons on user-choice', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(400, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(
         _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(
-              const AuthProviderConfig.auth0(
-                domain: 'ex.auth0.com',
-                clientId: 'cid',
+          serverAuthDiscoveryNotifierProvider.overrideWith(
+            () => _FakeDiscoveryNotifier(
+              _discovery(
+                strategy: AuthStrategy.userChoice,
+                providers: const [
+                  _localProvider,
+                  AuthProviderSummary(
+                    id: 2,
+                    name: 'Google',
+                    type: AuthProviderType.oidc,
+                    isDefault: false,
+                    enabled: true,
+                  ),
+                  AuthProviderSummary(
+                    id: 3,
+                    name: 'Okta',
+                    type: AuthProviderType.saml,
+                    isDefault: false,
+                    enabled: true,
+                  ),
+                ],
               ),
-            ),
-          ),
-          serverConfigNotifierProvider.overrideWith(
-            () => _FakeServerConfigNotifier(),
-          ),
-          authStateNotifierProvider.overrideWith(
-            () => _FakeAuthStateNotifier(),
-          ),
-        ]),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('browser_login_button')), findsOneWidget);
-      expect(find.text('Auth0'), findsOneWidget);
-    });
-
-    testWidgets('shows SSO button for SAML provider', (tester) async {
-      await tester.pumpWidget(
-        _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(
-              const AuthProviderConfig.saml(
-                loginUrl: 'https://idp.example.com/sso',
-              ),
-            ),
-          ),
-          serverConfigNotifierProvider.overrideWith(
-            () => _FakeServerConfigNotifier(),
-          ),
-          authStateNotifierProvider.overrideWith(
-            () => _FakeAuthStateNotifier(),
-          ),
-        ]),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('browser_login_button')), findsOneWidget);
-      expect(find.text('SAML SSO'), findsOneWidget);
-      expect(find.text('SSOでログイン'), findsOneWidget);
-    });
-
-    testWidgets('shows credential form for firebase provider', (tester) async {
-      await tester.pumpWidget(
-        _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(
-              const AuthProviderConfig.firebase(projectId: 'proj'),
             ),
           ),
           serverConfigNotifierProvider.overrideWith(
@@ -127,15 +145,25 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('username_field')), findsOneWidget);
-      expect(find.byKey(const Key('password_field')), findsOneWidget);
-      expect(find.text('Firebase 認証'), findsOneWidget);
+      expect(find.byKey(const Key('provider_button_2')), findsOneWidget);
+      expect(find.byKey(const Key('provider_button_3')), findsOneWidget);
+      expect(find.text('Google'), findsOneWidget);
+      expect(find.text('Okta'), findsOneWidget);
     });
 
-    testWidgets('shows QR pairing link on all providers', (tester) async {
+    testWidgets('QR pairing + manual token are always present', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 1400));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(
         _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          serverAuthDiscoveryNotifierProvider.overrideWith(
+            () => _FakeDiscoveryNotifier(
+              _discovery(
+                strategy: AuthStrategy.localOnly,
+                providers: const [_localProvider],
+              ),
+            ),
           ),
           serverConfigNotifierProvider.overrideWith(
             () => _FakeServerConfigNotifier(),
@@ -148,17 +176,22 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('qr_pairing_button')), findsOneWidget);
+      expect(find.byKey(const Key('manual_token_toggle')), findsOneWidget);
     });
 
-    testWidgets('manual token section toggled by tap', (tester) async {
-      // Set a taller viewport so all list items are rendered at once.
-      await tester.binding.setSurfaceSize(const Size(400, 1200));
+    testWidgets('manual token field toggles open', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 1600));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await tester.pumpWidget(
         _wrap(const LoginPage(), [
-          authProviderConfigNotifierProvider.overrideWith(
-            () => _FakeConfigNotifier(const AuthProviderConfig.legacy()),
+          serverAuthDiscoveryNotifierProvider.overrideWith(
+            () => _FakeDiscoveryNotifier(
+              _discovery(
+                strategy: AuthStrategy.localOnly,
+                providers: const [_localProvider],
+              ),
+            ),
           ),
           serverConfigNotifierProvider.overrideWith(
             () => _FakeServerConfigNotifier(),
@@ -170,10 +203,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Initially hidden.
       expect(find.byKey(const Key('manual_token_field')), findsNothing);
 
-      // Tap toggle.
       await tester.tap(find.byKey(const Key('manual_token_toggle')));
       await tester.pumpAndSettle();
 
@@ -187,20 +218,18 @@ void main() {
 // Test fakes
 // ---------------------------------------------------------------------------
 
-class _FakeConfigNotifier extends AuthProviderConfigNotifier {
-  _FakeConfigNotifier(this._initial);
-  final AuthProviderConfig _initial;
+class _FakeDiscoveryNotifier extends ServerAuthDiscoveryNotifier {
+  _FakeDiscoveryNotifier(this._initial);
+  final ServerAuthDiscovery _initial;
 
   @override
-  AuthProviderConfig build() => _initial;
+  ServerAuthDiscovery build() => _initial;
 }
 
 class _FakeServerConfigNotifier extends ServerConfigNotifier {
   @override
-  ServerConfig build() => const ServerConfig(
-    baseUrl: 'https://saso.example.com',
-    apiMode: ApiMode.rest,
-  );
+  ServerConfig build() =>
+      const ServerConfig(baseUrl: 'https://saso.example.com');
 }
 
 class _FakeAuthStateNotifier extends AuthStateNotifier {
@@ -214,6 +243,8 @@ class _FakeAuthStateNotifier extends AuthStateNotifier {
   }) async => const AuthResult.failure(message: 'test');
 
   @override
-  Future<AuthResult> loginWithBrowser() async =>
-      const AuthResult.failure(message: 'test');
+  Future<AuthResult> loginWithQrToken({
+    required String pairingToken,
+    required String serverUrl,
+  }) async => const AuthResult.failure(message: 'test');
 }

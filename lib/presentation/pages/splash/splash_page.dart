@@ -39,12 +39,10 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       return;
     }
 
-    // 4. Discover which auth provider the server has enabled.
-    final providerConfig = await AuthDiscoveryService().discover(
-      config.baseUrl,
-    );
+    // 4. Discover which auth providers the server has enabled.
+    final discovery = await AuthDiscoveryService().discover(config.baseUrl);
     if (!mounted) return;
-    ref.read(authProviderConfigNotifierProvider.notifier).set(providerConfig);
+    ref.read(serverAuthDiscoveryNotifierProvider.notifier).set(discovery);
 
     // 5. Attempt to restore credentials from secure storage (JWT / cookie).
     await ref.read(authStateNotifierProvider.notifier).loadStoredCredentials();

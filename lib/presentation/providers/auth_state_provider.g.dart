@@ -6,10 +6,14 @@ part of 'auth_state_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'dca69043d18e3de8c4e683dc86e187cb3ccde780';
+String _$authServiceHash() => r'd17a736a9de9427b5d06ba5260920846a121ff33';
 
-/// Selects and instantiates the appropriate [AuthService] based on the
-/// currently detected provider config and server URL.
+/// Returns the local credential-based auth service that talks to the
+/// server's `/auth/start` endpoint with `{id, password}`.
+///
+/// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
+/// through the server's `/m/setup` browser flow rather than a per-provider
+/// native SDK, so this provider does not depend on discovery.
 ///
 /// Copied from [authService].
 @ProviderFor(authService)
@@ -25,27 +29,34 @@ final authServiceProvider = AutoDisposeProvider<AuthService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthServiceRef = AutoDisposeProviderRef<AuthService>;
-String _$authProviderConfigNotifierHash() =>
-    r'a3ae664c27195ecb23534591a9626bf5a3637e56';
+String _$serverAuthDiscoveryNotifierHash() =>
+    r'e294fc87fe4802507ef6d63d997b1835e289569b';
 
-/// See also [AuthProviderConfigNotifier].
-@ProviderFor(AuthProviderConfigNotifier)
-final authProviderConfigNotifierProvider = AutoDisposeNotifierProvider<
-  AuthProviderConfigNotifier,
-  AuthProviderConfig
+/// Holds the latest [ServerAuthDiscovery] document received from the server.
+///
+/// The splash page populates this after calling [AuthDiscoveryService]; the
+/// login page reads from it to decide which sections to render (credential
+/// form / per-provider buttons / QR + manual token).
+///
+/// Copied from [ServerAuthDiscoveryNotifier].
+@ProviderFor(ServerAuthDiscoveryNotifier)
+final serverAuthDiscoveryNotifierProvider = AutoDisposeNotifierProvider<
+  ServerAuthDiscoveryNotifier,
+  ServerAuthDiscovery
 >.internal(
-  AuthProviderConfigNotifier.new,
-  name: r'authProviderConfigNotifierProvider',
+  ServerAuthDiscoveryNotifier.new,
+  name: r'serverAuthDiscoveryNotifierProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$authProviderConfigNotifierHash,
+          : _$serverAuthDiscoveryNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AuthProviderConfigNotifier = AutoDisposeNotifier<AuthProviderConfig>;
-String _$authStateNotifierHash() => r'daccf4fd81d8c6ea2b9931a2ce5a5a11f42bc23b';
+typedef _$ServerAuthDiscoveryNotifier =
+    AutoDisposeNotifier<ServerAuthDiscovery>;
+String _$authStateNotifierHash() => r'f110c9c583f1db56905676ded0deaa295fb2f322';
 
 /// See also [AuthStateNotifier].
 @ProviderFor(AuthStateNotifier)

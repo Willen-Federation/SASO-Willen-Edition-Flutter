@@ -19,119 +19,120 @@ void main() {
     service = AuthDiscoveryService(httpClient: client);
   });
 
-  test('returns legacy for empty serverUrl', () async {
+  test('returns local-only sentinel for empty serverUrl', () async {
     final result = await service.discover('');
-    expect(result, isA<LegacyAuthConfig>());
+    expect(result.authStrategy, AuthStrategy.localOnly);
+    expect(result.hasLocalLogin, isTrue);
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
 
-  test('returns legacy for malformed URL', () async {
+  test('returns local-only sentinel for malformed URL', () async {
     final result = await service.discover('not-a-url');
-    expect(result, isA<LegacyAuthConfig>());
+    expect(result.authStrategy, AuthStrategy.localOnly);
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
 
-  test('returns legacy on 404', () async {
+  test('returns local-only fallback on 404', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response('Not Found', 404));
 
     final result = await service.discover('https://saso.example.com');
-    expect(result, isA<LegacyAuthConfig>());
+    expect(result.authStrategy, AuthStrategy.localOnly);
+    expect(result.hasLocalLogin, isTrue);
   });
 
-  test('returns legacy on network exception', () async {
+  test('returns local-only fallback on network exception', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenThrow(Exception('network error'));
 
     final result = await service.discover('https://saso.example.com');
-    expect(result, isA<LegacyAuthConfig>());
+    expect(result.authStrategy, AuthStrategy.localOnly);
   });
 
-  test('returns legacy when server returns legacy provider', () async {
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response('{"provider":"legacy"}', 200));
-
-    final result = await service.discover('https://saso.example.com');
-    expect(result, isA<LegacyAuthConfig>());
-  });
-
-  test('returns OidcAuthConfig when server returns oidc provider', () async {
-    const body =
-        '{"provider":"oidc","config":{"issuer":"https://sso.example.com"}}';
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response(body, 200));
-
-    final result = await service.discover('https://saso.example.com');
-    expect(result, isA<OidcAuthConfig>());
-    expect((result as OidcAuthConfig).issuer, 'https://sso.example.com');
-  });
-
-  test(
-    'returns FirebaseAuthConfig when server returns firebase provider',
-    () async {
-      const body = '{"provider":"firebase","config":{"projectId":"my-proj"}}';
-      when(
-        () => client.get(any(), headers: any(named: 'headers')),
-      ).thenAnswer((_) async => http.Response(body, 200));
-
-      final result = await service.discover('https://saso.example.com');
-      expect(result, isA<FirebaseAuthConfig>());
-    },
-  );
-
-  test('returns Auth0AuthConfig when server returns auth0 provider', () async {
-    const body =
-        '{"provider":"auth0","config":{"domain":"ex.auth0.com","clientId":"cid"}}';
+  test('parses local-only discovery document', () async {
+    const body = '''
+{
+  "serverName": "SASO",
+  "version": "1.0.0",
+  "mobileSetupUrl": "https://saso.example.com/m/setup",
+  "authStrategy": "local-only",
+  "providers": [
+    {"id":1, "name":"Local", "type":"local", "isDefault":true, "enabled":true}
+  ]
+}''';
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response(body, 200));
 
     final result = await service.discover('https://saso.example.com');
-    expect(result, isA<Auth0AuthConfig>());
-    expect((result as Auth0AuthConfig).domain, 'ex.auth0.com');
+    expect(result.serverName, 'SASO');
+    expect(result.authStrategy, AuthStrategy.localOnly);
+    expect(result.hasLocalLogin, isTrue);
+    expect(result.externalProviders, isEmpty);
   });
 
-  test(
-    'returns CognitoAuthConfig when server returns cognito provider',
-    () async {
-      const body =
-          '{"provider":"cognito","config":{"userPoolId":"us-east-1_X","clientId":"c","region":"us-east-1"}}';
-      when(
-        () => client.get(any(), headers: any(named: 'headers')),
-      ).thenAnswer((_) async => http.Response(body, 200));
+  test('parses user-choice discovery with multiple providers', () async {
+    const body = '''
+{
+  "serverName": "Acme",
+  "version": "1.2.3",
+  "mobileSetupUrl": "https://acme.example.com/m/setup",
+  "authStrategy": "user-choice",
+  "providers": [
+    {"id":1, "name":"Local", "type":"local", "isDefault":false, "enabled":true},
+    {"id":2, "name":"Google", "type":"oidc", "isDefault":false, "enabled":true},
+    {"id":3, "name":"Okta", "type":"saml", "isDefault":false, "enabled":true}
+  ]
+}''';
+    when(
+      () => client.get(any(), headers: any(named: 'headers')),
+    ).thenAnswer((_) async => http.Response(body, 200));
 
-      final result = await service.discover('https://saso.example.com');
-      expect(result, isA<CognitoAuthConfig>());
-    },
-  );
+    final result = await service.discover('https://acme.example.com');
+    expect(result.authStrategy, AuthStrategy.userChoice);
+    expect(result.hasLocalLogin, isTrue);
+    expect(result.externalProviders, hasLength(2));
+    expect(
+      result.externalProviders.map((p) => p.name).toList(),
+      ['Google', 'Okta'],
+    );
+  });
 
-  test('returns SamlAuthConfig when server returns saml provider', () async {
-    const body =
-        '{"provider":"saml","config":{"loginUrl":"https://idp.example.com/sso"}}';
+  test('fills in local-only fallback when server returns empty providers', () async {
+    const body = '''
+{
+  "serverName": "",
+  "version": "",
+  "mobileSetupUrl": "",
+  "authStrategy": "user-choice",
+  "providers": []
+}''';
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response(body, 200));
 
     final result = await service.discover('https://saso.example.com');
-    expect(result, isA<SamlAuthConfig>());
-    expect((result as SamlAuthConfig).loginUrl, 'https://idp.example.com/sso');
+    expect(result.hasLocalLogin, isTrue);
+    expect(result.authStrategy, AuthStrategy.localOnly);
   });
 
-  test('probes correct URL', () async {
+  test('probes the correct URL', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response('{"provider":"legacy"}', 200));
+    ).thenAnswer(
+      (_) async => http.Response(
+        '{"serverName":"","version":"","mobileSetupUrl":"","authStrategy":"local-only","providers":[]}',
+        200,
+      ),
+    );
 
     await service.discover('https://saso.example.com');
 
-    final captured =
-        verify(
-          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-        ).captured;
+    final captured = verify(
+      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+    ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://saso.example.com/api/v1/auth/providers',
