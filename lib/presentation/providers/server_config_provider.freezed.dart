@@ -213,7 +213,7 @@ return $default(_that.baseUrl,_that.apiMode,_that.sessionCookie,_that.jwtToken,_
 
 
 class _ServerConfig implements ServerConfig {
-  const _ServerConfig({this.baseUrl = 'https://saso.sksl.jp', this.apiMode = ApiMode.rest, this.sessionCookie, this.jwtToken, this.refreshToken, this.deviceId, this.offlineMode = false, this.aiAutofillEnabled = false});
+  const _ServerConfig({this.baseUrl = '', this.apiMode = ApiMode.rest, this.sessionCookie, this.jwtToken, this.refreshToken, this.deviceId, this.offlineMode = false, this.aiAutofillEnabled = false});
   
 
 @override@JsonKey() final  String baseUrl;

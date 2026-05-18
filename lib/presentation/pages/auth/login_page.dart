@@ -36,7 +36,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
     if (username.isEmpty || password.isEmpty) {
-      setState(() => _errorMessage = 'メールアドレスとパスワードを入力してください');
+      setState(() => _errorMessage = 'ユーザー名とパスワードを入力してください');
       return;
     }
     setState(() {
@@ -333,11 +333,13 @@ class _CredentialForm extends StatelessWidget {
           key: const Key('username_field'),
           controller: usernameController,
           decoration: const InputDecoration(
-            labelText: 'メールアドレス',
+            labelText: 'ユーザー名',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.email_outlined),
+            prefixIcon: Icon(Icons.person_outline),
           ),
-          keyboardType: TextInputType.emailAddress,
+          keyboardType: TextInputType.text,
+          autocorrect: false,
+          enableSuggestions: false,
           autofillHints: const [AutofillHints.username],
           textInputAction: TextInputAction.next,
         ),
