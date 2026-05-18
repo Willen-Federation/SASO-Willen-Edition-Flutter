@@ -141,6 +141,7 @@ class _ItemDetail extends ConsumerWidget {
           const SizedBox(height: 8),
         ],
 
+
         if (item.features.isNotEmpty) ...[
           Text('バリエーション', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
