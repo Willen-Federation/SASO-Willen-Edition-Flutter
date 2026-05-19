@@ -187,8 +187,9 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                   icon: const Icon(Icons.link_off),
                   label: const Text('再設定'),
                   style: TextButton.styleFrom(
-                    foregroundColor:
-                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    foregroundColor: Theme.of(
+                      context,
+                    ).colorScheme.onPrimaryContainer,
                   ),
                   onPressed: () => context.go('/onboarding'),
                 ),
@@ -257,16 +258,15 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                         OutlinedButton.icon(
                           key: const Key('test_connection_button'),
                           onPressed: _testing ? null : _testConnection,
-                          icon:
-                              _testing
-                                  ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                  : const Icon(Icons.network_check),
+                          icon: _testing
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.network_check),
                           label: Text(l10n.testConnection),
                         ),
                         const SizedBox(width: 12),

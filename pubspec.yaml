@@ -6,7 +6,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.7.0 <4.0.0"
+  # cupertino_icons 1.0.9 (PR #100) requires Dart ^3.9.0.
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,11 +15,15 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # State management (Riverpod)
-  flutter_riverpod: ^3.1.0
-  riverpod_annotation: ^4.0.0
-  hooks_riverpod: ^3.1.0
-  flutter_hooks: ^0.21.3+1
+  # State management (Riverpod 2.x).
+  # PR #98 bumped the Riverpod stack to 3.x / riverpod_generator 4.x,
+  # which renames generated providers (`xxxNotifierProvider` →
+  # `xxxProvider`) and reshapes the override API. Pinned to 2.x until
+  # the codebase migration to Riverpod 3 is scheduled.
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  hooks_riverpod: ^2.6.1
+  flutter_hooks: ^0.20.5
 
   # Navigation
   go_router: ^14.8.1
@@ -77,10 +82,26 @@ dependencies:
   url_launcher: ^6.3.1
 
   # Connectivity stream for the offline indicator badge.
-  connectivity_plus: ^7.1.1
+  # 7.x requires Xcode 26.1.1 (calls `NWPath.isUltraConstrained`, which
+  # isn't declared in the SDK headers shipped on the current `macos-15`
+  # GitHub runner). Hold at 6.x until the runner catches up.
+  connectivity_plus: ^6.1.5
 
   # Internationalisation
   intl: any
+
+# Pin transitive deps that break the build but aren't directly listed
+# above. Remove an entry as soon as the upstream issue resolves.
+dependency_overrides:
+  # Transitive via `amplify_analytics_pinpoint`. 12.4.0 added an
+  # `NSProcessInfo.isiOSAppOnVision` call guarded by
+  # `@available(iOS 26.1, *)`, but the selector isn't declared in the
+  # SDK headers shipped with the current `macos-15` GitHub runner's
+  # Xcode, so the iOS simulator build fails with an ARC semantic
+  # error. 12.3.0 predates that call. Drop this override when the
+  # runner image ships an Xcode that knows the iOS 26.1 SDK, or when
+  # device_info_plus removes the call.
+  device_info_plus: 12.3.0
 
 dev_dependencies:
   flutter_test:
@@ -89,15 +110,23 @@ dev_dependencies:
     sdk: flutter
 
   # Code generation
-  build_runner: ^2.15.0
-  freezed: ^3.2.3
-  json_serializable: ^6.11.2
-  riverpod_generator: ^4.0.0+1
+  # build_runner 2.9+ moved to `build ^4.0.0`, which is incompatible
+  # with riverpod_generator 2.6.x. The newer freezed / json_serializable
+  # majors are pulled back too so the build-runners stack stays
+  # self-consistent until the Riverpod 3 migration.
+  build_runner: ^2.5.4
+  freezed: ^3.1.0
+  json_serializable: ^6.9.5
+  riverpod_generator: ^2.6.5
 
   # Linting
   flutter_lints: ^5.0.0
-  custom_lint: ^0.8.1
-  riverpod_lint: ^3.1.0
+  # custom_lint 0.8.x depends on analyzer ^8.0.0, which conflicts with
+  # the analyzer ^7.0.0 that riverpod_lint 2.6.x needs. Hold custom_lint
+  # at the 0.7.x line until the Riverpod 3 migration unsticks the lint
+  # stack as a whole.
+  custom_lint: ^0.7.6
+  riverpod_lint: ^2.6.5
 
   # App icon generation
   flutter_launcher_icons: ^0.14.4

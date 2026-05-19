@@ -189,18 +189,14 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder:
-          (_) => DraggableScrollableSheet(
-            initialChildSize: 0.55,
-            minChildSize: 0.3,
-            maxChildSize: 0.9,
-            expand: false,
-            builder:
-                (_, scrollController) => _PriceHistorySheet(
-                  isbn: isbn,
-                  scrollController: scrollController,
-                ),
-          ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollController) =>
+            _PriceHistorySheet(isbn: isbn, scrollController: scrollController),
+      ),
     );
   }
 
@@ -228,19 +224,20 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     });
 
     final name = _nameController.text.trim();
-    final rawCode =
-        _janController.text.trim().isEmpty ? null : _janController.text.trim();
+    final rawCode = _janController.text.trim().isEmpty
+        ? null
+        : _janController.text.trim();
     // Route the scanned code to the correct field: ISBN-13/10 → isbnCode,
     // everything else (JAN/EAN) → janCode.
     final bool codeIsIsbn =
         rawCode != null && IsbnLookupService.isIsbn(rawCode);
-    final String? isbn =
-        codeIsIsbn ? IsbnLookupService.normalize(rawCode) : null;
+    final String? isbn = codeIsIsbn
+        ? IsbnLookupService.normalize(rawCode)
+        : null;
     final String? janCode = codeIsIsbn ? null : rawCode;
-    final String? labelCode =
-        _labelCodeController.text.trim().isEmpty
-            ? null
-            : _labelCodeController.text.trim();
+    final String? labelCode = _labelCodeController.text.trim().isEmpty
+        ? null
+        : _labelCodeController.text.trim();
     final price = int.tryParse(_priceController.text) ?? 0;
     final stock = int.tryParse(_stockController.text) ?? 0;
 
@@ -370,8 +367,8 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 border: OutlineInputBorder(),
               ),
               textCapitalization: TextCapitalization.sentences,
-              validator:
-                  (v) => (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
             ),
             const SizedBox(height: 12),
 
@@ -385,10 +382,9 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'スキャンして入力',
-                  onPressed:
-                      () => context.push('/scanner/jan').then((code) {
-                        if (code is String) _janController.text = code;
-                      }),
+                  onPressed: () => context.push('/scanner/jan').then((code) {
+                    if (code is String) _janController.text = code;
+                  }),
                 ),
               ),
               keyboardType: TextInputType.number,
@@ -407,10 +403,9 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
                   tooltip: 'ラベルをスキャン',
-                  onPressed:
-                      () => context.push('/scanner/jan').then((code) {
-                        if (code is String) _labelCodeController.text = code;
-                      }),
+                  onPressed: () => context.push('/scanner/jan').then((code) {
+                    if (code is String) _labelCodeController.text = code;
+                  }),
                 ),
               ),
             ),
@@ -491,14 +486,13 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
 
             FilledButton.icon(
               onPressed: _saving ? null : _save,
-              icon:
-                  _saving
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.save_outlined),
+              icon: _saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.save_outlined),
               label: Text(_saving ? '登録中…' : '登録する'),
             ),
           ],
@@ -522,21 +516,19 @@ class _ProductInfoCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading:
-            product.imageUrl != null
-                ? ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    product.imageUrl!,
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (_, __, ___) =>
-                            const Icon(Icons.inventory_2_outlined, size: 32),
-                  ),
-                )
-                : const Icon(Icons.inventory_2_outlined, size: 32),
+        leading: product.imageUrl != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image.network(
+                  product.imageUrl!,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.inventory_2_outlined, size: 32),
+                ),
+              )
+            : const Icon(Icons.inventory_2_outlined, size: 32),
         title: Text(
           product.displayName,
           maxLines: 2,
@@ -610,13 +602,12 @@ class _BookInfoCard extends StatelessWidget {
                   width: 60,
                   height: 80,
                   fit: BoxFit.cover,
-                  placeholder:
-                      (_, __) => Container(
-                        width: 60,
-                        height: 80,
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.book_outlined, size: 28),
-                      ),
+                  placeholder: (_, __) => Container(
+                    width: 60,
+                    height: 80,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.book_outlined, size: 28),
+                  ),
                   errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
                 ),
               )
@@ -745,11 +736,10 @@ class _PriceHistorySheet extends ConsumerWidget {
           child: historyAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('取得失敗: $e')),
-            data:
-                (entries) => ListView(
-                  controller: scrollController,
-                  children: [PriceHistoryChart(entries: entries)],
-                ),
+            data: (entries) => ListView(
+              controller: scrollController,
+              children: [PriceHistoryChart(entries: entries)],
+            ),
           ),
         ),
       ],
@@ -842,33 +832,30 @@ class _CategoryPickerTile extends ConsumerWidget {
 
     return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
-      error:
-          (e, _) => Text(
-            'カテゴリ取得失敗: $e',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-      data:
-          (categories) => DropdownButtonFormField<Category>(
-            decoration: const InputDecoration(
-              labelText: 'カテゴリ *',
-              border: OutlineInputBorder(),
-            ),
-            // ignore: deprecated_member_use
-            value: selected,
-            hint: const Text('カテゴリを選択'),
-            items:
-                categories
-                    .map(
-                      (cat) => DropdownMenuItem(
-                        value: cat,
-                        child: Text('${'　' * cat.depth}${cat.name}'),
-                      ),
-                    )
-                    .toList(),
-            onChanged: (v) {
-              if (v != null) onSelected(v);
-            },
-          ),
+      error: (e, _) => Text(
+        'カテゴリ取得失敗: $e',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+      data: (categories) => DropdownButtonFormField<Category>(
+        decoration: const InputDecoration(
+          labelText: 'カテゴリ *',
+          border: OutlineInputBorder(),
+        ),
+        // ignore: deprecated_member_use
+        value: selected,
+        hint: const Text('カテゴリを選択'),
+        items: categories
+            .map(
+              (cat) => DropdownMenuItem(
+                value: cat,
+                child: Text('${'　' * cat.depth}${cat.name}'),
+              ),
+            )
+            .toList(),
+        onChanged: (v) {
+          if (v != null) onSelected(v);
+        },
+      ),
     );
   }
 }

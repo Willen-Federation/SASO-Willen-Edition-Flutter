@@ -102,27 +102,23 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   void _offerItemRegistration(String janCode) {
     showDialog<void>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('コードを認識できません'),
-            content: Text('$janCode\n\nこのコードで新しいアイテムを登録しますか？'),
-            actions: [
-              TextButton(
-                onPressed: () => ctx.pop(),
-                child: const Text('キャンセル'),
-              ),
-              FilledButton.icon(
-                onPressed: () {
-                  ctx.pop();
-                  context.pushReplacement(
-                    '/items/register?janCode=${Uri.encodeComponent(janCode)}',
-                  );
-                },
-                icon: const Icon(Icons.add_box_outlined),
-                label: const Text('アイテム登録'),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('コードを認識できません'),
+        content: Text('$janCode\n\nこのコードで新しいアイテムを登録しますか？'),
+        actions: [
+          TextButton(onPressed: () => ctx.pop(), child: const Text('キャンセル')),
+          FilledButton.icon(
+            onPressed: () {
+              ctx.pop();
+              context.pushReplacement(
+                '/items/register?janCode=${Uri.encodeComponent(janCode)}',
+              );
+            },
+            icon: const Icon(Icons.add_box_outlined),
+            label: const Text('アイテム登録'),
           ),
+        ],
+      ),
     );
   }
 

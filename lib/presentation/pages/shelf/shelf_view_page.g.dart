@@ -73,10 +73,9 @@ class ShelfDataProvider
         (ref) => shelfData(ref as ShelfDataRef, shelfId),
         from: shelfDataProvider,
         name: r'shelfDataProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$shelfDataHash,
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$shelfDataHash,
         dependencies: ShelfDataFamily._dependencies,
         allTransitiveDependencies: ShelfDataFamily._allTransitiveDependencies,
         shelfId: shelfId,

@@ -15,10 +15,9 @@ final featureFlagServiceProvider =
     AutoDisposeProvider<FeatureFlagService>.internal(
       featureFlagService,
       name: r'featureFlagServiceProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$featureFlagServiceHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$featureFlagServiceHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
@@ -105,10 +104,9 @@ class FeatureFlagProvider extends AutoDisposeProvider<bool> {
         (ref) => featureFlag(ref as FeatureFlagRef, key),
         from: featureFlagProvider,
         name: r'featureFlagProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$featureFlagHash,
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$featureFlagHash,
         dependencies: FeatureFlagFamily._dependencies,
         allTransitiveDependencies: FeatureFlagFamily._allTransitiveDependencies,
         key: key,

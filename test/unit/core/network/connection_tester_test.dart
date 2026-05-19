@@ -42,10 +42,9 @@ void main() {
     );
 
     expect(result, isA<ConnectionTestSuccess>());
-    final captured =
-        verify(
-          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-        ).captured;
+    final captured = verify(
+      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+    ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://saso.example.com/category/list.json',
@@ -63,10 +62,9 @@ void main() {
     );
 
     expect(result, isA<ConnectionTestSuccess>());
-    final captured =
-        verify(
-          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-        ).captured;
+    final captured = verify(
+      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+    ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://api.example.com/api/v1/health',
@@ -203,10 +201,9 @@ void main() {
 
       await tester.autoDetect('https://saso.example.com');
 
-      final captured =
-          verify(
-            () => client.get(captureAny(), headers: any(named: 'headers')),
-          ).captured;
+      final captured = verify(
+        () => client.get(captureAny(), headers: any(named: 'headers')),
+      ).captured;
       expect(
         (captured.first as Uri).toString(),
         'https://saso.example.com/api/v1/health',

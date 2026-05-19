@@ -15,11 +15,10 @@ class ConfigBundleModel {
       ConfigBundleModel(
         version: json['version'] as String,
         generatedAt: DateTime.parse(json['generatedAt'] as String),
-        featureFlags:
-            (json['featureFlags'] as List<dynamic>)
-                .cast<Map<String, dynamic>>()
-                .map(FeatureFlagModel.fromJson)
-                .toList(),
+        featureFlags: (json['featureFlags'] as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .map(FeatureFlagModel.fromJson)
+            .toList(),
       );
 
   final String version;

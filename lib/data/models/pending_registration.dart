@@ -31,10 +31,9 @@ class PendingRegistration {
         imagePath: map['image_path'] as String?,
         draftId: map['draft_id'] as String?,
         errorMessage: map['error_message'] as String?,
-        syncedAt:
-            map['synced_at'] != null
-                ? DateTime.tryParse(map['synced_at'] as String)
-                : null,
+        syncedAt: map['synced_at'] != null
+            ? DateTime.tryParse(map['synced_at'] as String)
+            : null,
       );
 
   final int? id;

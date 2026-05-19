@@ -14,10 +14,9 @@ final databaseHelperProvider =
     AutoDisposeFutureProvider<DatabaseHelper>.internal(
       databaseHelper,
       name: r'databaseHelperProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$databaseHelperHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$databaseHelperHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

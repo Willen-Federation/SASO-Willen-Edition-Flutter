@@ -20,13 +20,13 @@ permissions:
   contents: read
 
 env:
-  # NOTE: pinned to 3.29.2 — the version `subosito/flutter-action@v2`
-  # could resolve at the time of the last green run (commit 0f7d3c7).
-  # The previous bump to 3.41.7 was rejected by the action's release
-  # catalog and killed every workflow run instantly at setup time,
-  # producing no step logs. Keep this in sync with the local SDK the
-  # maintainer ships with `flutter --version`.
-  FLUTTER_VERSION: '3.29.2'
+  # NOTE: bumped to 3.44.0 (Dart 3.12.0) — the previous 3.29.2 pin
+  # shipped Dart 3.7.2, which can't satisfy `cupertino_icons ^1.0.9`
+  # (requires Dart ^3.9.0, introduced by PR #100). Verified present in
+  # `subosito/flutter-action@v2`'s release catalog before bumping
+  # (releases_linux.json). Keep this in sync with the local SDK the
+  # maintainer ships with `flutter --version` whenever feasible.
+  FLUTTER_VERSION: '3.44.0'
 
 jobs:
   # Issue #26-MED-004 — third-party actions pinned to immutable SHAs
@@ -104,11 +104,31 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      # Flutter 3.32+ enables Swift Package Manager integration by
+      # default. With it on, SPM-aware plugins (e.g. `mobile_scanner`)
+      # link through SPM while `GeneratedPluginRegistrant.m` is still
+      # emitted for CocoaPods, producing "Use of undeclared identifier
+      # 'MobileScannerPlugin'" at compile time. Several other plugins
+      # in this project (auth0_flutter, amplify_*) are CocoaPods-only,
+      # so the consistent fix is to keep the whole iOS build on Pods.
+      - name: Disable Swift Package Manager
+        run: flutter config --no-enable-swift-package-manager
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
+
+      # The macos-15 runner's cached CocoaPods specs CDN snapshot is
+      # too old to resolve current Firebase / Amplify podspecs (`pod
+      # install` exits with "CocoaPods's specs repository is too
+      # out-of-date"). `flutter build` invokes `pod install` without
+      # `--repo-update`, so we run it ourselves first and let Flutter
+      # reuse the fresh Pods/ output.
+      - name: Pod install with repo refresh
+        run: pod install --repo-update
+        working-directory: ios
 
       - name: Build iOS simulator
         run: flutter build ios --simulator --debug --no-codesign

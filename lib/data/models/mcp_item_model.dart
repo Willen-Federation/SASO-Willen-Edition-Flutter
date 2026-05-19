@@ -21,10 +21,9 @@ class McpItemModel {
     price: json['price'] as int? ?? 0,
     stock: json['stock'] as int? ?? 0,
     janCode: json['janCode'] as String? ?? json['jan_code'] as String?,
-    createdAt:
-        json['createdAt'] != null
-            ? DateTime.tryParse(json['createdAt'] as String)
-            : null,
+    createdAt: json['createdAt'] != null
+        ? DateTime.tryParse(json['createdAt'] as String)
+        : null,
     score: (json['score'] as num?)?.toDouble(),
   );
 

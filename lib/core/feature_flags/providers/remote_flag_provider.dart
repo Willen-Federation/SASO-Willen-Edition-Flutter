@@ -17,8 +17,9 @@ class RemoteFlagProvider implements FlagProvider {
     await _config.setConfigSettings(
       RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 10),
-        minimumFetchInterval:
-            kDebugMode ? Duration.zero : const Duration(minutes: 5),
+        minimumFetchInterval: kDebugMode
+            ? Duration.zero
+            : const Duration(minutes: 5),
       ),
     );
 
@@ -46,10 +47,9 @@ class RemoteFlagProvider implements FlagProvider {
   @override
   FlagResolution<String> resolveString(String key, String defaultValue) =>
       FlagResolution(
-        value:
-            _config.getString(key).isEmpty
-                ? defaultValue
-                : _config.getString(key),
+        value: _config.getString(key).isEmpty
+            ? defaultValue
+            : _config.getString(key),
         reason: 'REMOTE_CONFIG',
       );
 }

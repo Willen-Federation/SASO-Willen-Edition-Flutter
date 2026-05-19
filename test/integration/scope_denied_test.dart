@@ -9,16 +9,15 @@ void main() {
     'A 403 SASO-MOBILE-2008 surfaces as a scope-insufficient problem',
     () async {
       final backend = FakeBackend({
-        'POST /api/v1/items':
-            (_) => problem(
-              status: 403,
-              code: 'SASO-MOBILE-2008',
-              detail: 'This endpoint requires the "items:write" scope.',
-              extraHeaders: {
-                'WWW-Authenticate':
-                    'Bearer realm="api", error="insufficient_scope", scope="items:write"',
-              },
-            ),
+        'POST /api/v1/items': (_) => problem(
+          status: 403,
+          code: 'SASO-MOBILE-2008',
+          detail: 'This endpoint requires the "items:write" scope.',
+          extraHeaders: {
+            'WWW-Authenticate':
+                'Bearer realm="api", error="insufficient_scope", scope="items:write"',
+          },
+        ),
       });
 
       final client = RestV1ApiClient(

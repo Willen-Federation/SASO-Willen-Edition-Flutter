@@ -18,10 +18,9 @@ final pushNotificationServiceProvider =
     AutoDisposeProvider<PushNotificationService>.internal(
       pushNotificationService,
       name: r'pushNotificationServiceProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$pushNotificationServiceHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$pushNotificationServiceHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

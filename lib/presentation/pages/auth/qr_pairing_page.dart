@@ -195,12 +195,11 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
           IconButton(
             icon: ValueListenableBuilder(
               valueListenable: _controller,
-              builder:
-                  (_, state, __) => Icon(
-                    state.torchState == TorchState.on
-                        ? Icons.flash_off
-                        : Icons.flash_on,
-                  ),
+              builder: (_, state, __) => Icon(
+                state.torchState == TorchState.on
+                    ? Icons.flash_off
+                    : Icons.flash_on,
+              ),
             ),
             onPressed: _controller.toggleTorch,
           ),
@@ -230,44 +229,43 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
             child: Container(
               color: Colors.black54,
               padding: const EdgeInsets.all(16),
-              child:
-                  _processing
-                      ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+              child: _processing
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
                           ),
-                          const SizedBox(width: 12),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          l10n.qrPairingInProgress,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_errorMessage != null) ...[
                           Text(
-                            l10n.qrPairingInProgress,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      )
-                      : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (_errorMessage != null) ...[
-                            Text(
-                              _errorMessage!,
-                              style: const TextStyle(color: Colors.red),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                          Text(
-                            l10n.qrPairingInstruction,
-                            style: const TextStyle(color: Colors.white70),
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red),
                             textAlign: TextAlign.center,
                           ),
+                          const SizedBox(height: 8),
                         ],
-                      ),
+                        Text(
+                          l10n.qrPairingInstruction,
+                          style: const TextStyle(color: Colors.white70),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
             ),
           ),
         ],
