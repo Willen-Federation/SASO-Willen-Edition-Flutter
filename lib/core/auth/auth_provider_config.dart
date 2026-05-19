@@ -138,10 +138,9 @@ extension ServerAuthDiscoveryX on ServerAuthDiscovery {
       providers.any((p) => p.enabled && p.type == AuthProviderType.local);
 
   /// Enabled non-local providers, in the order returned by the server.
-  List<AuthProviderSummary> get externalProviders =>
-      providers.where((p) => p.enabled && p.type != AuthProviderType.local).toList(
-        growable: false,
-      );
+  List<AuthProviderSummary> get externalProviders => providers
+      .where((p) => p.enabled && p.type != AuthProviderType.local)
+      .toList(growable: false);
 }
 
 // ===========================================================================

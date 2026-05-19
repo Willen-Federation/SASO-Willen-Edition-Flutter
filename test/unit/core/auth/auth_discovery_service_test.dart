@@ -94,14 +94,16 @@ void main() {
     expect(result.authStrategy, AuthStrategy.userChoice);
     expect(result.hasLocalLogin, isTrue);
     expect(result.externalProviders, hasLength(2));
-    expect(
-      result.externalProviders.map((p) => p.name).toList(),
-      ['Google', 'Okta'],
-    );
+    expect(result.externalProviders.map((p) => p.name).toList(), [
+      'Google',
+      'Okta',
+    ]);
   });
 
-  test('fills in local-only fallback when server returns empty providers', () async {
-    const body = '''
+  test(
+    'fills in local-only fallback when server returns empty providers',
+    () async {
+      const body = '''
 {
   "serverName": "",
   "version": "",
@@ -109,19 +111,18 @@ void main() {
   "authStrategy": "user-choice",
   "providers": []
 }''';
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response(body, 200));
+      when(
+        () => client.get(any(), headers: any(named: 'headers')),
+      ).thenAnswer((_) async => http.Response(body, 200));
 
-    final result = await service.discover('https://saso.example.com');
-    expect(result.hasLocalLogin, isTrue);
-    expect(result.authStrategy, AuthStrategy.localOnly);
-  });
+      final result = await service.discover('https://saso.example.com');
+      expect(result.hasLocalLogin, isTrue);
+      expect(result.authStrategy, AuthStrategy.localOnly);
+    },
+  );
 
   test('probes the correct URL', () async {
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer(
+    when(() => client.get(any(), headers: any(named: 'headers'))).thenAnswer(
       (_) async => http.Response(
         '{"serverName":"","version":"","mobileSetupUrl":"","authStrategy":"local-only","providers":[]}',
         200,
@@ -130,9 +131,10 @@ void main() {
 
     await service.discover('https://saso.example.com');
 
-    final captured = verify(
-      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-    ).captured;
+    final captured =
+        verify(
+          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+        ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://saso.example.com/api/v1/auth/providers',

@@ -125,10 +125,7 @@ void main() {
     testWidgets('renders status badge with current status', (tester) async {
       await tester.pumpWidget(_buildPage());
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('item_status_badge_button')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('item_status_badge_button')), findsOneWidget);
       expect(find.text('アクティブ'), findsOneWidget);
     });
 

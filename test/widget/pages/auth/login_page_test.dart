@@ -16,14 +16,13 @@ ServerAuthDiscovery _discovery({
   required List<AuthProviderSummary> providers,
   String serverName = 'Test Server',
   String mobileSetupUrl = 'https://saso.example.com/m/setup',
-}) =>
-    ServerAuthDiscovery(
-      serverName: serverName,
-      version: '0.0.0',
-      mobileSetupUrl: mobileSetupUrl,
-      authStrategy: strategy,
-      providers: providers,
-    );
+}) => ServerAuthDiscovery(
+  serverName: serverName,
+  version: '0.0.0',
+  mobileSetupUrl: mobileSetupUrl,
+  authStrategy: strategy,
+  providers: providers,
+);
 
 const _localProvider = AuthProviderSummary(
   id: 1,
@@ -102,54 +101,55 @@ void main() {
       expect(find.text('Corporate SSO'), findsOneWidget);
     });
 
-    testWidgets('shows both credential form and provider buttons on user-choice', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(const Size(400, 1600));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+    testWidgets(
+      'shows both credential form and provider buttons on user-choice',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await tester.pumpWidget(
-        _wrap(const LoginPage(), [
-          serverAuthDiscoveryNotifierProvider.overrideWith(
-            () => _FakeDiscoveryNotifier(
-              _discovery(
-                strategy: AuthStrategy.userChoice,
-                providers: const [
-                  _localProvider,
-                  AuthProviderSummary(
-                    id: 2,
-                    name: 'Google',
-                    type: AuthProviderType.oidc,
-                    isDefault: false,
-                    enabled: true,
-                  ),
-                  AuthProviderSummary(
-                    id: 3,
-                    name: 'Okta',
-                    type: AuthProviderType.saml,
-                    isDefault: false,
-                    enabled: true,
-                  ),
-                ],
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.userChoice,
+                  providers: const [
+                    _localProvider,
+                    AuthProviderSummary(
+                      id: 2,
+                      name: 'Google',
+                      type: AuthProviderType.oidc,
+                      isDefault: false,
+                      enabled: true,
+                    ),
+                    AuthProviderSummary(
+                      id: 3,
+                      name: 'Okta',
+                      type: AuthProviderType.saml,
+                      isDefault: false,
+                      enabled: true,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          serverConfigNotifierProvider.overrideWith(
-            () => _FakeServerConfigNotifier(),
-          ),
-          authStateNotifierProvider.overrideWith(
-            () => _FakeAuthStateNotifier(),
-          ),
-        ]),
-      );
-      await tester.pumpAndSettle();
+            serverConfigNotifierProvider.overrideWith(
+              () => _FakeServerConfigNotifier(),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('username_field')), findsOneWidget);
-      expect(find.byKey(const Key('provider_button_2')), findsOneWidget);
-      expect(find.byKey(const Key('provider_button_3')), findsOneWidget);
-      expect(find.text('Google'), findsOneWidget);
-      expect(find.text('Okta'), findsOneWidget);
-    });
+        expect(find.byKey(const Key('username_field')), findsOneWidget);
+        expect(find.byKey(const Key('provider_button_2')), findsOneWidget);
+        expect(find.byKey(const Key('provider_button_3')), findsOneWidget);
+        expect(find.text('Google'), findsOneWidget);
+        expect(find.text('Okta'), findsOneWidget);
+      },
+    );
 
     testWidgets('QR pairing + manual token are always present', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 1400));

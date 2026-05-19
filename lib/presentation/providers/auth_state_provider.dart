@@ -154,9 +154,10 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         final accessToken = json['access_token'] as String;
         final refreshToken = json['refresh_token'] as String;
         final deviceIdRaw = json['device_id'];
-        final deviceId = deviceIdRaw is int
-            ? deviceIdRaw
-            : int.parse(deviceIdRaw.toString());
+        final deviceId =
+            deviceIdRaw is int
+                ? deviceIdRaw
+                : int.parse(deviceIdRaw.toString());
 
         await ref
             .read(serverConfigNotifierProvider.notifier)
