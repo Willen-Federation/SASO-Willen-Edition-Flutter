@@ -82,6 +82,15 @@ dependencies:
   # Internationalisation
   intl: any
 
+dependency_overrides:
+  # device_info_plus 12.4.0 (transitive via amplify_analytics_pinpoint) calls
+  # `[NSProcessInfo isiOSAppOnVision]`, guarded by `@available(iOS 26.1, *)`.
+  # The macos-15 runner's Xcode SDK does not declare that selector yet, so
+  # the iOS Simulator Build fails with ARC Semantic Issue. 12.3.0 is the
+  # last version before the call was introduced and still satisfies the
+  # `^12.0.0` constraint declared by amplify_analytics_pinpoint 2.11.0.
+  device_info_plus: 12.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
