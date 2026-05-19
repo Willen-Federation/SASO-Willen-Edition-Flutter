@@ -87,6 +87,19 @@ dependencies:
   # Internationalisation
   intl: any
 
+# Pin transitive deps that break the build but aren't directly listed
+# above. Remove an entry as soon as the upstream issue resolves.
+dependency_overrides:
+  # Transitive via `amplify_analytics_pinpoint`. 12.4.0 added an
+  # `NSProcessInfo.isiOSAppOnVision` call guarded by
+  # `@available(iOS 26.1, *)`, but the selector isn't declared in the
+  # SDK headers shipped with the current `macos-15` GitHub runner's
+  # Xcode, so the iOS simulator build fails with an ARC semantic
+  # error. 12.3.0 predates that call. Drop this override when the
+  # runner image ships an Xcode that knows the iOS 26.1 SDK, or when
+  # device_info_plus removes the call.
+  device_info_plus: 12.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
