@@ -89,14 +89,14 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
       // Normalise (strips trailing slash, enforces https for non-loopback).
       final normalized = UrlValidator.ensureHttpsOrLoopback(urlRaw).toString();
 
-      // Quick health check before committing.
-      final config = ref
-          .read(serverConfigNotifierProvider)
-          .copyWith(baseUrl: normalized, apiMode: ApiMode.rest);
-      final result = await ConnectionTester().test(config);
+      // Auto-detect whether the server speaks REST v1 (/api/v1/health) or
+      // the legacy API (/category/list.json) and save the matching mode so
+      // the correct ApiClient and auth flow are used downstream.
+      final detected = await ConnectionTester().autoDetect(normalized);
 
       if (!mounted) return;
 
+      final result = detected.result;
       if (result is ConnectionTestFailure || result is ConnectionTestTimeout) {
         final msg = switch (result) {
           ConnectionTestFailure(message: final m) => m,
@@ -107,11 +107,11 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
         return;
       }
 
-      // Save URL + REST mode; the GoRouter redirect will take the user to
+      // Save URL + detected mode; the GoRouter redirect will take the user to
       // /auth/login automatically once the state changes.
       await ref
           .read(serverConfigNotifierProvider.notifier)
-          .save(url: normalized, mode: ApiMode.rest);
+          .save(url: normalized, mode: detected.mode);
 
       if (!mounted) return;
       context.go('/auth/login');

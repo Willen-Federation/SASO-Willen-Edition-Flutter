@@ -37,6 +37,33 @@ class ConnectionTester {
   final http.Client _http;
   final Duration _timeout;
 
+  /// Probes the server and returns the best matching [ApiMode].
+  ///
+  /// Strategy:
+  /// 1. Try REST v1 (`/api/v1/health`). If it responds 2xx/3xx → REST mode.
+  /// 2. Otherwise try legacy (`/category/list.json`). If it responds → legacy.
+  /// 3. If both fail return the REST failure so the caller can surface it.
+  Future<({ConnectionTestResult result, ApiMode mode})> autoDetect(
+    String baseUrl,
+  ) async {
+    final restConfig = ServerConfig(baseUrl: baseUrl);
+    final restResult = await test(restConfig);
+    if (restResult is ConnectionTestSuccess) {
+      return (result: restResult, mode: ApiMode.rest);
+    }
+
+    final legacyConfig = ServerConfig(
+      baseUrl: baseUrl,
+      apiMode: ApiMode.legacy,
+    );
+    final legacyResult = await test(legacyConfig);
+    if (legacyResult is ConnectionTestSuccess) {
+      return (result: legacyResult, mode: ApiMode.legacy);
+    }
+
+    return (result: restResult, mode: ApiMode.rest);
+  }
+
   Future<ConnectionTestResult> test(ServerConfig config) async {
     if (config.apiMode == ApiMode.mock) {
       return const ConnectionTestResult.success(
