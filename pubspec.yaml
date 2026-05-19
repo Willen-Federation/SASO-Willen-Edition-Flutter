@@ -45,7 +45,7 @@ dependencies:
   mobile_scanner: ^7.2.0
 
   # Image capture & photo library access
-  image_picker: ^1.1.2
+  image_picker: ^1.2.2
 
   # Firebase (Apache 2.0 — GPL compatible)
   firebase_core: ^4.9.0
