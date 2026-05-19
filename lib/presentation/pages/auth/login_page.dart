@@ -197,7 +197,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       color: theme.colorScheme.errorContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
+                    // SelectableText so the user can long-press and copy
+                    // the (potentially long) HTTP status + body snippet to
+                    // share with support.
+                    child: SelectableText(
                       _errorMessage!,
                       style: TextStyle(
                         color: theme.colorScheme.onErrorContainer,
