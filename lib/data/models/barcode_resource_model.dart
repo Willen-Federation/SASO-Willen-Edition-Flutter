@@ -19,10 +19,9 @@ class BarcodeResourceModel {
         itemId: (json['item_id'] as int?) ?? (json['itemId'] as int?),
         name: json['name'] as String?,
         symbology: json['symbology'] as String?,
-        lastSeenAt:
-            json['last_seen_at'] != null
-                ? DateTime.tryParse(json['last_seen_at'] as String)
-                : null,
+        lastSeenAt: json['last_seen_at'] != null
+            ? DateTime.tryParse(json['last_seen_at'] as String)
+            : null,
       );
 
   final String code;

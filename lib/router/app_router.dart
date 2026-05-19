@@ -83,8 +83,8 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/items/:id',
-        builder:
-            (_, state) => ItemDetailPage(itemId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            ItemDetailPage(itemId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/scanner',
@@ -100,8 +100,8 @@ GoRouter appRouter(Ref ref) {
       // Legacy route kept for backward compatibility.
       GoRoute(
         path: '/scanner/jan',
-        builder:
-            (_, __) => const BarcodeScannerPage(mode: ScannerMode.register),
+        builder: (_, __) =>
+            const BarcodeScannerPage(mode: ScannerMode.register),
       ),
       GoRoute(
         path: '/categories',
@@ -109,8 +109,8 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/shelves/:id',
-        builder:
-            (_, state) => ShelfViewPage(shelfId: state.pathParameters['id']!),
+        builder: (_, state) =>
+            ShelfViewPage(shelfId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/items/register',
@@ -121,13 +121,12 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/inventory/adjust',
-        builder:
-            (_, state) => InventoryAdjustPage(
-              prefillJanCode: state.uri.queryParameters['janCode'],
-              prefillItemId: int.tryParse(
-                state.uri.queryParameters['itemId'] ?? '',
-              ),
-            ),
+        builder: (_, state) => InventoryAdjustPage(
+          prefillJanCode: state.uri.queryParameters['janCode'],
+          prefillItemId: int.tryParse(
+            state.uri.queryParameters['itemId'] ?? '',
+          ),
+        ),
       ),
       GoRoute(
         path: '/locations',

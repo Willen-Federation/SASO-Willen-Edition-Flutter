@@ -7,7 +7,7 @@ part of 'server_config_provider.dart';
 // **************************************************************************
 
 String _$serverConfigNotifierHash() =>
-    r'd8a791fac8908a523513c82a0490274f9185b6fb';
+    r'82207c56d04edac2142cb4c1a381a3620c884233';
 
 /// See also [ServerConfigNotifier].
 @ProviderFor(ServerConfigNotifier)
@@ -15,10 +15,9 @@ final serverConfigNotifierProvider =
     AutoDisposeNotifierProvider<ServerConfigNotifier, ServerConfig>.internal(
       ServerConfigNotifier.new,
       name: r'serverConfigNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$serverConfigNotifierHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$serverConfigNotifierHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

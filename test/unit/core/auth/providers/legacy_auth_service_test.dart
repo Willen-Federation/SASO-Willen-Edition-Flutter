@@ -235,14 +235,13 @@ void main() {
         password: 'secret',
       );
 
-      final captured =
-          verify(
-            () => httpClient.post(
-              captureAny(),
-              headers: captureAny(named: 'headers'),
-              body: captureAny(named: 'body'),
-            ),
-          ).captured;
+      final captured = verify(
+        () => httpClient.post(
+          captureAny(),
+          headers: captureAny(named: 'headers'),
+          body: captureAny(named: 'body'),
+        ),
+      ).captured;
       final uri = captured[0] as Uri;
       final headers = captured[1] as Map<String, String>;
       final body = captured[2] as Map<String, String>;

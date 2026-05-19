@@ -143,8 +143,9 @@ void main() {
         // Skew is 30s; an expiry 10 seconds out is inside the skew, so
         // the token must be rejected even though it has not strictly
         // expired yet.
-        final almostExpired =
-            DateTime.now().add(const Duration(seconds: 10)).toUtc();
+        final almostExpired = DateTime.now()
+            .add(const Duration(seconds: 10))
+            .toUtc();
         when(
           () => storage.read(AppConstants.jwtTokenKey),
         ).thenAnswer((_) async => 'about-to-expire');

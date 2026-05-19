@@ -20,8 +20,9 @@ String _$authServiceHash() => r'd17a736a9de9427b5d06ba5260920846a121ff33';
 final authServiceProvider = AutoDisposeProvider<AuthService>.internal(
   authService,
   name: r'authServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -40,23 +41,23 @@ String _$serverAuthDiscoveryNotifierHash() =>
 ///
 /// Copied from [ServerAuthDiscoveryNotifier].
 @ProviderFor(ServerAuthDiscoveryNotifier)
-final serverAuthDiscoveryNotifierProvider = AutoDisposeNotifierProvider<
-  ServerAuthDiscoveryNotifier,
-  ServerAuthDiscovery
->.internal(
-  ServerAuthDiscoveryNotifier.new,
-  name: r'serverAuthDiscoveryNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product')
+final serverAuthDiscoveryNotifierProvider =
+    AutoDisposeNotifierProvider<
+      ServerAuthDiscoveryNotifier,
+      ServerAuthDiscovery
+    >.internal(
+      ServerAuthDiscoveryNotifier.new,
+      name: r'serverAuthDiscoveryNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
           : _$serverAuthDiscoveryNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 typedef _$ServerAuthDiscoveryNotifier =
     AutoDisposeNotifier<ServerAuthDiscovery>;
-String _$authStateNotifierHash() => r'f110c9c583f1db56905676ded0deaa295fb2f322';
+String _$authStateNotifierHash() => r'66a0a803230c0e0fcc6d5266d3791ae8507bf437';
 
 /// See also [AuthStateNotifier].
 @ProviderFor(AuthStateNotifier)
@@ -64,10 +65,9 @@ final authStateNotifierProvider =
     AutoDisposeNotifierProvider<AuthStateNotifier, AuthState>.internal(
       AuthStateNotifier.new,
       name: r'authStateNotifierProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$authStateNotifierHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$authStateNotifierHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

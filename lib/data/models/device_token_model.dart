@@ -16,10 +16,9 @@ class DeviceTokenModel {
         revoked: json['revoked'] as bool? ?? false,
         expiresAt: DateTime.parse(json['expiresAt'] as String),
         createdAt: DateTime.parse(json['createdAt'] as String),
-        lastUsedAt:
-            json['lastUsedAt'] != null
-                ? DateTime.parse(json['lastUsedAt'] as String)
-                : null,
+        lastUsedAt: json['lastUsedAt'] != null
+            ? DateTime.parse(json['lastUsedAt'] as String)
+            : null,
       );
 
   final int id;

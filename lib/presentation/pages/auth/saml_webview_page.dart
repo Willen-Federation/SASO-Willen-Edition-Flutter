@@ -65,41 +65,40 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
       port: validated.hasPort ? validated.port : null,
     );
 
-    _controller =
-        WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onPageStarted: (_) => setState(() => _loading = true),
-              onPageFinished: (_) => setState(() => _loading = false),
-              onNavigationRequest: (request) {
-                final uri = Uri.tryParse(request.url);
-                if (uri == null) return NavigationDecision.prevent;
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) => setState(() => _loading = true),
+          onPageFinished: (_) => setState(() => _loading = false),
+          onNavigationRequest: (request) {
+            final uri = Uri.tryParse(request.url);
+            if (uri == null) return NavigationDecision.prevent;
 
-                // App's custom callback scheme — always allowed; pops
-                // the token back to the caller.
-                if (uri.scheme == SamlWebViewPage.callbackScheme) {
-                  final token = uri.queryParameters['token'];
-                  Navigator.of(context).pop(token);
-                  return NavigationDecision.prevent;
-                }
+            // App's custom callback scheme — always allowed; pops
+            // the token back to the caller.
+            if (uri.scheme == SamlWebViewPage.callbackScheme) {
+              final token = uri.queryParameters['token'];
+              Navigator.of(context).pop(token);
+              return NavigationDecision.prevent;
+            }
 
-                // Host validation: only allow same-origin navigation
-                // (HTTPS scheme + identical host + identical port).
-                // This prevents an attacker controlling a redirect at
-                // the IdP from sending the cookie-bearing request to
-                // an arbitrary host.
-                if (!_isSameOrigin(uri)) {
-                  debugPrint(
-                    'SamlWebViewPage: blocked cross-origin navigation to ${uri.origin}',
-                  );
-                  return NavigationDecision.prevent;
-                }
-                return NavigationDecision.navigate;
-              },
-            ),
-          )
-          ..loadRequest(validated);
+            // Host validation: only allow same-origin navigation
+            // (HTTPS scheme + identical host + identical port).
+            // This prevents an attacker controlling a redirect at
+            // the IdP from sending the cookie-bearing request to
+            // an arbitrary host.
+            if (!_isSameOrigin(uri)) {
+              debugPrint(
+                'SamlWebViewPage: blocked cross-origin navigation to ${uri.origin}',
+              );
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(validated);
   }
 
   bool _isSameOrigin(Uri candidate) {
@@ -108,12 +107,12 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
       return false;
     }
     // Default port comparison: 0 / no-port means the scheme's default.
-    final cPort =
-        candidate.hasPort ? candidate.port : _defaultPort(candidate.scheme);
-    final tPort =
-        _trustedOrigin.hasPort
-            ? _trustedOrigin.port
-            : _defaultPort(_trustedOrigin.scheme);
+    final cPort = candidate.hasPort
+        ? candidate.port
+        : _defaultPort(candidate.scheme);
+    final tPort = _trustedOrigin.hasPort
+        ? _trustedOrigin.port
+        : _defaultPort(_trustedOrigin.scheme);
     return cPort == tPort;
   }
 
@@ -138,23 +137,22 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body:
-          _initError != null
-              ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    'SSOログインURLが無効です: $_initError',
-                    textAlign: TextAlign.center,
-                  ),
+      body: _initError != null
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'SSOログインURLが無効です: $_initError',
+                  textAlign: TextAlign.center,
                 ),
-              )
-              : Stack(
-                children: [
-                  WebViewWidget(controller: _controller!),
-                  if (_loading) const LinearProgressIndicator(),
-                ],
               ),
+            )
+          : Stack(
+              children: [
+                WebViewWidget(controller: _controller!),
+                if (_loading) const LinearProgressIndicator(),
+              ],
+            ),
     );
   }
 }

@@ -13,8 +13,9 @@ String _$appRouterHash() => r'a6bd8dc6b7e7bcd455cf30e696d4eaafc2905e42';
 final appRouterProvider = AutoDisposeProvider<GoRouter>.internal(
   appRouter,
   name: r'appRouterProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$appRouterHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$appRouterHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

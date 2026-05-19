@@ -129,13 +129,12 @@ class _SparklinePainter extends CustomPainter {
     canvas.drawPath(fillPath, Paint()..color = color.withValues(alpha: 0.12));
 
     // Line.
-    final linePaint =
-        Paint()
-          ..color = color
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round;
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     final linePath = Path();
     linePath.moveTo(toOffset(0, prices[0]).dx, toOffset(0, prices[0]).dy);

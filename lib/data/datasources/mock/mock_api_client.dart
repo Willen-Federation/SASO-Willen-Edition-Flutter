@@ -34,27 +34,25 @@ class MockApiClient implements SasoApiClient {
     var results = MockData.items;
 
     if (categoryId != null) {
-      results =
-          results
-              .where(
-                (i) =>
-                    i.categoryId == categoryId ||
-                    i.categoryId.startsWith('$categoryId-'),
-              )
-              .toList();
+      results = results
+          .where(
+            (i) =>
+                i.categoryId == categoryId ||
+                i.categoryId.startsWith('$categoryId-'),
+          )
+          .toList();
     }
 
     if (query != null && query.isNotEmpty) {
       final q = query.toLowerCase();
-      results =
-          results
-              .where(
-                (i) =>
-                    i.id.contains(q) ||
-                    i.name.toLowerCase().contains(q) ||
-                    (i.description?.toLowerCase().contains(q) ?? false),
-              )
-              .toList();
+      results = results
+          .where(
+            (i) =>
+                i.id.contains(q) ||
+                i.name.toLowerCase().contains(q) ||
+                (i.description?.toLowerCase().contains(q) ?? false),
+          )
+          .toList();
     }
 
     return results;
@@ -111,10 +109,9 @@ class MockApiClient implements SasoApiClient {
     if (existing == null) throw Exception('Item not found: $itemId');
     return existing.copyWith(
       name: (patch['name'] as String?) ?? existing.name,
-      description:
-          patch.containsKey('description')
-              ? patch['description'] as String?
-              : existing.description,
+      description: patch.containsKey('description')
+          ? patch['description'] as String?
+          : existing.description,
       status: (patch['status'] as String?) ?? existing.status,
     );
   }

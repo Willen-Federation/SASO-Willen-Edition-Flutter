@@ -71,10 +71,9 @@ class ItemByIdProvider extends AutoDisposeFutureProvider<Item> {
         (ref) => itemById(ref as ItemByIdRef, id),
         from: itemByIdProvider,
         name: r'itemByIdProvider',
-        debugGetCreateSourceHash:
-            const bool.fromEnvironment('dart.vm.product')
-                ? null
-                : _$itemByIdHash,
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$itemByIdHash,
         dependencies: ItemByIdFamily._dependencies,
         allTransitiveDependencies: ItemByIdFamily._allTransitiveDependencies,
         id: id,
@@ -218,10 +217,9 @@ class ItemSearchProvider extends AutoDisposeFutureProvider<List<Item>> {
          ),
          from: itemSearchProvider,
          name: r'itemSearchProvider',
-         debugGetCreateSourceHash:
-             const bool.fromEnvironment('dart.vm.product')
-                 ? null
-                 : _$itemSearchHash,
+         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+             ? null
+             : _$itemSearchHash,
          dependencies: ItemSearchFamily._dependencies,
          allTransitiveDependencies: ItemSearchFamily._allTransitiveDependencies,
          query: query,
@@ -350,10 +348,9 @@ final itemStatusUpdaterProvider =
     AutoDisposeAsyncNotifierProvider<ItemStatusUpdater, void>.internal(
       ItemStatusUpdater.new,
       name: r'itemStatusUpdaterProvider',
-      debugGetCreateSourceHash:
-          const bool.fromEnvironment('dart.vm.product')
-              ? null
-              : _$itemStatusUpdaterHash,
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$itemStatusUpdaterHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

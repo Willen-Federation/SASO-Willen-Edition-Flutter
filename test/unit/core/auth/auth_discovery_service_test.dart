@@ -131,10 +131,9 @@ void main() {
 
     await service.discover('https://saso.example.com');
 
-    final captured =
-        verify(
-          () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-        ).captured;
+    final captured = verify(
+      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
+    ).captured;
     expect(
       (captured[0] as Uri).toString(),
       'https://saso.example.com/api/v1/auth/providers',

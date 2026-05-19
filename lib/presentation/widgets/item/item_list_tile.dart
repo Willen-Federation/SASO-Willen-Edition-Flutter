@@ -42,10 +42,9 @@ class ItemListTile extends StatelessWidget {
             Text(
               '在庫 ${item.totalStock}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color:
-                    item.totalStock > 0
-                        ? Colors.green
-                        : theme.colorScheme.error,
+                color: item.totalStock > 0
+                    ? Colors.green
+                    : theme.colorScheme.error,
               ),
             ),
           ],
