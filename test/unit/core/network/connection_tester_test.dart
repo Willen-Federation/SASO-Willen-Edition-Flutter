@@ -59,11 +59,7 @@ void main() {
     ).thenAnswer((_) async => http.Response('{}', 200));
 
     final result = await tester.test(
-      const ServerConfig(
-        apiMode: ApiMode.rest,
-        baseUrl: 'https://api.example.com',
-        jwtToken: 'tok-1',
-      ),
+      const ServerConfig(baseUrl: 'https://api.example.com', jwtToken: 'tok-1'),
     );
 
     expect(result, isA<ConnectionTestSuccess>());
@@ -85,7 +81,7 @@ void main() {
 
   test('non-mock mode with empty url returns failure without HTTP', () async {
     final result = await tester.test(
-      const ServerConfig(apiMode: ApiMode.legacy, baseUrl: ''),
+      const ServerConfig(apiMode: ApiMode.legacy),
     );
     expect(result, isA<ConnectionTestFailure>());
     expect((result as ConnectionTestFailure).message, 'URL_MISSING');
