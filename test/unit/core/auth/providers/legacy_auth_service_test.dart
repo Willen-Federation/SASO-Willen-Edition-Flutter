@@ -27,7 +27,8 @@ void main() {
     when(() => storage.write(any(), any())).thenAnswer((_) async {});
   });
 
-  String? failureMessage(AuthResult r) => r is AuthFailure ? r.message : null;
+  String? failureMessage(AuthResult r) =>
+      r is AuthFailure ? r.message : null;
 
   group('LegacyAuthService.login URL validation', () {
     test('returns HTTPS error for plaintext HTTP non-loopback URL', () async {
@@ -72,31 +73,31 @@ void main() {
       verifyNever(() => storage.write(any(), any()));
     });
 
-    test(
-      '200 without Set-Cookie surfaces explicit missing-cookie error',
-      () async {
-        when(
-          () => httpClient.post(
-            any(),
-            headers: any(named: 'headers'),
-            body: any(named: 'body'),
-          ),
-        ).thenAnswer((_) async => http.Response('{"jwt":"eyJ..."}', 200));
+    test('200 without Set-Cookie surfaces explicit missing-cookie error',
+        () async {
+      when(
+        () => httpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer(
+        (_) async => http.Response('{"jwt":"eyJ..."}', 200),
+      );
 
-        final result = await service.login(
-          serverUrl: 'https://saso.example.com',
-          username: 'u',
-          password: 'p',
-        );
+      final result = await service.login(
+        serverUrl: 'https://saso.example.com',
+        username: 'u',
+        password: 'p',
+      );
 
-        expect(result, isA<AuthFailure>());
-        expect(
-          failureMessage(result),
-          allOf(contains('HTTP 200'), contains('Set-Cookie')),
-        );
-        verifyNever(() => storage.write(any(), any()));
-      },
-    );
+      expect(result, isA<AuthFailure>());
+      expect(
+        failureMessage(result),
+        allOf(contains('HTTP 200'), contains('Set-Cookie')),
+      );
+      verifyNever(() => storage.write(any(), any()));
+    });
 
     test('TimeoutException becomes a network-timeout failure', () async {
       when(
@@ -235,19 +236,21 @@ void main() {
         password: 'secret',
       );
 
-      final captured =
-          verify(
-            () => httpClient.post(
-              captureAny(),
-              headers: captureAny(named: 'headers'),
-              body: captureAny(named: 'body'),
-            ),
-          ).captured;
+      final captured = verify(
+        () => httpClient.post(
+          captureAny(),
+          headers: captureAny(named: 'headers'),
+          body: captureAny(named: 'body'),
+        ),
+      ).captured;
       final uri = captured[0] as Uri;
       final headers = captured[1] as Map<String, String>;
       final body = captured[2] as Map<String, String>;
       expect(uri.toString(), 'https://saso.example.com/auth/start');
-      expect(headers['Content-Type'], 'application/x-www-form-urlencoded');
+      expect(
+        headers['Content-Type'],
+        'application/x-www-form-urlencoded',
+      );
       expect(body, {'id': 'alice', 'password': 'secret'});
     });
   });

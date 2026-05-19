@@ -117,13 +117,13 @@ flutter:
     - assets/icons/
 
 flutter_launcher_icons:
-  image_path: "assets/icons/saso-full-rounded-1024.png"
+  image_path: "assets/icons/saso-compact-rounded-1024.png"
   android: "ic_launcher"
   ios: true
   remove_alpha_ios: true
   min_sdk_android: 21
   web:
     generate: true
-    image_path: "assets/icons/saso-full-rounded-1024.png"
+    image_path: "assets/icons/saso-compact-rounded-1024.png"
     background_color: "#FFFFFF"
     theme_color: "#0D47A1"

@@ -23,7 +23,9 @@ void main() {
   });
 
   test('mock mode short-circuits without HTTP', () async {
-    final result = await tester.test(const ServerConfig(apiMode: ApiMode.mock));
+    final result = await tester.test(
+      const ServerConfig(apiMode: ApiMode.mock),
+    );
     expect(result, isA<ConnectionTestSuccess>());
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
@@ -166,28 +168,26 @@ void main() {
       expect(detected.result, isA<ConnectionTestSuccess>());
     });
 
-    test(
-      'falls back to legacy mode when REST fails but legacy succeeds',
-      () async {
-        int callCount = 0;
-        when(
-          () => client.get(any(), headers: any(named: 'headers')),
-        ).thenAnswer((_) async {
-          callCount++;
-          // First call: REST /api/v1/health → 404
-          // Second call: legacy /category/list.json → 200
-          return callCount == 1
-              ? http.Response('Not Found', 404)
-              : http.Response('[]', 200);
-        });
+    test('falls back to legacy mode when REST fails but legacy succeeds',
+        () async {
+      int callCount = 0;
+      when(
+        () => client.get(any(), headers: any(named: 'headers')),
+      ).thenAnswer((_) async {
+        callCount++;
+        // First call: REST /api/v1/health → 404
+        // Second call: legacy /category/list.json → 200
+        return callCount == 1
+            ? http.Response('Not Found', 404)
+            : http.Response('[]', 200);
+      });
 
-        final detected = await tester.autoDetect('https://saso.example.com');
+      final detected = await tester.autoDetect('https://saso.example.com');
 
-        expect(detected.mode, ApiMode.legacy);
-        expect(detected.result, isA<ConnectionTestSuccess>());
-        expect(callCount, 2);
-      },
-    );
+      expect(detected.mode, ApiMode.legacy);
+      expect(detected.result, isA<ConnectionTestSuccess>());
+      expect(callCount, 2);
+    });
 
     test('returns REST failure when both probes fail', () async {
       when(
@@ -207,10 +207,9 @@ void main() {
 
       await tester.autoDetect('https://saso.example.com');
 
-      final captured =
-          verify(
-            () => client.get(captureAny(), headers: any(named: 'headers')),
-          ).captured;
+      final captured = verify(
+        () => client.get(captureAny(), headers: any(named: 'headers')),
+      ).captured;
       expect(
         (captured.first as Uri).toString(),
         'https://saso.example.com/api/v1/health',
@@ -220,9 +219,9 @@ void main() {
     test('legacy fallback probes /category/list.json', () async {
       int callCount = 0;
       final capturedUris = <Uri>[];
-      when(() => client.get(any(), headers: any(named: 'headers'))).thenAnswer((
-        invocation,
-      ) async {
+      when(
+        () => client.get(any(), headers: any(named: 'headers')),
+      ).thenAnswer((invocation) async {
         callCount++;
         capturedUris.add(invocation.positionalArguments.first as Uri);
         return callCount == 1
@@ -232,10 +231,8 @@ void main() {
 
       await tester.autoDetect('https://saso.example.com');
 
-      expect(
-        capturedUris[1].toString(),
-        'https://saso.example.com/category/list.json',
-      );
+      expect(capturedUris[1].toString(),
+          'https://saso.example.com/category/list.json');
     });
   });
 }
