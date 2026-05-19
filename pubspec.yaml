@@ -64,7 +64,7 @@ dependencies:
   auth0_flutter: ^1.14.0
 
   # Amazon Cognito native SDK via Amplify Auth [ff_auth_cognito]
-  amplify_auth_cognito: ^2.0.0
+  amplify_auth_cognito: ^2.11.0
 
   # SAML SSO WebView fallback
   webview_flutter: ^4.10.0
