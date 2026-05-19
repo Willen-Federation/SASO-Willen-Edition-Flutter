@@ -48,10 +48,10 @@ dependencies:
   image_picker: ^1.1.2
 
   # Firebase (Apache 2.0 — GPL compatible)
-  firebase_core: ^3.15.2
-  firebase_messaging: ^15.2.10
-  firebase_auth: ^5.7.0
-  firebase_remote_config: ^5.5.0
+  firebase_core: ^4.9.0
+  firebase_messaging: ^16.2.2
+  firebase_auth: ^6.5.1
+  firebase_remote_config: ^6.5.1
 
   # AWS Amplify / SNS Pinpoint (Apache 2.0 — GPL compatible) [ff_push_sns]
   amplify_flutter: ^2.0.0
