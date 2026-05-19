@@ -70,14 +70,14 @@ dependencies:
   webview_flutter: ^4.10.0
 
   # UI
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
   cached_network_image: ^3.4.1
 
   # Opens the web /mypage portal for device-token management.
   url_launcher: ^6.3.1
 
   # Connectivity stream for the offline indicator badge.
-  connectivity_plus: ^6.1.0
+  connectivity_plus: ^7.1.1
 
   # Internationalisation
   intl: any
