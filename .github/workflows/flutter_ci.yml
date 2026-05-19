@@ -120,13 +120,14 @@ jobs:
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
 
-      # The macos-15 runner's cached CocoaPods specs repo is too old
-      # to resolve current Firebase / Amplify podspecs and pod install
-      # bails out with "CocoaPods's specs repository is too
-      # out-of-date". Refresh the repo before letting `flutter build`
-      # run pod install.
-      - name: Update CocoaPods specs repo
-        run: pod repo update
+      # The macos-15 runner's cached CocoaPods specs CDN snapshot is
+      # too old to resolve current Firebase / Amplify podspecs (`pod
+      # install` exits with "CocoaPods's specs repository is too
+      # out-of-date"). `flutter build` invokes `pod install` without
+      # `--repo-update`, so we run it ourselves first and let Flutter
+      # reuse the fresh Pods/ output.
+      - name: Pod install with repo refresh
+        run: pod install --repo-update
         working-directory: ios
 
       - name: Build iOS simulator
