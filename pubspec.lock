@@ -642,18 +642,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_appauth
-      sha256: b09fa8e3eaba12ec341c69ec45063e06eb565304e24cc35caaf105bbae2e955c
+      sha256: "93f2991422eab5c84c697c694ec2b2351447ad70c18a68ab3cb364ef6422ebe4"
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.1"
+    version: "12.0.0"
   flutter_appauth_platform_interface:
     dependency: transitive
     description:
       name: flutter_appauth_platform_interface
-      sha256: fd2920b853d09741aff2e1178e044ea2ade0c87799cd8e63f094ab35b00fdf70
+      sha256: a17fe4cd6afa30b634e21922c02657e41130bceb03952a43fa469b95a758c328
       url: "https://pub.dev"
     source: hosted
-    version: "9.0.0"
+    version: "12.0.0"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -1601,6 +1601,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.17"
+  timing:
+    dependency: transitive
+    description:
+      name: timing
+      sha256: "62ee18aca144e4a9f29d212f5a4c6a053be252b895ab14b5821996cff4ed90fe"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   tuple:
     dependency: transitive
     description:
