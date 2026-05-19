@@ -15,10 +15,10 @@ dependencies:
     sdk: flutter
 
   # State management (Riverpod)
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
-  hooks_riverpod: ^2.6.1
-  flutter_hooks: ^0.20.5
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.0
+  hooks_riverpod: ^3.1.0
+  flutter_hooks: ^0.21.3+1
 
   # Navigation
   go_router: ^14.8.1
@@ -48,10 +48,10 @@ dependencies:
   image_picker: ^1.1.2
 
   # Firebase (Apache 2.0 — GPL compatible)
-  firebase_core: ^3.15.2
-  firebase_messaging: ^15.2.10
-  firebase_auth: ^5.7.0
-  firebase_remote_config: ^5.5.0
+  firebase_core: ^4.9.0
+  firebase_messaging: ^16.2.2
+  firebase_auth: ^6.5.1
+  firebase_remote_config: ^6.5.1
 
   # AWS Amplify / SNS Pinpoint (Apache 2.0 — GPL compatible) [ff_push_sns]
   amplify_flutter: ^2.0.0
@@ -64,7 +64,7 @@ dependencies:
   auth0_flutter: ^1.14.0
 
   # Amazon Cognito native SDK via Amplify Auth [ff_auth_cognito]
-  amplify_auth_cognito: ^2.0.0
+  amplify_auth_cognito: ^2.11.0
 
   # SAML SSO WebView fallback
   webview_flutter: ^4.10.0
@@ -89,15 +89,15 @@ dev_dependencies:
     sdk: flutter
 
   # Code generation
-  build_runner: ^2.5.4
-  freezed: ^3.1.0
-  json_serializable: ^6.9.5
-  riverpod_generator: ^2.6.5
+  build_runner: ^2.15.0
+  freezed: ^3.2.3
+  json_serializable: ^6.11.2
+  riverpod_generator: ^4.0.0+1
 
   # Linting
   flutter_lints: ^5.0.0
-  custom_lint: ^0.7.6
-  riverpod_lint: ^2.6.5
+  custom_lint: ^0.8.1
+  riverpod_lint: ^3.1.0
 
   # App icon generation
   flutter_launcher_icons: ^0.14.4

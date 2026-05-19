@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -133,9 +134,12 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     required String serverUrl,
   }) async {
     state = const AuthState.loading();
+    final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
+    debugPrint('[QrPairing] POST $uri');
+
+    final http.Response response;
     try {
-      final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
-      final response = await http
+      response = await http
           .post(
             uri,
             headers: {
@@ -148,8 +152,25 @@ class AuthStateNotifier extends _$AuthStateNotifier {
             }),
           )
           .timeout(AppConstants.httpTimeout);
+    } on TimeoutException catch (_) {
+      state = const AuthState.unauthenticated();
+      final msg =
+          'Network timeout after ${AppConstants.httpTimeout.inSeconds}s '
+          '(POST $uri)';
+      debugPrint('[QrPairing] $msg');
+      return AuthResult.failure(message: msg);
+    } catch (e) {
+      state = const AuthState.unauthenticated();
+      final msg = 'Network error: $e (POST $uri)';
+      debugPrint('[QrPairing] $msg');
+      return AuthResult.failure(message: msg);
+    }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+    final status = response.statusCode;
+    debugPrint('[QrPairing] HTTP $status (${response.body.length} bytes body)');
+
+    if (status == 200 || status == 201) {
+      try {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         final accessToken = json['access_token'] as String;
         final refreshToken = json['refresh_token'] as String;
@@ -172,15 +193,39 @@ class AuthStateNotifier extends _$AuthStateNotifier {
           token: accessToken,
         );
         return AuthResult.success(userId: 'qr-device', token: accessToken);
+      } catch (e) {
+        state = const AuthState.unauthenticated();
+        final msg =
+            'Pairing failed: server returned HTTP $status but the response '
+            'body could not be parsed ($e). Body: ${_snippet(response.body)}';
+        debugPrint('[QrPairing] $msg');
+        return AuthResult.failure(message: msg);
       }
-      state = const AuthState.unauthenticated();
-      return AuthResult.failure(
-        message: 'ペアリング失敗 (HTTP ${response.statusCode})',
-      );
-    } catch (e) {
-      state = const AuthState.unauthenticated();
-      return AuthResult.failure(message: e.toString());
     }
+
+    state = const AuthState.unauthenticated();
+    // A 404 on /api/v1/mobile/connect almost always means the server is a
+    // legacy SASO deployment that doesn't expose the v1 REST surface —
+    // QR pairing is REST-only, so surface that hint instead of a bare code.
+    final hint =
+        status == 404
+            ? ' — /api/v1/mobile/connect not found; the server may be a '
+                'legacy SASO deployment without the v1 REST API'
+            : '';
+    final msg =
+        'Pairing failed (HTTP $status$hint): ${_snippet(response.body)} '
+        '(POST $uri)';
+    debugPrint('[QrPairing] $msg');
+    return AuthResult.failure(message: msg);
+  }
+
+  /// Collapse whitespace and truncate so HTML/JSON error bodies stay
+  /// readable when surfaced in the pairing UI banner.
+  static String _snippet(String body) {
+    final flat = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (flat.isEmpty) return '(empty body)';
+    if (flat.length <= 200) return flat;
+    return '${flat.substring(0, 200)}…';
   }
 
   Future<void> logout() async {
