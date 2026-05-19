@@ -22,9 +22,9 @@ class ItemDetailPage extends ConsumerWidget {
       next.whenOrNull(
         data: (_) {
           if (prev is AsyncLoading) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.itemStatusUpdated)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.itemStatusUpdated)));
           }
         },
         error: (e, _) {
@@ -140,7 +140,6 @@ class _ItemDetail extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
         ],
-
 
         if (item.features.isNotEmpty) ...[
           Text('バリエーション', style: theme.textTheme.titleMedium),

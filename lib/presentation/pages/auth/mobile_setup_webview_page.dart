@@ -160,9 +160,10 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
     }
     final cPort =
         candidate.hasPort ? candidate.port : _defaultPort(candidate.scheme);
-    final tPort = _trustedOrigin.hasPort
-        ? _trustedOrigin.port
-        : _defaultPort(_trustedOrigin.scheme);
+    final tPort =
+        _trustedOrigin.hasPort
+            ? _trustedOrigin.port
+            : _defaultPort(_trustedOrigin.scheme);
     return cPort == tPort;
   }
 
@@ -186,9 +187,10 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.providerName == null
-        ? 'サーバーログイン'
-        : '${widget.providerName} でログイン';
+    final title =
+        widget.providerName == null
+            ? 'サーバーログイン'
+            : '${widget.providerName} でログイン';
 
     return Scaffold(
       appBar: AppBar(
@@ -198,22 +200,23 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: _initError != null
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'サーバーURLが無効です: $_initError',
-                  textAlign: TextAlign.center,
+      body:
+          _initError != null
+              ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'サーバーURLが無効です: $_initError',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
+              )
+              : Stack(
+                children: [
+                  WebViewWidget(controller: _controller!),
+                  if (_loading) const LinearProgressIndicator(),
+                ],
               ),
-            )
-          : Stack(
-              children: [
-                WebViewWidget(controller: _controller!),
-                if (_loading) const LinearProgressIndicator(),
-              ],
-            ),
     );
   }
 }
