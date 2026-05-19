@@ -104,6 +104,16 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      # Flutter 3.32+ enables Swift Package Manager integration by
+      # default. With it on, SPM-aware plugins (e.g. `mobile_scanner`)
+      # link through SPM while `GeneratedPluginRegistrant.m` is still
+      # emitted for CocoaPods, producing "Use of undeclared identifier
+      # 'MobileScannerPlugin'" at compile time. Several other plugins
+      # in this project (auth0_flutter, amplify_*) are CocoaPods-only,
+      # so the consistent fix is to keep the whole iOS build on Pods.
+      - name: Disable Swift Package Manager
+        run: flutter config --no-enable-swift-package-manager
+
       - name: Install dependencies
         run: flutter pub get
 
