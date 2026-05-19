@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -10,9 +11,11 @@ import '../auth_service.dart';
 /// Session-cookie based auth for SASO legacy endpoints.
 /// Used when ff_auth_oidc and ff_auth_firebase are both OFF.
 class LegacyAuthService implements AuthService {
-  LegacyAuthService(this._secureStorage);
+  LegacyAuthService(this._secureStorage, {http.Client? httpClient})
+    : _http = httpClient ?? http.Client();
 
   final SecureStorageService _secureStorage;
+  final http.Client _http;
   String? _sessionCookie;
   String? _userId;
 
@@ -39,36 +42,62 @@ class LegacyAuthService implements AuthService {
         message: 'Server URL must use HTTPS: ${e.message}',
       );
     }
+    final uri = base.replace(path: '${base.path}/auth/start');
+    final http.Response response;
     try {
-      final uri = base.replace(path: '${base.path}/auth/start');
-      final response = await http
+      response = await _http
           .post(
             uri,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: {'id': username, 'password': password},
           )
           .timeout(AppConstants.httpTimeout);
-
-      if (response.statusCode == 200 || response.statusCode == 302) {
-        final cookie = response.headers['set-cookie'];
-        if (cookie != null) {
-          _sessionCookie = cookie.split(';').first;
-          _userId = username;
-          await _secureStorage.write(
-            AppConstants.sessionCookieKey,
-            _sessionCookie!,
-          );
-          return AuthResult.success(
-            userId: username,
-            sessionCookie: _sessionCookie,
-          );
-        }
-      }
-
-      return const AuthResult.failure(message: 'Authentication failed');
+    } on TimeoutException catch (_) {
+      return AuthResult.failure(
+        message:
+            'Network timeout after ${AppConstants.httpTimeout.inSeconds}s '
+            '(POST $uri)',
+      );
     } catch (e) {
-      return AuthResult.failure(message: e.toString());
+      return AuthResult.failure(message: 'Network error: $e (POST $uri)');
     }
+
+    final status = response.statusCode;
+    if (status == 200 || status == 302) {
+      final cookie = response.headers['set-cookie'];
+      if (cookie != null) {
+        _sessionCookie = cookie.split(';').first;
+        _userId = username;
+        await _secureStorage.write(
+          AppConstants.sessionCookieKey,
+          _sessionCookie!,
+        );
+        return AuthResult.success(
+          userId: username,
+          sessionCookie: _sessionCookie,
+        );
+      }
+      return AuthResult.failure(
+        message:
+            'Authentication failed: server returned HTTP $status but no '
+            'Set-Cookie header. Body: ${_snippet(response.body)}',
+      );
+    }
+
+    return AuthResult.failure(
+      message:
+          'Authentication failed (HTTP $status): ${_snippet(response.body)}',
+    );
+  }
+
+  /// Collapse whitespace and truncate to keep error messages displayable
+  /// in the login banner while still surfacing the meaningful prefix of
+  /// a server response (HTML error page, JSON `{"error":"…"}`, etc.).
+  static String _snippet(String body) {
+    final flat = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (flat.isEmpty) return '(empty body)';
+    if (flat.length <= 200) return flat;
+    return '${flat.substring(0, 200)}…';
   }
 
   @override

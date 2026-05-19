@@ -94,6 +94,15 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         state = AuthState.authenticated(userId: 'restored', token: token);
         return;
       }
+
+      // Legacy session-cookie path: cookie is already restored into
+      // ServerConfig by ServerConfigNotifier.load(); just reflect the
+      // authenticated state so the router skips the login screen.
+      final cookie = await secureStorage.read(AppConstants.sessionCookieKey);
+      if (cookie != null && cookie.isNotEmpty) {
+        state = const AuthState.authenticated(userId: 'restored');
+        return;
+      }
     } catch (_) {}
     state = const AuthState.unauthenticated();
   }
@@ -183,7 +192,12 @@ class AuthStateNotifier extends _$AuthStateNotifier {
 
   void _applyResult(AuthResult result, AuthService service) {
     result.when(
-      success: (userId, token, _, expiresAt) {
+      success: (userId, token, sessionCookie, expiresAt) {
+        if (sessionCookie != null) {
+          ref
+              .read(serverConfigNotifierProvider.notifier)
+              .updateSessionCookie(sessionCookie);
+        }
         state = AuthState.authenticated(
           userId: userId,
           token: token,

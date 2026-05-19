@@ -46,12 +46,16 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final modeIndex =
         prefs.getInt(AppConstants.apiModeKey) ?? ApiMode.rest.index;
     final refreshToken = await secureStorage.read(AppConstants.refreshTokenKey);
+    final sessionCookie = await secureStorage.read(
+      AppConstants.sessionCookieKey,
+    );
     final deviceId = prefs.getInt(AppConstants.deviceIdKey);
     final offlineMode = prefs.getBool(AppConstants.offlineModeKey) ?? false;
     final aiAutofill = prefs.getBool(AppConstants.aiAutofillKey) ?? false;
     state = ServerConfig(
       baseUrl: url,
       apiMode: ApiMode.values[modeIndex],
+      sessionCookie: sessionCookie,
       refreshToken: refreshToken,
       deviceId: deviceId,
       offlineMode: offlineMode,
@@ -107,8 +111,14 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final prefs = await SharedPreferences.getInstance();
     final secureStorage = ref.read(secureStorageProvider);
     await secureStorage.delete(AppConstants.refreshTokenKey);
+    await secureStorage.delete(AppConstants.sessionCookieKey);
     await prefs.remove(AppConstants.refreshTokenKey);
     await prefs.remove(AppConstants.deviceIdKey);
-    state = state.copyWith(jwtToken: null, refreshToken: null, deviceId: null);
+    state = state.copyWith(
+      jwtToken: null,
+      refreshToken: null,
+      deviceId: null,
+      sessionCookie: null,
+    );
   }
 }

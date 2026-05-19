@@ -24,6 +24,10 @@
 *.iml
 .metadata
 
+# MCP / AI tooling (local only)
+.serena/
+.claude/
+
 
 
 # Flutter repo-specific
