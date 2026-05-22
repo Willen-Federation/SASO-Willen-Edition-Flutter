@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/auth/auth_provider_config.dart';
 import '../../core/auth/auth_service.dart';
+import '../../core/auth/providers/auth0_auth_service.dart';
 import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/constants/app_constants.dart';
@@ -122,6 +123,48 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       username: username,
       password: password,
     );
+
+    _applyResult(result, service);
+    return result;
+  }
+
+  /// Auth0 Universal Login. The server must have advertised an enabled
+  /// Auth0 provider with `domain` + `clientId` via
+  /// `GET /api/v1/auth/providers` — the caller is expected to pull those
+  /// values out of [ServerAuthDiscoveryX.auth0Provider]. We deliberately
+  /// take the raw strings (not the summary) so this method stays usable
+  /// from tests that inject fake configs.
+  ///
+  /// On success the Auth0 access token is persisted as
+  /// [AppConstants.jwtTokenKey] (done by [Auth0AuthService.login]). We
+  /// also clear stale OIDC / session-cookie state so the next
+  /// `loadStoredCredentials()` resolves to the Auth0 JWT instead of
+  /// preferring an expired OIDC refresh.
+  Future<AuthResult> loginWithAuth0({
+    required String domain,
+    required String clientId,
+  }) async {
+    state = const AuthState.loading();
+    final secureStorage = ref.read(secureStorageProvider);
+    final service = Auth0AuthService(
+      domain: domain,
+      clientId: clientId,
+      secureStorage: secureStorage,
+    );
+    final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+
+    final result = await service.login(
+      serverUrl: serverUrl,
+      username: '',
+      password: '',
+    );
+
+    if (result is AuthSuccess) {
+      await secureStorage.delete(AppConstants.oidcRefreshTokenKey);
+      await secureStorage.delete(AppConstants.oidcExpiresAtKey);
+      await secureStorage.delete(AppConstants.oidcUserIdKey);
+      await secureStorage.delete(AppConstants.sessionCookieKey);
+    }
 
     _applyResult(result, service);
     return result;

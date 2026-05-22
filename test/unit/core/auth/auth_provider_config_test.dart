@@ -123,6 +123,106 @@ void main() {
       expect(result.authStrategy, AuthStrategy.localOnly);
       expect(result.providers, isEmpty);
     });
+
+    test('parses Auth0 provider with config map', () {
+      final result = ServerAuthDiscovery.fromJson({
+        'authStrategy': 'user-choice',
+        'providers': [
+          {
+            'id': 9,
+            'name': 'Acme Workforce',
+            'type': 'auth0',
+            'isDefault': false,
+            'enabled': true,
+            'config': {
+              'domain': 'acme.auth0.com',
+              'clientId': 'pubClientId123',
+            },
+          },
+        ],
+      });
+
+      final auth0 = result.providers.single;
+      expect(auth0.type, AuthProviderType.auth0);
+      expect(auth0.config['domain'], 'acme.auth0.com');
+      expect(auth0.config['clientId'], 'pubClientId123');
+      expect(auth0.isAuth0Ready, isTrue);
+      expect(auth0.auth0Domain, 'acme.auth0.com');
+      expect(auth0.auth0ClientId, 'pubClientId123');
+
+      // Auth0 gets its own dedicated button — it must NOT bleed into the
+      // generic externalProviders list.
+      expect(result.externalProviders, isEmpty);
+      expect(result.auth0Provider, isNotNull);
+      expect(result.auth0Provider?.id, 9);
+    });
+
+    test('auth0Provider is null when config is missing', () {
+      final result = ServerAuthDiscovery.fromJson({
+        'providers': [
+          {
+            'id': 9,
+            'name': 'Auth0',
+            'type': 'auth0',
+            'isDefault': false,
+            'enabled': true,
+            // no config map — server forgot or never set domain/clientId
+          },
+        ],
+      });
+
+      expect(result.providers.single.isAuth0Ready, isFalse);
+      expect(result.auth0Provider, isNull);
+      expect(result.externalProviders, isEmpty);
+    });
+
+    test('auth0Provider is null when provider is disabled', () {
+      final result = ServerAuthDiscovery.fromJson({
+        'providers': [
+          {
+            'id': 9,
+            'name': 'Auth0',
+            'type': 'auth0',
+            'isDefault': false,
+            'enabled': false,
+            'config': {
+              'domain': 'acme.auth0.com',
+              'clientId': 'pubClientId123',
+            },
+          },
+        ],
+      });
+
+      expect(result.auth0Provider, isNull);
+    });
+
+    test('non-string config values are dropped', () {
+      final result = ServerAuthDiscovery.fromJson({
+        'providers': [
+          {
+            'id': 9,
+            'name': 'Auth0',
+            'type': 'auth0',
+            'isDefault': false,
+            'enabled': true,
+            'config': {
+              'domain': 'acme.auth0.com',
+              'clientId': 'pubClientId123',
+              'unexpectedInt': 42,
+              'unexpectedNull': null,
+              'empty': '',
+            },
+          },
+        ],
+      });
+
+      final cfg = result.providers.single.config;
+      expect(cfg['domain'], 'acme.auth0.com');
+      expect(cfg['clientId'], 'pubClientId123');
+      expect(cfg.containsKey('unexpectedInt'), isFalse);
+      expect(cfg.containsKey('unexpectedNull'), isFalse);
+      expect(cfg.containsKey('empty'), isFalse);
+    });
   });
 
   group('AuthProviderType.fromWire', () {

@@ -74,7 +74,7 @@ These remain on the PHP server, reachable from the in-app `/mypage` link
 | REST v1 — username/password | `POST /auth/start` then upgrade if local provider exists | discovered via `AuthDiscoveryService` |
 | REST v1 — QR pairing | `POST /api/v1/mobile/connect` | `qr_pairing_page.dart`, `LoginPage._loginWithManualToken` |
 | OIDC | `flutter_appauth` | `oidc_auth_service.dart` |
-| Auth0 | `auth0_flutter` | `auth0_auth_service.dart` |
+| Auth0 | `auth0_flutter` Universal Login — gated on discovery returning `type: "auth0"` with public `config.domain` + `config.clientId`. No button is rendered without that signal. | `auth0_auth_service.dart`, `LoginPage._loginWithAuth0` |
 | SAML | WebView fallback | `saml_auth_service.dart`, `saml_webview_page.dart` |
 | Firebase | `firebase_auth` | `firebase_auth_service.dart` |
 | Cognito | Amplify Auth | `cognito_auth_service.dart` |

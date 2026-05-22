@@ -16,9 +16,18 @@ part 'auth_provider_config.freezed.dart';
 //     "authStrategy": "user-choice",
 //     "providers": [
 //       {"id": 1, "name": "Local", "type": "local", "isDefault": true, "enabled": true},
-//       {"id": 2, "name": "Corporate SSO", "type": "oidc", "isDefault": false, "enabled": true}
+//       {"id": 2, "name": "Corporate SSO", "type": "oidc", "isDefault": false, "enabled": true},
+//       {
+//         "id": 3, "name": "Auth0", "type": "auth0",
+//         "isDefault": false, "enabled": true,
+//         "config": {"domain": "tenant.auth0.com", "clientId": "abc123"}
+//       }
 //     ]
 //   }
+//
+// `config` is an optional per-provider map of public identifiers (non-secret).
+// Auth0 needs `domain` + `clientId` so the native SDK can drive Universal
+// Login. Without those values the client cannot render an Auth0 button.
 //
 // The Flutter login page consumes this and renders three independent
 // sections: a credential form (when `local` is present), one button per
@@ -78,6 +87,9 @@ abstract class AuthProviderSummary with _$AuthProviderSummary {
     required AuthProviderType type,
     required bool isDefault,
     required bool enabled,
+    // Per-provider public config (e.g. Auth0 `domain` / `clientId`). Only
+    // non-secret identifiers belong here — secrets stay on the server.
+    @Default(<String, String>{}) Map<String, String> config,
   }) = _AuthProviderSummary;
 }
 
@@ -112,6 +124,14 @@ abstract class ServerAuthDiscovery with _$ServerAuthDiscovery {
     for (final entry in rawProviders) {
       if (entry is! Map) continue;
       final map = entry.cast<String, dynamic>();
+      final rawConfig = map['config'];
+      final config = <String, String>{};
+      if (rawConfig is Map) {
+        for (final e in rawConfig.entries) {
+          final v = e.value;
+          if (v is String && v.isNotEmpty) config[e.key.toString()] = v;
+        }
+      }
       providers.add(
         AuthProviderSummary(
           id: (map['id'] as num?)?.toInt() ?? 0,
@@ -119,6 +139,7 @@ abstract class ServerAuthDiscovery with _$ServerAuthDiscovery {
           type: AuthProviderType.fromWire((map['type'] as String?) ?? ''),
           isDefault: (map['isDefault'] as bool?) ?? false,
           enabled: (map['enabled'] as bool?) ?? false,
+          config: config,
         ),
       );
     }
@@ -137,10 +158,41 @@ extension ServerAuthDiscoveryX on ServerAuthDiscovery {
   bool get hasLocalLogin =>
       providers.any((p) => p.enabled && p.type == AuthProviderType.local);
 
-  /// Enabled non-local providers, in the order returned by the server.
+  /// Enabled non-local providers excluding Auth0 (which has its own
+  /// dedicated branded button rendered separately via [auth0Provider]).
   List<AuthProviderSummary> get externalProviders => providers
-      .where((p) => p.enabled && p.type != AuthProviderType.local)
+      .where(
+        (p) =>
+            p.enabled &&
+            p.type != AuthProviderType.local &&
+            p.type != AuthProviderType.auth0,
+      )
       .toList(growable: false);
+
+  /// The first enabled Auth0 provider that also carries the public
+  /// `domain` + `clientId` config the native SDK needs. Returns null
+  /// when Auth0 is absent, disabled, or misconfigured — callers should
+  /// treat null as "do not render an Auth0 button" to honour the
+  /// "no server signal → no button" contract.
+  AuthProviderSummary? get auth0Provider {
+    for (final p in providers) {
+      if (p.enabled && p.isAuth0Ready) return p;
+    }
+    return null;
+  }
+}
+
+extension AuthProviderSummaryAuth0X on AuthProviderSummary {
+  bool get isAuth0Ready =>
+      type == AuthProviderType.auth0 &&
+      (config['domain']?.isNotEmpty ?? false) &&
+      (config['clientId']?.isNotEmpty ?? false);
+
+  String? get auth0Domain =>
+      type == AuthProviderType.auth0 ? config['domain'] : null;
+
+  String? get auth0ClientId =>
+      type == AuthProviderType.auth0 ? config['clientId'] : null;
 }
 
 // ===========================================================================
