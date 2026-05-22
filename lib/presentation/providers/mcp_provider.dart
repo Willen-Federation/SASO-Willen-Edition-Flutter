@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/datasources/remote/mcp/mcp_client.dart';
+import '../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../data/models/mcp_category_model.dart';
 import '../../data/models/mcp_item_model.dart';
 import '../../data/models/stock_adjustment_model.dart';
@@ -63,16 +64,39 @@ final storageLocationsProvider =
       ref,
       parentId,
     ) async {
-      final client = ref.watch(mcpClientProvider);
-      if (client == null) return [];
-      final args = <String, dynamic>{};
-      if (parentId != null) args['parentId'] = parentId;
-      final result = await client.callTool('list_storage_locations', args);
-      final locations = result['locations'] as List<dynamic>? ?? [];
-      return locations
-          .cast<Map<String, dynamic>>()
-          .map(StorageLocationModel.fromJson)
-          .toList();
+      // Preferred path: MCP server (richer payload, single round-trip).
+      final mcp = ref.watch(mcpClientProvider);
+      if (mcp != null) {
+        try {
+          final args = <String, dynamic>{};
+          if (parentId != null) args['parentId'] = parentId;
+          final result = await mcp.callTool('list_storage_locations', args);
+          final locations = result['locations'] as List<dynamic>? ?? [];
+          return locations
+              .cast<Map<String, dynamic>>()
+              .map(StorageLocationModel.fromJson)
+              .toList();
+        } catch (_) {
+          // Fall through to REST fallback when MCP is unavailable.
+        }
+      }
+
+      // Fallback: direct REST call to /api/v1/storage-locations. Works on
+      // deployments that haven't enabled the /mcp dispatcher yet.
+      final config = ref.watch(serverConfigNotifierProvider);
+      if (config.apiMode == ApiMode.rest &&
+          config.baseUrl.isNotEmpty &&
+          config.jwtToken != null &&
+          config.jwtToken!.isNotEmpty) {
+        final rest = RestV1ApiClient(
+          serverUrl: config.baseUrl,
+          jwtToken: config.jwtToken!,
+          refreshToken: config.refreshToken,
+        );
+        final rows = await rest.fetchStorageLocations(parentId: parentId);
+        return rows.map(StorageLocationModel.fromJson).toList();
+      }
+      return [];
     });
 
 // ---------------------------------------------------------------------------

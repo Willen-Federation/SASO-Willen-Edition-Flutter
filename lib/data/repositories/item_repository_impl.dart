@@ -94,6 +94,28 @@ class ItemRepositoryImpl implements ItemRepository {
     return updated.toDomain();
   }
 
+  @override
+  Future<Item> updateFields(
+    ItemId id, {
+    String? name,
+    String? note,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
+  }) async {
+    final body = <String, dynamic>{};
+    if (name != null) body['name'] = name;
+    if (note != null) body['note'] = note;
+    if (janCode != null) body['jan_code'] = janCode;
+    if (isbnCode != null) body['isbn_code'] = isbnCode;
+    if (labelCode != null) body['label_code'] = labelCode;
+    if (body.isEmpty) return fetchById(id);
+    final updated = await _apiClient.updateItem(id.value, body);
+    await _cache.write(updated);
+    _domainCache.remove(id.value);
+    return updated.toDomain();
+  }
+
   Future<void> clearCache() async {
     _domainCache.clear();
     await _cache.clear();

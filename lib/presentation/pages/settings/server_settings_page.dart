@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
+import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 
 class ServerSettingsPage extends ConsumerStatefulWidget {
@@ -97,6 +98,32 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     }
   }
 
+  Future<void> _logout() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.logout),
+        content: Text(l10n.logoutConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.logout),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    if (!mounted) return;
+    await ref.read(authStateNotifierProvider.notifier).logout();
+    if (!mounted) return;
+    context.go('/auth/login');
+  }
+
   Future<void> _testConnection() async {
     setState(() {
       _testing = true;
@@ -159,6 +186,19 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // ── Brand header ───────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: Image.asset(
+                'assets/images/branding/saso-full-512.png',
+                height: 56,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+
           // ── Production mode banner ─────────────────────────────────────
           if (isProduction) ...[
             Card(
@@ -444,6 +484,28 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
+
+          // ── Logout (hidden in mock mode) ───────────────────────────────
+          if (_selectedMode != ApiMode.mock) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                key: const Key('logout_tile'),
+                leading: Icon(
+                  Icons.logout,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  l10n.logout,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: _logout,
+              ),
+            ),
+          ],
         ],
       ),
     );

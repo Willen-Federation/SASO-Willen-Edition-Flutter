@@ -20,4 +20,16 @@ abstract interface class ItemRepository {
   /// domain entity. Implementations are expected to keep the local cache
   /// in sync (or invalidate it) so subsequent reads observe the new value.
   Future<Item> updateStatus(ItemId id, ItemStatus status);
+
+  /// Patches editable item fields (name, note, JAN/ISBN/label codes) and
+  /// returns the refreshed domain entity. Null arguments are omitted from the
+  /// PATCH body so callers can update one field at a time.
+  Future<Item> updateFields(
+    ItemId id, {
+    String? name,
+    String? note,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
+  });
 }

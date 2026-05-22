@@ -58,3 +58,34 @@ class ItemStatusUpdater extends _$ItemStatusUpdater {
     });
   }
 }
+
+/// AsyncNotifier that performs general field patches (name, note, codes) and
+/// refreshes [itemByIdProvider] on success.
+@riverpod
+class ItemFieldUpdater extends _$ItemFieldUpdater {
+  @override
+  Future<void> build() async {}
+
+  Future<void> updateFields(
+    String itemId, {
+    String? name,
+    String? note,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = await ref.read(itemRepositoryProvider.future);
+      await repo.updateFields(
+        ItemId.parse(itemId),
+        name: name,
+        note: note,
+        janCode: janCode,
+        isbnCode: isbnCode,
+        labelCode: labelCode,
+      );
+      ref.invalidate(itemByIdProvider(itemId));
+    });
+  }
+}
