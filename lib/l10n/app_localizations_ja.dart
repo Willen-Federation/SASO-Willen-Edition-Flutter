@@ -161,6 +161,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get logout => 'ログアウト';
 
   @override
+  String get logoutConfirmMessage => 'ログアウトしますか？認証情報は削除されます。';
+
+  @override
   String get username => 'ユーザー名';
 
   @override

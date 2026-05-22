@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'ログアウト'**
   String get logout;
 
+  /// No description provided for @logoutConfirmMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'ログアウトしますか？認証情報は削除されます。'**
+  String get logoutConfirmMessage;
+
   /// No description provided for @username.
   ///
   /// In ja, this message translates to:

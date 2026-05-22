@@ -356,5 +356,24 @@ final itemStatusUpdaterProvider =
     );
 
 typedef _$ItemStatusUpdater = AutoDisposeAsyncNotifier<void>;
+String _$itemFieldUpdaterHash() => r'1afdca650637634a132a9b5e011ecf0ece0feb17';
+
+/// AsyncNotifier that performs general field patches (name, note, codes) and
+/// refreshes [itemByIdProvider] on success.
+///
+/// Copied from [ItemFieldUpdater].
+@ProviderFor(ItemFieldUpdater)
+final itemFieldUpdaterProvider =
+    AutoDisposeAsyncNotifierProvider<ItemFieldUpdater, void>.internal(
+      ItemFieldUpdater.new,
+      name: r'itemFieldUpdaterProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$itemFieldUpdaterHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ItemFieldUpdater = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

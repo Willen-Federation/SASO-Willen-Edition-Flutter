@@ -9,6 +9,7 @@ import '../presentation/pages/category/category_browser_page.dart';
 import '../presentation/pages/home/home_page.dart';
 import '../presentation/pages/inventory/inventory_adjust_page.dart';
 import '../presentation/pages/item/item_detail_page.dart';
+import '../presentation/pages/item/item_edit_page.dart';
 import '../presentation/pages/item/item_register_page.dart';
 import '../presentation/pages/item/item_search_page.dart';
 import '../presentation/pages/location/location_list_page.dart';
@@ -80,6 +81,11 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/items/search',
         builder: (_, __) => const ItemSearchPage(),
+      ),
+      GoRoute(
+        path: '/items/:id/edit',
+        builder: (_, state) =>
+            ItemEditPage(itemId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/items/:id',

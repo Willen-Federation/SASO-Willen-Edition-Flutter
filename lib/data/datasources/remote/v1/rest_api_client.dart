@@ -165,6 +165,30 @@ class RestV1ApiClient implements SasoApiClient {
     );
   }
 
+  /// List storage locations. When [parentId] is null, the server returns the
+  /// root-level locations; otherwise it returns direct children of the given
+  /// parent.
+  ///
+  /// Used as a fallback for the MCP `list_storage_locations` tool when the
+  /// server does not expose `/mcp` (legacy / partial deployments).
+  Future<List<Map<String, dynamic>>> fetchStorageLocations({
+    int? parentId,
+  }) async {
+    final params = <String, String>{
+      if (parentId != null) 'parent_id': '$parentId',
+    };
+    final uri = Uri.parse(
+      '$serverUrl/api/v1/storage-locations',
+    ).replace(queryParameters: params.isEmpty ? null : params);
+    final response = await _authenticatedRequest(
+      () => _http.get(uri, headers: _headers).timeout(AppConstants.httpTimeout),
+    );
+    _handleErrors(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List<dynamic>;
+    return data.cast<Map<String, dynamic>>().toList();
+  }
+
   @override
   Future<List<ItemModel>> fetchItemsByShelf(String shelfId) async {
     final uri = Uri.parse('$serverUrl/api/v1/storage-locations/$shelfId/items');

@@ -120,5 +120,29 @@ void main() {
         throwsA(isA<ArgumentError>()),
       );
     });
+
+    test('strips an accidental /api/v1 suffix', () {
+      final uri = UrlValidator.ensureHttpsOrLoopback(
+        'https://saso.sksl.jp/api/v1',
+        allowLoopback: false,
+      );
+      expect(uri.toString(), 'https://saso.sksl.jp');
+    });
+
+    test('strips /api/v1/<anything> suffix too', () {
+      final uri = UrlValidator.ensureHttpsOrLoopback(
+        'https://saso.sksl.jp/api/v1/health',
+        allowLoopback: false,
+      );
+      expect(uri.toString(), 'https://saso.sksl.jp');
+    });
+
+    test('preserves /api (without v1) since it is not the v1 prefix', () {
+      final uri = UrlValidator.ensureHttpsOrLoopback(
+        'https://saso.sksl.jp/api',
+        allowLoopback: false,
+      );
+      expect(uri.path, '/api');
+    });
   });
 }

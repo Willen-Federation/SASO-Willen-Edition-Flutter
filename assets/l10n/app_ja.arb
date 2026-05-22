@@ -65,6 +65,7 @@
 
   "login": "ログイン",
   "logout": "ログアウト",
+  "logoutConfirmMessage": "ログアウトしますか？認証情報は削除されます。",
   "username": "ユーザー名",
   "password": "パスワード",
   "loginFailed": "ログインに失敗しました",

@@ -161,6 +161,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
+  String get logoutConfirmMessage =>
+      'Log out of this device? Your credentials will be cleared.';
+
+  @override
   String get username => 'Username';
 
   @override

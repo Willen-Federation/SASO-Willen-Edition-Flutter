@@ -15,8 +15,9 @@ abstract final class UrlValidator {
   /// - Scheme must be `https`, OR `http` with a loopback host while
   ///   [allowLoopback] is true (defaults to `kDebugMode`).
   ///
-  /// Normalizes by lowercasing the host and stripping a trailing
-  /// slash from the path.
+  /// Normalizes by lowercasing the host, stripping a trailing slash from
+  /// the path, and dropping an accidental `/api/v1[/...]` suffix (clients
+  /// append the API path themselves).
   ///
   /// Throws [ArgumentError] when any rule is violated.
   static Uri ensureHttpsOrLoopback(String url, {bool? allowLoopback}) {
@@ -45,6 +46,13 @@ abstract final class UrlValidator {
     var path = parsed.path;
     while (path.length > 1 && path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
+    }
+    // Anchor the baseUrl at the server root — clients append `/api/v1/...`
+    // themselves, so a pasted `https://host/api/v1` would otherwise produce
+    // `/api/v1/api/v1/...`.
+    const apiPrefix = '/api/v1';
+    if (path == apiPrefix || path.startsWith('$apiPrefix/')) {
+      path = '';
     }
 
     return parsed.replace(scheme: scheme, host: host, path: path);

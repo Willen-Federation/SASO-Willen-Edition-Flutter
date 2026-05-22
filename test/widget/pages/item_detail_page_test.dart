@@ -47,6 +47,25 @@ class _StubItemRepository implements ItemRepository {
     item = item.copyWith(status: status);
     return item;
   }
+
+  @override
+  Future<Item> updateFields(
+    ItemId id, {
+    String? name,
+    String? note,
+    String? janCode,
+    String? isbnCode,
+    String? labelCode,
+  }) async {
+    item = item.copyWith(
+      name: name ?? item.name,
+      note: note ?? item.note,
+      janCode: janCode ?? item.janCode,
+      isbnCode: isbnCode ?? item.isbnCode,
+      labelCode: labelCode ?? item.labelCode,
+    );
+    return item;
+  }
 }
 
 final _testItem = Item(

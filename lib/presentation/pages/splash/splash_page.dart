@@ -57,19 +57,18 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   @override
-  Widget build(BuildContext context) => const Scaffold(
+  Widget build(BuildContext context) => Scaffold(
     body: Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.inventory_2_outlined, size: 64),
-          SizedBox(height: 16),
-          Text(
-            'SASO Willen',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Image.asset(
+            'assets/images/branding/saso-full-512.png',
+            width: 240,
+            fit: BoxFit.contain,
           ),
-          SizedBox(height: 32),
-          CircularProgressIndicator(),
+          const SizedBox(height: 32),
+          const CircularProgressIndicator(),
         ],
       ),
     ),

@@ -139,17 +139,11 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
               children: [
                 // ── Hero ───────────────────────────────────────────────────
                 const SizedBox(height: 16),
-                Icon(
-                  Icons.inventory_2_outlined,
-                  size: 72,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'SASO Willen',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Center(
+                  child: Image.asset(
+                    'assets/images/branding/saso-full-512.png',
+                    height: 96,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: 8),

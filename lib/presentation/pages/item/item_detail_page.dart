@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_status.dart';
 import '../../../l10n/app_localizations.dart';
@@ -39,7 +40,17 @@ class ItemDetailPage extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(itemId)),
+      appBar: AppBar(
+        title: Text(itemId),
+        actions: [
+          IconButton(
+            key: const Key('item_edit_button'),
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: '編集',
+            onPressed: () => context.push('/items/$itemId/edit'),
+          ),
+        ],
+      ),
       body: itemAsync.when(
         loading: () => const LoadingWidget(),
         error: (e, _) => ErrorDisplayWidget(

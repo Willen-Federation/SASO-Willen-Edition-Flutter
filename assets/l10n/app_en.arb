@@ -55,6 +55,7 @@
   "retry": "Retry",
   "login": "Login",
   "logout": "Logout",
+  "logoutConfirmMessage": "Log out of this device? Your credentials will be cleared.",
   "username": "Username",
   "password": "Password",
   "loginFailed": "Login failed",
