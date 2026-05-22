@@ -166,6 +166,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/branding/saso-full-512.png',
+                      height: 80,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
                 if (config.baseUrl.isNotEmpty ||
                     discovery.serverName.isNotEmpty)
                   Padding(

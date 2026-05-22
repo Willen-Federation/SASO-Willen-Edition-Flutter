@@ -22,7 +22,17 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SASO Willen'),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/branding/saso-compact-rounded-256.png',
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 8),
+            const Text('SASO Willen'),
+          ],
+        ),
         actions: [
           const OfflineIndicator(),
           if (pendingCount > 0)
