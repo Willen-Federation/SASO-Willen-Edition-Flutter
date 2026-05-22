@@ -80,11 +80,21 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
     final newLabel = _labelController.text.trim();
 
     final patch = <String, String?>{};
-    if (newName != widget.item.name) patch['name'] = newName;
-    if (newNote != (widget.item.note ?? '')) patch['note'] = newNote;
-    if (newJan != (widget.item.janCode ?? '')) patch['janCode'] = newJan;
-    if (newIsbn != (widget.item.isbnCode ?? '')) patch['isbnCode'] = newIsbn;
-    if (newLabel != (widget.item.labelCode ?? '')) patch['labelCode'] = newLabel;
+    if (newName != widget.item.name) {
+      patch['name'] = newName;
+    }
+    if (newNote != (widget.item.note ?? '')) {
+      patch['note'] = newNote;
+    }
+    if (newJan != (widget.item.janCode ?? '')) {
+      patch['janCode'] = newJan;
+    }
+    if (newIsbn != (widget.item.isbnCode ?? '')) {
+      patch['isbnCode'] = newIsbn;
+    }
+    if (newLabel != (widget.item.labelCode ?? '')) {
+      patch['labelCode'] = newLabel;
+    }
 
     if (patch.isEmpty) {
       ScaffoldMessenger.of(

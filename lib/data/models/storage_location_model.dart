@@ -19,26 +19,24 @@ class StorageLocationModel {
   });
 
   /// Accepts both camelCase (MCP) and snake_case (REST) field names.
-  factory StorageLocationModel.fromJson(Map<String, dynamic> json) =>
-      StorageLocationModel(
-        id: json['id'] as int,
-        parentId: (json['parentId'] ?? json['parent_id']) as int?,
-        code: json['code'] as String,
-        name: json['name'] as String,
-        depth: json['depth'] as int? ?? 0,
-        position: json['position'] as int? ?? 0,
-        locationType:
-            (json['locationType'] ?? json['location_type']) as String?,
-        description: json['description'] as String?,
-        capacity: json['capacity'] as int?,
-        notes: json['notes'] as String?,
-        operationalStatus:
-            (json['operationalStatus'] ?? json['operational_status'])
-                as String?,
-        canReceive:
-            (json['canReceive'] ?? json['can_receive']) as bool? ?? true,
-        canShip: (json['canShip'] ?? json['can_ship']) as bool? ?? true,
-      );
+  factory StorageLocationModel.fromJson(
+    Map<String, dynamic> json,
+  ) => StorageLocationModel(
+    id: json['id'] as int,
+    parentId: (json['parentId'] ?? json['parent_id']) as int?,
+    code: json['code'] as String,
+    name: json['name'] as String,
+    depth: json['depth'] as int? ?? 0,
+    position: json['position'] as int? ?? 0,
+    locationType: (json['locationType'] ?? json['location_type']) as String?,
+    description: json['description'] as String?,
+    capacity: json['capacity'] as int?,
+    notes: json['notes'] as String?,
+    operationalStatus:
+        (json['operationalStatus'] ?? json['operational_status']) as String?,
+    canReceive: (json['canReceive'] ?? json['can_receive']) as bool? ?? true,
+    canShip: (json['canShip'] ?? json['can_ship']) as bool? ?? true,
+  );
 
   final int id;
   final int? parentId;
