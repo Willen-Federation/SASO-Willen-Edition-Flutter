@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthProviderSummary {
 
- int get id; String get name; AuthProviderType get type; bool get isDefault; bool get enabled;
+ int get id; String get name; AuthProviderType get type; bool get isDefault; bool get enabled;// Per-provider public config (e.g. Auth0 `domain` / `clientId`). Only
+// non-secret identifiers belong here — secrets stay on the server.
+ Map<String, String> get config;
 /// Create a copy of AuthProviderSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $AuthProviderSummaryCopyWith<AuthProviderSummary> get copyWith => _$AuthProvider
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled)&&const DeepCollectionEquality().equals(other.config, config));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled);
+int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled,const DeepCollectionEquality().hash(config));
 
 @override
 String toString() {
-  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled)';
+  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled, config: $config)';
 }
 
 
@@ -45,7 +47,7 @@ abstract mixin class $AuthProviderSummaryCopyWith<$Res>  {
   factory $AuthProviderSummaryCopyWith(AuthProviderSummary value, $Res Function(AuthProviderSummary) _then) = _$AuthProviderSummaryCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, AuthProviderType type, bool isDefault, bool enabled
+ int id, String name, AuthProviderType type, bool isDefault, bool enabled, Map<String, String> config
 });
 
 
@@ -62,14 +64,15 @@ class _$AuthProviderSummaryCopyWithImpl<$Res>
 
 /// Create a copy of AuthProviderSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,Object? config = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AuthProviderType,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
 as bool,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,config: null == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,
   ));
 }
 
@@ -154,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled,  Map<String, String> config)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthProviderSummary() when $default != null:
-return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled,_that.config);case _:
   return orElse();
 
 }
@@ -175,10 +178,10 @@ return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled,  Map<String, String> config)  $default,) {final _that = this;
 switch (_that) {
 case _AuthProviderSummary():
-return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled,_that.config);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +198,10 @@ return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);ca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  AuthProviderType type,  bool isDefault,  bool enabled,  Map<String, String> config)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthProviderSummary() when $default != null:
-return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);case _:
+return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled,_that.config);case _:
   return null;
 
 }
@@ -210,7 +213,7 @@ return $default(_that.id,_that.name,_that.type,_that.isDefault,_that.enabled);ca
 
 
 class _AuthProviderSummary implements AuthProviderSummary {
-  const _AuthProviderSummary({required this.id, required this.name, required this.type, required this.isDefault, required this.enabled});
+  const _AuthProviderSummary({required this.id, required this.name, required this.type, required this.isDefault, required this.enabled, final  Map<String, String> config = const <String, String>{}}): _config = config;
   
 
 @override final  int id;
@@ -218,6 +221,17 @@ class _AuthProviderSummary implements AuthProviderSummary {
 @override final  AuthProviderType type;
 @override final  bool isDefault;
 @override final  bool enabled;
+// Per-provider public config (e.g. Auth0 `domain` / `clientId`). Only
+// non-secret identifiers belong here — secrets stay on the server.
+ final  Map<String, String> _config;
+// Per-provider public config (e.g. Auth0 `domain` / `clientId`). Only
+// non-secret identifiers belong here — secrets stay on the server.
+@override@JsonKey() Map<String, String> get config {
+  if (_config is EqualUnmodifiableMapView) return _config;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_config);
+}
+
 
 /// Create a copy of AuthProviderSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -229,16 +243,16 @@ _$AuthProviderSummaryCopyWith<_AuthProviderSummary> get copyWith => __$AuthProvi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthProviderSummary&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&(identical(other.enabled, enabled) || other.enabled == enabled)&&const DeepCollectionEquality().equals(other._config, _config));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled);
+int get hashCode => Object.hash(runtimeType,id,name,type,isDefault,enabled,const DeepCollectionEquality().hash(_config));
 
 @override
 String toString() {
-  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled)';
+  return 'AuthProviderSummary(id: $id, name: $name, type: $type, isDefault: $isDefault, enabled: $enabled, config: $config)';
 }
 
 
@@ -249,7 +263,7 @@ abstract mixin class _$AuthProviderSummaryCopyWith<$Res> implements $AuthProvide
   factory _$AuthProviderSummaryCopyWith(_AuthProviderSummary value, $Res Function(_AuthProviderSummary) _then) = __$AuthProviderSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, AuthProviderType type, bool isDefault, bool enabled
+ int id, String name, AuthProviderType type, bool isDefault, bool enabled, Map<String, String> config
 });
 
 
@@ -266,14 +280,15 @@ class __$AuthProviderSummaryCopyWithImpl<$Res>
 
 /// Create a copy of AuthProviderSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? type = null,Object? isDefault = null,Object? enabled = null,Object? config = null,}) {
   return _then(_AuthProviderSummary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AuthProviderType,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
 as bool,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,config: null == config ? _self._config : config // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,
   ));
 }
 

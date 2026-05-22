@@ -182,6 +182,124 @@ void main() {
       expect(find.byKey(const Key('manual_token_toggle')), findsOneWidget);
     });
 
+    testWidgets(
+      'Auth0 button renders when discovery returns enabled Auth0 with config',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 1400));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.userChoice,
+                  providers: const [
+                    _localProvider,
+                    AuthProviderSummary(
+                      id: 9,
+                      name: 'Acme Workforce',
+                      type: AuthProviderType.auth0,
+                      isDefault: false,
+                      enabled: true,
+                      config: {
+                        'domain': 'acme.auth0.com',
+                        'clientId': 'pubClientId123',
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            serverConfigNotifierProvider.overrideWith(
+              () => _FakeServerConfigNotifier(),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('auth0_login_button')), findsOneWidget);
+        expect(find.text('Acme Workforce'), findsOneWidget);
+        // Auth0 must not also appear in the generic provider list — the
+        // dedicated button is the only entry point.
+        expect(find.byKey(const Key('provider_button_9')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Auth0 button is hidden when discovery does not include Auth0',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 1400));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.localOnly,
+                  providers: const [_localProvider],
+                ),
+              ),
+            ),
+            serverConfigNotifierProvider.overrideWith(
+              () => _FakeServerConfigNotifier(),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('auth0_login_button')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Auth0 button is hidden when domain/clientId config is missing',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 1400));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.userChoice,
+                  providers: const [
+                    _localProvider,
+                    // Auth0 advertised but no domain/clientId — must not
+                    // surface a button the native SDK can't actually use.
+                    AuthProviderSummary(
+                      id: 9,
+                      name: 'Auth0',
+                      type: AuthProviderType.auth0,
+                      isDefault: false,
+                      enabled: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            serverConfigNotifierProvider.overrideWith(
+              () => _FakeServerConfigNotifier(),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('auth0_login_button')), findsNothing);
+      },
+    );
+
     testWidgets('manual token field toggles open', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 1600));
       addTearDown(() => tester.binding.setSurfaceSize(null));

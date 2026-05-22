@@ -10,15 +10,19 @@ import 'mobile_setup_webview_page.dart';
 
 /// Unified login page.
 ///
-/// Renders three independent sections back-to-back, each gated on what the
+/// Renders independent sections back-to-back, each gated on what the
 /// server's `/api/v1/auth/providers` discovery returned:
 ///   1. Username / password form — shown when the server has the built-in
 ///      `local` provider enabled.
-///   2. Server-configured providers — one button per enabled non-local
-///      provider (OIDC / SAML / Auth0 / Cognito / Firebase). Tapping opens
-///      the server's `/m/setup?provider_id=…` flow in an in-app WebView and
-///      exchanges the returned pairing token for a JWT.
-///   3. QR pairing + manual token entry — always available regardless of
+///   2. Auth0 — dedicated branded button shown only when discovery
+///      returned an enabled `auth0` provider with `domain` + `clientId`
+///      in its `config` map. Drives Auth0 Universal Login through the
+///      native `auth0_flutter` SDK, bypassing the WebView setup flow.
+///   3. Other server-configured providers — one button per enabled
+///      non-local, non-Auth0 provider (OIDC / SAML / Cognito / Firebase).
+///      Tapping opens the server's `/m/setup?provider_id=…` flow in an
+///      in-app WebView and exchanges the returned pairing token for a JWT.
+///   4. QR pairing + manual token entry — always available regardless of
 ///      discovery, since the pairing tokens come from `/mypage/devicePair`.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -58,6 +62,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final result = await ref
         .read(authStateNotifierProvider.notifier)
         .loginWithCredentials(username: username, password: password);
+    if (!mounted) return;
+    result.when(
+      success: (_, __, ___, ____) => context.go('/home'),
+      failure: (msg, _) => setState(() {
+        _loading = false;
+        _errorMessage = msg;
+      }),
+    );
+  }
+
+  Future<void> _loginWithAuth0(AuthProviderSummary provider) async {
+    final domain = provider.auth0Domain;
+    final clientId = provider.auth0ClientId;
+    if (domain == null || clientId == null) {
+      setState(() => _errorMessage = 'Auth0 設定が不完全です (domain / clientId)');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+    final result = await ref
+        .read(authStateNotifierProvider.notifier)
+        .loginWithAuth0(domain: domain, clientId: clientId);
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
@@ -149,6 +177,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final theme = Theme.of(context);
 
     final hasLocal = discovery.hasLocalLogin;
+    final auth0Provider = discovery.auth0Provider;
     final externalProviders = discovery.externalProviders;
 
     return Scaffold(
@@ -236,9 +265,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ],
 
-                // ── 2-c. Server-configured providers ─────────────────────
-                if (externalProviders.isNotEmpty) ...[
+                // ── 2-b. Auth0 (dedicated, native SDK) ───────────────────
+                if (auth0Provider != null) ...[
                   if (hasLocal) const SizedBox(height: 24),
+                  const _SectionHeader(
+                    icon: Icons.verified_user,
+                    label: 'Auth0 でログイン',
+                  ),
+                  const SizedBox(height: 12),
+                  _Auth0Button(
+                    label: auth0Provider.name.isNotEmpty
+                        ? auth0Provider.name
+                        : 'Auth0 でログイン',
+                    onPressed: () => _loginWithAuth0(auth0Provider),
+                  ),
+                ],
+
+                // ── 2-c. Other server-configured providers ───────────────
+                if (externalProviders.isNotEmpty) ...[
+                  if (hasLocal || auth0Provider != null)
+                    const SizedBox(height: 24),
                   const _SectionHeader(
                     icon: Icons.open_in_browser,
                     label: 'サーバー設定のログイン方法',
@@ -253,7 +299,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                 ],
 
-                // ── 2-b. QR / manual pairing token ───────────────────────
+                // ── 2-d. QR / manual pairing token ───────────────────────
                 const SizedBox(height: 24),
                 const _SectionHeader(
                   icon: Icons.qr_code_scanner,
@@ -396,6 +442,38 @@ class _CredentialForm extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Auth0-branded login button. Sits in its own widget so the brand
+/// colour / accessibility label can evolve without touching the generic
+/// provider list. Only rendered when discovery confirms Auth0 is enabled
+/// and configured.
+class _Auth0Button extends StatelessWidget {
+  const _Auth0Button({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  // Auth0 brand orange (https://auth0.com/brand).
+  static const _brand = Color(0xFFEB5424);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        key: const Key('auth0_login_button'),
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: _brand,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        icon: const Icon(Icons.verified_user),
+        label: Text(label),
+      ),
     );
   }
 }
