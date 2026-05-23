@@ -135,49 +135,64 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   };
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(_title),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.flash_on),
-          onPressed: _controller.toggleTorch,
-          tooltip: 'フラッシュ',
-        ),
-        IconButton(
-          icon: const Icon(Icons.flip_camera_ios),
-          onPressed: _controller.switchCamera,
-          tooltip: 'カメラ切替',
-        ),
-      ],
-    ),
-    body: Stack(
-      children: [
-        MobileScanner(controller: _controller, onDetect: _onDetect),
-        // Scan overlay
-        Center(
-          child: Container(
-            width: 240,
-            height: 240,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 2),
-              borderRadius: BorderRadius.circular(12),
+  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
+    // Camera feed fills the background — force light status-bar icons so
+    // the time / battery indicators stay readable over the (typically
+    // dark) live preview regardless of platform theme.
+    value: SystemUiOverlayStyle.light,
+    child: Scaffold(
+      appBar: AppBar(
+        title: Text(_title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on),
+            onPressed: _controller.toggleTorch,
+            tooltip: 'フラッシュ',
+          ),
+          IconButton(
+            icon: const Icon(Icons.flip_camera_ios),
+            onPressed: _controller.switchCamera,
+            tooltip: 'カメラ切替',
+          ),
+        ],
+      ),
+      // The camera preview should fill the whole body (notch included)
+      // for the best framing experience, but the hint text overlay must
+      // not collide with the home indicator on iPhone X+ devices. Wrap
+      // the overlays in a SafeArea (preview stays outside it).
+      body: Stack(
+        children: [
+          MobileScanner(controller: _controller, onDetect: _onDetect),
+          // Scan overlay (centered — naturally inside safe bounds).
+          Center(
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
-        ),
-        if (_processing)
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
-        Positioned(
-          bottom: 48,
-          left: 0,
-          right: 0,
-          child: Text(
-            _hint,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+          if (_processing)
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
+          // Bottom hint — keep clear of the home indicator.
+          SafeArea(
+            top: false,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32, left: 16, right: 16),
+                child: Text(
+                  _hint,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
