@@ -42,16 +42,29 @@ class LegacyAuthService implements AuthService {
         message: 'Server URL must use HTTPS: ${e.message}',
       );
     }
-    final uri = base.replace(path: '${base.path}/auth/start');
+    // Posts to the canonical SASO login endpoint. The trailing slash
+    // matters: the server's `/auth/start/` template anchors its form
+    // action on this absolute path so webview-embedded logins can't drift
+    // the POST target via relative URL resolution, and the failure-redirect
+    // logic on newer SASO builds anchors on `/auth/start/error/1/` rather
+    // than the older bare `/error/1/`.
+    final uri = base.replace(path: '${base.path}/auth/start/');
     final http.Response response;
     try {
-      response = await _http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: {'id': username, 'password': password},
-          )
+      // Disable redirect-follow so we can inspect the 3xx response directly.
+      // SASO's login endpoint signals "wrong credentials" via 303 →
+      // `/auth/start/error/1/` (post-fix) or the older `/error/1/` (pre-fix),
+      // both of which then 404. If the http client silently follows the
+      // redirect we lose the actual auth signal and surface a misleading
+      // "HTTP 404" with a homepage HTML body.
+      final request = http.Request('POST', uri)
+        ..headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        ..bodyFields = {'id': username, 'password': password}
+        ..followRedirects = false;
+      final streamed = await _http
+          .send(request)
           .timeout(AppConstants.httpTimeout);
+      response = await http.Response.fromStream(streamed);
     } on TimeoutException catch (_) {
       return AuthResult.failure(
         message:
@@ -63,8 +76,41 @@ class LegacyAuthService implements AuthService {
     }
 
     final status = response.statusCode;
-    if (status == 200 || status == 302) {
-      final cookie = response.headers['set-cookie'];
+    final cookie = response.headers['set-cookie'];
+
+    // 302/303: SASO uses a See-Other redirect to either an error page
+    // (`/error/1/` on bad credentials) or to a logged-in landing page on
+    // success. Both responses set a PHPSESSID cookie, so the cookie alone
+    // is not a success signal — the Location target is.
+    if (status == 302 || status == 303) {
+      final location = response.headers['location'] ?? '';
+      if (_looksLikeAuthErrorRedirect(location)) {
+        return AuthResult.failure(
+          message:
+              'Authentication failed: server redirected to "$location" — '
+              'the username or password is likely incorrect.',
+        );
+      }
+      if (cookie != null) {
+        _sessionCookie = cookie.split(';').first;
+        _userId = username;
+        await _secureStorage.write(
+          AppConstants.sessionCookieKey,
+          _sessionCookie!,
+        );
+        return AuthResult.success(
+          userId: username,
+          sessionCookie: _sessionCookie,
+        );
+      }
+      return AuthResult.failure(
+        message:
+            'Authentication failed: server returned HTTP $status '
+            '(Location: "$location") but no Set-Cookie header.',
+      );
+    }
+
+    if (status == 200) {
       if (cookie != null) {
         _sessionCookie = cookie.split(';').first;
         _userId = username;
@@ -88,6 +134,23 @@ class LegacyAuthService implements AuthService {
       message:
           'Authentication failed (HTTP $status): ${_snippet(response.body)}',
     );
+  }
+
+  /// Returns true when [location] looks like the SASO server's "credentials
+  /// rejected" landing page. The server redirects with `303 → /error/...`
+  /// on older deployments or `303 → /auth/start/error/...` on newer ones
+  /// after failed POSTs, while successful logins redirect to `/home/`,
+  /// `/mypage/`, etc.
+  static bool _looksLikeAuthErrorRedirect(String location) {
+    if (location.isEmpty) return false;
+    final path = Uri.tryParse(location)?.path ?? location;
+    // Match any path containing an `/error/` segment so both legacy and
+    // newer SASO redirect shapes are covered, plus the bare `/error`
+    // tail and relative `error/...` variants.
+    return path.contains('/error/') ||
+        path.endsWith('/error') ||
+        path == 'error' ||
+        path.startsWith('error/');
   }
 
   /// Collapse whitespace and truncate to keep error messages displayable

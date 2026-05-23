@@ -49,25 +49,36 @@ curl -i -H 'Accept: application/json' \
 
 ---
 
-## 3. ユーザー名 / パスワードログイン (`/auth/start`)
+## 3. ユーザー名 / パスワードログイン (`/auth/start/`)
+
+サーバー側の `/auth/start/` の `<form action>` が絶対パスに固定されており、
+これが**正規エンドポイント**です。末尾スラッシュ重要 — 新しいデプロイ
+では失敗時のリダイレクトが `auth/start/error/1/` 形式に統一されています
+（古いデプロイでは `/error/1/`）。
 
 ```bash
 curl -i -X POST \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'id=USERNAME&password=PASSWORD' \
-  https://saso.example.com/auth/start
+  https://saso.example.com/auth/start/
 ```
 
-**期待**: `HTTP/1.1 200 OK` か `302 Found` と `Set-Cookie: …` ヘッダー。Flutter は
-このセッション Cookie で以後のリクエストを認証します。
+**期待**: `HTTP/1.1 200 OK` か `302 Found` / `303 See Other` と `Set-Cookie: …`
+ヘッダー。Flutter はこのセッション Cookie で以後のリクエストを認証します。
 
 | 結果 | 解釈 |
 |---|---|
-| 200/302 + `Set-Cookie` | サーバーは想定どおり動いている。クライアントが「Authentication failed (HTTP 200) Set-Cookie 無し」を出すなら Cookie 名を確認 |
-| 200/302 だが `Set-Cookie` 無し | サーバーが JWT を JSON で返している可能性。新エンドポイント (`/api/v1/auth/login` 相当) への移行が必要 |
+| 200/302/303 + `Set-Cookie` + 成功 `Location` | サーバーは想定どおり動いている |
+| 303 + `Location: /error/...` | **認証情報が間違っている**。サーバーは 303 でエラーページにリダイレクトして失敗を示すため、`PHPSESSID` 等の Cookie は付与されていても認証はしていない。Flutter 側は「the username or password is likely incorrect」と表示する |
+| 200/302/303 だが `Set-Cookie` 無し（かつ Location も非エラー） | サーバーが JWT を JSON で返している可能性。新エンドポイント (`/api/v1/auth/login` 相当) への移行が必要 |
 | 401 | 認証情報が間違っている。サーバー側のユーザー DB を確認 |
-| 404 | サーバーが `/auth/start` 未実装。レガシー側だけ存在する想定が崩れている |
+| 404 | サーバーが `/auth/start/` 未実装。極めて古い SASO の可能性 |
 | 5xx | サーバー側エラー |
+
+> **注**: `curl` でログインを叩く場合は `-L`（リダイレクト追跡）を **付けないこと**。
+> 付けると失敗時の 303 を追跡してエラーページの 404 だけが見え、本当の挙動が隠れます。
+> Flutter クライアント側は `http.Request.followRedirects = false` で 3xx を直接観測しています。
+> 失敗時の `Location` は `/error/...`（古いデプロイ）または `/auth/start/error/...`（新しいデプロイ）のいずれかになります。
 
 ---
 
@@ -82,17 +93,19 @@ curl -i -X POST \
 ```
 
 これらが出ている場合は Discovery がフォールバックしている=サーバー側 API が
-未整備。出ていないのにログインに失敗するなら `/auth/start` 側の問題。
+未整備。出ていないのにログインに失敗するなら `/auth/start/` 側の問題。
 
 ---
 
 ## 5. 切り分けマトリクス
 
-| `/api/v1/health` | `/api/v1/auth/providers` | `/auth/start` | 推定原因 |
+| `/api/v1/health` | `/api/v1/auth/providers` | `/auth/start/` | 推定原因 |
 |:---:|:---:|:---:|---|
-| 200 | 200 | 200+Cookie | クライアントバグ。ログ全文を添えて報告 |
+| 200 | 200 | 200/302/303+Cookie | クライアントバグ。ログ全文を添えて報告 |
 | 200 | 200 | 401 | 認証情報誤り |
+| 200 | 200 | 303 → `/error/...` または `/auth/start/error/...` | 認証情報誤り（新デプロイで `/auth/start/error/...` に統一） |
 | 200 | 200 | 200 / no Cookie | サーバーが Cookie 名/フォーマットを変更。要すり合わせ |
-| 200 | 404 | 200+Cookie | Discovery 未デプロイ。フォールバック動作で実害はないがログが汚れる |
+| 200 | 500 (SASO-INFRA-9000) | 303 → `/error/...` | サーバーの `APP_KEY` が prod `.env` に未設定で Discovery が起動失敗 → クライアントは無音で `localOnly` フォールバック。認証情報誤りは別問題。`SASO-INFRA-9000` の `traceId` を運用に渡せばサーバー側で特定可能 |
+| 200 | 404 | 200/303+Cookie | Discovery 未デプロイ。フォールバック動作で実害はないがログが汚れる |
 | 404 | 404 | 200+Cookie | サーバーが M3 未対応。Flutter クライアントは現状この URL では運用不可 |
 | 接続不可 | 接続不可 | 接続不可 | URL/ネットワーク/証明書の問題。サーバー側の問題ではない |

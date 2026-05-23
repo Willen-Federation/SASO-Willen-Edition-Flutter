@@ -39,7 +39,7 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 // ---------------------------------------------------------------------------
 
 /// Returns the local credential-based auth service that talks to the
-/// server's `/auth/start` endpoint with `{id, password}`.
+/// server's `/auth/start/` endpoint with `{id, password}`.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
@@ -109,7 +109,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     state = const AuthState.unauthenticated();
   }
 
-  /// Credential-based login against the server's `/auth/start` endpoint.
+  /// Credential-based login against the server's `/auth/start/` endpoint.
   Future<AuthResult> loginWithCredentials({
     required String username,
     required String password,
