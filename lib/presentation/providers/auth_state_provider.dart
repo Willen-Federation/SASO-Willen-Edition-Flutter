@@ -11,6 +11,7 @@ import '../../core/auth/auth_service.dart';
 import '../../core/auth/providers/auth0_auth_service.dart';
 import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
+import '../../core/auth/providers/rest_auth_service.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/storage/secure_storage.dart';
 import 'server_config_provider.dart';
@@ -38,8 +39,16 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 // Local auth service (username/password) — always available
 // ---------------------------------------------------------------------------
 
-/// Returns the local credential-based auth service that talks to the
-/// server's `/auth/start/` endpoint with `{id, password}`.
+/// Returns the local credential-based auth service.
+///
+/// Selection rule:
+///   - [ApiMode.rest] → [RestAuthService] (`POST /api/v1/auth/login`,
+///     introduced in PR-A3 server-side). New deployments should land here.
+///   - [ApiMode.legacy] → [LegacyAuthService] (`POST /auth/start/` form
+///     redirect dance). Deprecated in v2.5; removed in v3.0.
+///   - [ApiMode.mock] → also returns [LegacyAuthService] but the mock
+///     code path skips the network call entirely so the choice doesn't
+///     matter — kept simple to avoid an extra branch.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
@@ -47,6 +56,12 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 @riverpod
 AuthService authService(Ref ref) {
   final secureStorage = ref.watch(secureStorageProvider);
+  final mode = ref.watch(
+    serverConfigNotifierProvider.select((config) => config.apiMode),
+  );
+  if (mode == ApiMode.rest) {
+    return RestAuthService(secureStorage);
+  }
   return LegacyAuthService(secureStorage);
 }
 
@@ -109,7 +124,14 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     state = const AuthState.unauthenticated();
   }
 
-  /// Credential-based login against the server's `/auth/start/` endpoint.
+  /// Credential-based login. Dispatches to the [authServiceProvider]
+  /// configured for the active [ApiMode] — [RestAuthService] for REST
+  /// deployments (`POST /api/v1/auth/login`), [LegacyAuthService] for
+  /// legacy ones (`POST /auth/start/`). On success, the REST path also
+  /// pumps the freshly issued token pair through
+  /// [ServerConfigNotifier.updateTokenPair] so the in-memory config —
+  /// and therefore [RestV1ApiClient] — picks up the new Bearer
+  /// immediately without an app restart.
   Future<AuthResult> loginWithCredentials({
     required String username,
     required String password,
@@ -123,6 +145,25 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       username: username,
       password: password,
     );
+
+    // Propagate the REST token pair into ServerConfig so api_client_provider
+    // rebuilds the RestV1ApiClient with the new Bearer. The service has
+    // already written the tokens to SecureStorage; this just syncs the
+    // in-memory state so the current session is usable without a restart.
+    if (result is AuthSuccess && service is RestAuthService) {
+      final access = service.currentToken;
+      final refresh = service.currentRefreshToken;
+      final deviceId = service.currentDeviceId;
+      if (access != null && refresh != null && deviceId != null) {
+        await ref
+            .read(serverConfigNotifierProvider.notifier)
+            .updateTokenPair(
+              accessToken: access,
+              refreshToken: refresh,
+              deviceId: deviceId,
+            );
+      }
+    }
 
     _applyResult(result, service);
     return result;
@@ -269,9 +310,24 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     return '${flat.substring(0, 200)}…';
   }
 
+  /// Sign out the active session. For REST mode, this hits
+  /// `POST /api/v1/auth/logout` so the server-side refresh token is
+  /// revoked. For legacy / SSO modes, falls through to the service's
+  /// own teardown (cookie clear / SDK signOut / etc.). Local state is
+  /// cleared even when the server is unreachable.
   Future<void> logout() async {
     try {
-      await ref.read(authServiceProvider).logout();
+      final service = ref.read(authServiceProvider);
+      if (service is RestAuthService) {
+        // REST: revoke the refresh token server-side via /api/v1/auth/logout
+        // before the local-state clear. We pass the baseUrl explicitly
+        // because AuthService.logout() doesn't carry one — see
+        // RestAuthService.logoutFromServer() for the rationale.
+        final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+        await service.logoutFromServer(serverUrl);
+      } else {
+        await service.logout();
+      }
       await ref.read(serverConfigNotifierProvider.notifier).clearTokens();
     } catch (_) {}
     state = const AuthState.unauthenticated();
