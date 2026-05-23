@@ -308,17 +308,53 @@ abstract class AppLocalizations {
   /// **'モック（サーバー不要）'**
   String get apiModeMock;
 
+  /// No description provided for @apiModeMockDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'ローカル開発用のインメモリデータ。ネットワーク通信を行いません。'**
+  String get apiModeMockDescription;
+
   /// No description provided for @apiModeLegacy.
   ///
   /// In ja, this message translates to:
-  /// **'レガシー（互換モード）'**
+  /// **'レガシー（非推奨）'**
   String get apiModeLegacy;
+
+  /// No description provided for @apiModeLegacyDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'/auth/start/ への セッションCookie 認証。v3.0で削除されます。'**
+  String get apiModeLegacyDescription;
+
+  /// No description provided for @apiModeLegacyDeprecationNotice.
+  ///
+  /// In ja, this message translates to:
+  /// **'レガシー（セッションCookie）認証はv3.0で削除されます。サーバーが対応次第、RESTモードへ移行してください。'**
+  String get apiModeLegacyDeprecationNotice;
 
   /// No description provided for @apiModeRest.
   ///
   /// In ja, this message translates to:
   /// **'REST v1'**
   String get apiModeRest;
+
+  /// No description provided for @apiModeRestDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'JWT ベースの REST API。本番環境ではこちらを推奨します。'**
+  String get apiModeRestDescription;
+
+  /// No description provided for @compatibilityModeSection.
+  ///
+  /// In ja, this message translates to:
+  /// **'互換モード（非推奨）'**
+  String get compatibilityModeSection;
+
+  /// No description provided for @compatibilityModeSubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'旧サーバー向け。v3.0で削除予定です。'**
+  String get compatibilityModeSubtitle;
 
   /// No description provided for @testConnection.
   ///
