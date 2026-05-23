@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/item.dart';
 import '../../providers/item_provider.dart';
 import '../../widgets/common/error_display_widget.dart';
@@ -138,7 +139,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           TextFormField(
             key: const Key('edit_name'),
@@ -150,7 +151,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           TextFormField(
             key: const Key('edit_note'),
             controller: _noteController,
@@ -160,7 +161,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
             ),
             maxLines: 3,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           TextFormField(
             key: const Key('edit_jan'),
             controller: _janController,
@@ -171,7 +172,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           TextFormField(
             key: const Key('edit_isbn'),
             controller: _isbnController,
@@ -182,7 +183,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           TextFormField(
             key: const Key('edit_label'),
             controller: _labelController,
@@ -191,7 +192,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
           FilledButton.icon(
             key: const Key('edit_save_button'),
             onPressed: saving ? null : _save,

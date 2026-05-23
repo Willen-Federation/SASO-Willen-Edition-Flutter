@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_icon_size.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
 import '../../../data/models/mcp_item_model.dart';
 import '../../../data/models/pending_adjustment.dart';
@@ -321,7 +323,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('入出庫')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           if (client == null) const _NoMcpBanner(),
           if (_phase == _Phase.shelf) ...[
@@ -332,7 +334,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
               hint: '棚のバーコード/QRコードを読み取ってください',
               onScan: _scanShelf,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             TextButton.icon(
               onPressed: _manualEnterShelf,
               icon: const Icon(Icons.keyboard),
@@ -341,7 +343,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
           ],
           if (_phase == _Phase.item) ...[
             _ConfirmedBadge(icon: Icons.shelves, label: '棚: $_scannedShelfId'),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm),
             _ScanPhaseCard(
               stepNumber: 2,
               title: '商品コードをスキャン',
@@ -349,7 +351,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
               hint: '商品のバーコード/QRコードを読み取ってください',
               onScan: _scanItem,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             TextButton.icon(
               onPressed: _manualEnterItem,
               icon: const Icon(Icons.keyboard),
@@ -363,13 +365,13 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                 label: '棚: $_scannedShelfId',
               ),
             if (_scannedItemCode != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               _ConfirmedBadge(
                 icon: Icons.qr_code,
                 label: '商品コード: $_scannedItemCode',
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             if (_loadingItem) const LinearProgressIndicator(),
             if (_item != null) ...[
               Card(
@@ -379,10 +381,10 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                   subtitle: Text('現在在庫: ${_item!.stock}'),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
             ],
             Text('調整数量', style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -392,13 +394,13 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                   icon: const Icon(Icons.remove),
                   tooltip: '数量を減らす',
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: AppSpacing.lg),
                 Text(
                   key: const Key('delta_value'),
                   '$_delta',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: AppSpacing.lg),
                 IconButton.outlined(
                   key: const Key('delta_increment'),
                   onPressed: () => setState(() => _delta++),
@@ -407,9 +409,9 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text('操作区分', style: Theme.of(context).textTheme.titleSmall),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             SegmentedButton<AdjustmentReason>(
               key: const Key('reason_selector'),
               segments: AdjustmentReason.values
@@ -423,13 +425,13 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
               selected: {_reason},
               onSelectionChanged: (s) => setState(() => _reason = s.first),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             if (_errorMessage != null) ...[
               Text(
                 _errorMessage!,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
             ],
             FilledButton.icon(
               key: const Key('submit_button'),
@@ -460,7 +462,7 @@ class _NoMcpBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     color: Theme.of(context).colorScheme.errorContainer,
-    margin: const EdgeInsets.only(bottom: 16),
+    margin: const EdgeInsets.only(bottom: AppSpacing.md),
     child: const ListTile(
       leading: Icon(Icons.cloud_off_outlined),
       title: Text('サーバー未接続'),
@@ -488,7 +490,7 @@ class _ScanPhaseCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(
     color: Theme.of(context).colorScheme.secondaryContainer,
     child: Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -503,19 +505,19 @@ class _ScanPhaseCard extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              Icon(icon, size: 24),
+              Icon(icon, size: AppIconSize.medium),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(hint, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           FilledButton.icon(
             onPressed: onScan,
             icon: const Icon(Icons.qr_code_scanner),
@@ -538,19 +540,21 @@ class _ConfirmedBadge extends StatelessWidget {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(20),
+      // Stadium-pill badge — uses an intentionally bespoke 20-px radius
+      // that sits between AppRadii.lg (12) and a full StadiumBorder.
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           Icons.check_circle,
-          size: 16,
+          size: AppIconSize.small,
           color: Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(width: 6),
-        Icon(icon, size: 16),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xs),
+        Icon(icon, size: AppIconSize.small),
+        const SizedBox(width: AppSpacing.xs),
         Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -578,31 +582,31 @@ class _SuccessView extends StatelessWidget {
     appBar: AppBar(title: const Text('完了')),
     body: Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
               Icons.check_circle_outline,
-              size: 72,
+              size: 72, // hero check-mark, larger than display token
               color: Colors.green,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Text(
               itemName,
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               '在庫: ${result.previousStock} → ${result.newStock}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             if (shelfId != null && shelfId!.isNotEmpty) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text('棚: $shelfId'),
             ],
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xl),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -613,7 +617,7 @@ class _SuccessView extends StatelessWidget {
                   icon: const Icon(Icons.qr_code_scanner),
                   label: const Text('続けてスキャン'),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.sm),
                 FilledButton.icon(
                   key: const Key('go_home'),
                   onPressed: () => context.go('/home'),

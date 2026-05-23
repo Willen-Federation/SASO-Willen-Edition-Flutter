@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_spacing.dart';
+
 /// Screen-width breakpoints used across the app.
 ///
 /// Phones are below [mobile]; tablets sit between [mobile] and [desktop];
@@ -70,7 +72,7 @@ class AdaptiveContainer extends StatelessWidget {
     super.key,
     required this.child,
     this.maxWidth,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16),
+    this.padding = const EdgeInsets.symmetric(horizontal: AppSpacing.md),
   });
 
   final Widget child;

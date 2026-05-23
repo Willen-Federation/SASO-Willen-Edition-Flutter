@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:saso_willen_edition/l10n/app_localizations.dart';
 
 import '../../../core/errors/problem_details.dart';
+import '../../../core/theme/app_spacing.dart';
 
 /// MaterialBanner that surfaces a `SASO-MOBILE-2008` scope-insufficient
 /// failure with a clear pictogram, the missing scope, and a CTA that
@@ -57,7 +58,7 @@ class ScopeDeniedBanner extends StatelessWidget {
           l10n.scopeInsufficientTitle,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(l10n.scopeInsufficientDetail(scope)),
       ],
     );

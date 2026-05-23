@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_icon_size.dart';
+import '../../../core/theme/app_spacing.dart';
+
 class ErrorDisplayWidget extends StatelessWidget {
   const ErrorDisplayWidget({super.key, required this.error, this.onRetry});
 
@@ -9,19 +12,23 @@ class ErrorDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-          const SizedBox(height: 16),
+          const Icon(
+            Icons.error_outline,
+            size: AppIconSize.xxLarge,
+            color: Colors.red,
+          ),
+          const SizedBox(height: AppSpacing.md),
           Text(
             error.toString(),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           if (onRetry != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),

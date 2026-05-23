@@ -8,6 +8,8 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
+import '../../../core/theme/app_radii.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import '../../widgets/common/adaptive_dialog.dart';
@@ -217,11 +219,11 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
         actions: [TextButton(onPressed: _save, child: Text(l10n.save))],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           // ── Brand header ───────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             child: Center(
               child: Image.asset(
                 'assets/images/branding/saso-full-512.png',
@@ -231,7 +233,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
 
           // ── Production mode banner ─────────────────────────────────────
           if (isProduction) ...[
@@ -269,7 +271,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
           ],
 
           // ── API Mode (hidden in production / REST mode) ────────────────
@@ -292,7 +294,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
             if (_selectedMode == ApiMode.legacy) _LegacyDeprecationBanner(l10n),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -300,7 +302,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                       l10n.apiMode,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     // Primary, supported modes — mock + rest only.
                     ...[ApiMode.mock, ApiMode.rest].map(
                       (mode) => RadioListTile<ApiMode>(
@@ -362,14 +364,14 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
           ],
 
           // Server URL
           if (_selectedMode != ApiMode.mock)
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -377,7 +379,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                       l10n.serverUrl,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     TextField(
                       controller: _urlController,
                       decoration: InputDecoration(
@@ -386,7 +388,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                       ),
                       keyboardType: TextInputType.url,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: [
                         OutlinedButton.icon(
@@ -403,7 +405,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                               : const Icon(Icons.network_check),
                           label: Text(l10n.testConnection),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.sm),
                         if (_lastTestResult != null)
                           Expanded(
                             child: Text(
@@ -419,7 +421,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
           // Paired-devices section: redirects to the web /mypage portal.
           // Mobile JWTs can't manage device tokens directly (admin session
@@ -435,12 +437,13 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 onTap: _openMyPage,
               ),
             ),
-          if (_selectedMode != ApiMode.mock) const SizedBox(height: 16),
+          if (_selectedMode != ApiMode.mock)
+            const SizedBox(height: AppSpacing.md),
 
           // Offline / data sync section
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -460,15 +463,15 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                     },
                   ),
                   const Divider(height: 1),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Data management',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
                     children: [
                       OutlinedButton.icon(
                         icon: const Icon(Icons.cloud_download_outlined),
@@ -490,20 +493,20 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
           // ── AI autofill (only in REST/production mode) ─────────────────
           if (isProduction) ...[
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         const Icon(Icons.auto_awesome_outlined),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         Text(
                           'AI自動入力',
                           style: Theme.of(context).textTheme.titleMedium,
@@ -527,14 +530,14 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
           ],
 
           // ── Feature Flags (hidden in production, debug/QA only) ────────
           if (!isProduction)
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -544,16 +547,16 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                           l10n.featureFlags,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         if (kDebugMode)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
                               vertical: 2,
                             ),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.amber,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: AppRadii.smAll,
                             ),
                             child: Text(
                               'DEBUG',
@@ -562,7 +565,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                           ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     ..._flagOverrides.entries.map(
                       (e) => SwitchListTile(
                         title: Text(_flagLabel(e.key, l10n)),
@@ -596,7 +599,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
 
           // ── Logout (hidden in mock mode) ───────────────────────────────
           if (_selectedMode != ApiMode.mock) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.md),
             Card(
               child: ListTile(
                 key: const Key('logout_tile'),
