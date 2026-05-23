@@ -62,6 +62,8 @@ AuthService authService(Ref ref) {
   if (mode == ApiMode.rest) {
     return RestAuthService(secureStorage);
   }
+  // TODO(v3.0): collapse this provider to `return RestAuthService(secureStorage);`
+  // once ApiMode.legacy is removed. See docs/v3-migration.md.
   return LegacyAuthService(secureStorage);
 }
 
@@ -115,6 +117,9 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       // Legacy session-cookie path: cookie is already restored into
       // ServerConfig by ServerConfigNotifier.load(); just reflect the
       // authenticated state so the router skips the login screen.
+      // TODO(v3.0): drop this branch with the ApiMode.legacy removal.
+      // The sessionCookieKey read + AppConstants.sessionCookieKey itself
+      // also go away. See docs/v3-migration.md.
       final cookie = await secureStorage.read(AppConstants.sessionCookieKey);
       if (cookie != null && cookie.isNotEmpty) {
         state = const AuthState.authenticated(userId: 'restored');

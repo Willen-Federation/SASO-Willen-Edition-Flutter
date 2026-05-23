@@ -32,6 +32,11 @@ abstract class ServerConfig with _$ServerConfig {
   const factory ServerConfig({
     @Default('') String baseUrl,
     @Default(ApiMode.rest) ApiMode apiMode,
+    // TODO(v3.0): drop `sessionCookie` together with ApiMode.legacy.
+    // Cookie persistence + AppConstants.sessionCookieKey + the
+    // updateSessionCookie() helper below all go away. The legacy
+    // session-cookie restore branch in AuthStateNotifier.loadStoredCredentials
+    // is the matching deletion point. See docs/v3-migration.md.
     String? sessionCookie,
     String? jwtToken,
     String? refreshToken,

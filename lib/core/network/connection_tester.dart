@@ -52,12 +52,19 @@ class ConnectionTester {
       return (result: restResult, mode: ApiMode.rest);
     }
 
+    // TODO(v3.0): drop the legacy fallback probe together with
+    // ApiMode.legacy removal. After v3.0, REST is the only supported
+    // surface; if /api/v1/health fails we should not silently fall
+    // back to /category/list.json. See docs/v3-migration.md.
+    // ignore: deprecated_member_use_from_same_package
     final legacyConfig = ServerConfig(
       baseUrl: baseUrl,
+      // ignore: deprecated_member_use_from_same_package
       apiMode: ApiMode.legacy,
     );
     final legacyResult = await test(legacyConfig);
     if (legacyResult is ConnectionTestSuccess) {
+      // ignore: deprecated_member_use_from_same_package
       return (result: legacyResult, mode: ApiMode.legacy);
     }
 
@@ -108,6 +115,8 @@ class ConnectionTester {
     if (base == null || !base.hasScheme) return null;
     return switch (config.apiMode) {
       ApiMode.mock => base,
+      // TODO(v3.0): drop the legacy probe URL — see docs/v3-migration.md.
+      // ignore: deprecated_member_use_from_same_package
       ApiMode.legacy => base.replace(path: '/category/list.json'),
       ApiMode.rest => base.replace(path: '/api/v1/health'),
     };
@@ -115,6 +124,8 @@ class ConnectionTester {
 
   Map<String, String> _headers(ServerConfig config) => switch (config.apiMode) {
     ApiMode.mock => const {},
+    // TODO(v3.0): drop the legacy cookie header path — see docs/v3-migration.md.
+    // ignore: deprecated_member_use_from_same_package
     ApiMode.legacy => {
       'Accept': 'application/json, text/html',
       if (config.sessionCookie != null) 'Cookie': config.sessionCookie!,

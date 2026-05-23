@@ -10,6 +10,16 @@ import '../auth_service.dart';
 
 /// Session-cookie based auth for SASO legacy endpoints.
 /// Used when ff_auth_oidc and ff_auth_firebase are both OFF.
+///
+/// **Deprecation status (v2.5):** Selected by `authServiceProvider`
+/// only when `ApiMode.legacy` is active. `ApiMode.rest` users hit
+/// `RestAuthService` (`POST /api/v1/auth/login`, added in PR-B3) instead.
+///
+/// **Removal target (v3.0):** this file is deleted in the same PR
+/// that drops `ApiMode.legacy` and `ServerConfig.sessionCookie`. The
+/// authServiceProvider switch (auth_state_provider.dart) and the
+/// legacy session-cookie restore branch in `loadStoredCredentials()`
+/// also go away. See `docs/v3-migration.md`.
 class LegacyAuthService implements AuthService {
   LegacyAuthService(this._secureStorage, {http.Client? httpClient})
     : _http = httpClient ?? http.Client();

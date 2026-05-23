@@ -9,7 +9,18 @@ import '../../../models/shelf_model.dart';
 import '../saso_api_client.dart';
 
 /// Adapter for deprecated SASO legacy endpoints.
-/// Migration note: Replace with RestV1ApiClient when M3 ships.
+///
+/// **Deprecation status (v2.5):** `ApiMode.legacy` is marked
+/// `@Deprecated`; this client continues to serve users on legacy
+/// SASO deployments that don't expose the REST v1 surface.
+///
+/// **Removal target (v3.0):** this file is deleted in the same PR
+/// that drops `ApiMode.legacy` from `server_config_provider.dart`.
+/// The 4 routing arms that instantiate it (`api_client_provider`,
+/// `category_provider`, `shelf_view_page`, `connection_tester`)
+/// carry matching `TODO(v3.0)` markers — grep `TODO(v3.0)` under
+/// `lib/` for the full Phase C deletion checklist. See
+/// `docs/v3-migration.md`.
 ///
 /// Endpoint map:
 ///   fetchItem       → GET  /item/start?id={id}
