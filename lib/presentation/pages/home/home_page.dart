@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../presentation/providers/outbox_provider.dart';
 import '../../../presentation/providers/server_config_provider.dart';
+import '../../layout/responsive.dart';
 import '../../widgets/common/offline_indicator.dart';
 
 class HomePage extends ConsumerWidget {
@@ -19,6 +20,9 @@ class HomePage extends ConsumerWidget {
       loading: () => 0,
       error: (_, __) => 0,
     );
+
+    final responsive = Responsive.of(context);
+    final crossAxisCount = responsive.adaptiveColumns(tablet: 3, desktop: 4);
 
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +77,7 @@ class HomePage extends ConsumerWidget {
           SliverPadding(
             padding: const EdgeInsets.all(16),
             sliver: SliverGrid.count(
-              crossAxisCount: 2,
+              crossAxisCount: crossAxisCount,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               children: [

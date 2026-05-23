@@ -9,6 +9,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../presentation/providers/item_provider.dart';
+import '../../layout/responsive.dart';
 import '../../widgets/common/error_display_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/item/item_list_tile.dart';
@@ -337,7 +338,29 @@ class _SearchResults extends ConsumerWidget {
         if (items.isEmpty) {
           return const Center(child: Text('結果が見つかりません'));
         }
-        return ListView.builder(
+        final responsive = Responsive.of(context);
+        final crossAxisCount = responsive.adaptiveColumns(
+          mobile: 1,
+          tablet: 2,
+          desktop: 3,
+        );
+        if (crossAxisCount == 1) {
+          return ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (_, i) => ItemListTile(
+              item: items[i],
+              onTap: () => context.push('/items/${items[i].id.value}'),
+            ),
+          );
+        }
+        return GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisExtent: 96,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+          ),
           itemCount: items.length,
           itemBuilder: (_, i) => ItemListTile(
             item: items[i],
