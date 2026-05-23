@@ -475,8 +475,7 @@ class RestV1ApiClient implements SasoApiClient {
         .cast<Map<String, dynamic>>();
     // Per OpenAPI ItemList.nextCursor (camelCase). Accept snake_case
     // `next_cursor` too in case an older server is still in front.
-    final nextCursor =
-        (body['nextCursor'] ?? body['next_cursor']) as int?;
+    final nextCursor = (body['nextCursor'] ?? body['next_cursor']) as int?;
     return (items: data, nextCursor: nextCursor);
   }
 

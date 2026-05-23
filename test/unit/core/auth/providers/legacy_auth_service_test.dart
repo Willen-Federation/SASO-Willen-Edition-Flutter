@@ -291,9 +291,7 @@ void main() {
     test(
       'sends POST to {base}/auth/start/ with form-urlencoded body and disables redirect follow',
       () async {
-        whenSendReturns(
-          streamed(200, headers: {'set-cookie': 's=1'}),
-        );
+        whenSendReturns(streamed(200, headers: {'set-cookie': 's=1'}));
 
         await service.login(
           serverUrl: 'https://saso.example.com',
@@ -301,15 +299,12 @@ void main() {
           password: 'secret',
         );
 
-        final captured = verify(
-          () => httpClient.send(captureAny()),
-        ).captured.single as http.Request;
+        final captured =
+            verify(() => httpClient.send(captureAny())).captured.single
+                as http.Request;
 
         expect(captured.method, 'POST');
-        expect(
-          captured.url.toString(),
-          'https://saso.example.com/auth/start/',
-        );
+        expect(captured.url.toString(), 'https://saso.example.com/auth/start/');
         expect(
           captured.headers['Content-Type'],
           contains('application/x-www-form-urlencoded'),
@@ -318,7 +313,8 @@ void main() {
         expect(
           captured.followRedirects,
           isFalse,
-          reason: 'must keep 3xx visible so the /error/* redirect is observable',
+          reason:
+              'must keep 3xx visible so the /error/* redirect is observable',
         );
       },
     );
