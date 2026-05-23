@@ -339,10 +339,65 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
         stock: stock,
       );
 
+  /// Whether the user has typed/picked anything that would be lost if they
+  /// backed out of the page. Used by [PopScope] (issue #145) to guard
+  /// Predictive Back gestures on Android 14+.
+  bool get _hasUnsavedInput {
+    // Anything actively in-flight should also block — losing the network
+    // call would leave the local outbox in `syncing` forever.
+    if (_saving) return true;
+    if (_nameController.text.trim().isNotEmpty) return true;
+    if (_janController.text.trim().isNotEmpty) return true;
+    if (_labelCodeController.text.trim().isNotEmpty) return true;
+    // _priceController / _stockController default to "0" — only consider
+    // them dirty if the user changed them.
+    final price = _priceController.text.trim();
+    if (price.isNotEmpty && price != '0') return true;
+    final stock = _stockController.text.trim();
+    if (stock.isNotEmpty && stock != '0') return true;
+    if (_capturedImage != null) return true;
+    if (_selectedCategory != null) return true;
+    return false;
+  }
+
+  Future<bool> _confirmDiscardDraft() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('編集を破棄しますか？'),
+        content: const Text('入力中の内容は保存されません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('編集を続ける'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('破棄する'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_savedItem != null) return _SuccessView(item: _savedItem!);
 
+    return PopScope(
+      canPop: !_hasUnsavedInput,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await _confirmDiscardDraft();
+        if (shouldPop && mounted) navigator.pop();
+      },
+      child: _buildScaffold(),
+    );
+  }
+
+  Widget _buildScaffold() {
     return Scaffold(
       appBar: AppBar(title: const Text('アイテム登録')),
       body: Form(

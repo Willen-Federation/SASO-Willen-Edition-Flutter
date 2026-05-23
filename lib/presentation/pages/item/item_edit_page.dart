@@ -70,6 +70,44 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
     super.dispose();
   }
 
+  /// Whether the form controllers differ from the item snapshot loaded by
+  /// the parent widget. Used by [PopScope] (issue #145) so the Predictive
+  /// Back gesture on Android 14+ surfaces a confirmation before discarding
+  /// edits.
+  bool get _isDirty {
+    if (_nameController.text.trim() != widget.item.name) return true;
+    if (_noteController.text.trim() != (widget.item.note ?? '')) return true;
+    if (_janController.text.trim() != (widget.item.janCode ?? '')) return true;
+    if (_isbnController.text.trim() != (widget.item.isbnCode ?? '')) {
+      return true;
+    }
+    if (_labelController.text.trim() != (widget.item.labelCode ?? '')) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> _confirmDiscardEdits() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('変更を破棄しますか？'),
+        content: const Text('保存していない変更は失われます。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('編集を続ける'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('破棄する'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -135,6 +173,21 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
   Widget build(BuildContext context) {
     final updaterState = ref.watch(itemFieldUpdaterProvider);
     final saving = updaterState.isLoading;
+    return PopScope(
+      // Guard the Predictive Back gesture (Android 14+) and the AppBar
+      // back button so unsaved edits are not silently discarded.
+      canPop: !_isDirty && !saving,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await _confirmDiscardEdits();
+        if (shouldPop && mounted) navigator.pop();
+      },
+      child: _buildForm(saving: saving),
+    );
+  }
+
+  Widget _buildForm({required bool saving}) {
     return Form(
       key: _formKey,
       child: ListView(

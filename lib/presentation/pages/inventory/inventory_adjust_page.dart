@@ -306,6 +306,41 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
     }
   }
 
+  /// Whether the user is partway through the scan → adjust flow. Used by
+  /// [PopScope] (issue #145) so the Android 14+ Predictive Back gesture
+  /// surfaces a confirmation before throwing away an in-progress
+  /// shelf/item scan.
+  bool get _hasInFlightWork {
+    if (_submitting) return true;
+    if (_loadingItem) return true;
+    // The user has progressed past the initial shelf-scan step.
+    if (_phase != _Phase.shelf) return true;
+    if (_scannedShelfId != null && _scannedShelfId!.isNotEmpty) return true;
+    if (_scannedItemCode != null && _scannedItemCode!.isNotEmpty) return true;
+    return false;
+  }
+
+  Future<bool> _confirmDiscardFlow() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('入出庫を中断しますか？'),
+        content: const Text('スキャン中の内容は保存されません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('続ける'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('中断する'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_result != null) {
@@ -316,6 +351,19 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
       );
     }
 
+    return PopScope(
+      canPop: !_hasInFlightWork,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await _confirmDiscardFlow();
+        if (shouldPop && mounted) navigator.pop();
+      },
+      child: _buildScaffold(),
+    );
+  }
+
+  Widget _buildScaffold() {
     final client = ref.watch(mcpClientProvider);
 
     return Scaffold(
