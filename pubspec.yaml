@@ -95,6 +95,12 @@ dependencies:
   # Internationalisation
   intl: any
 
+  # Issue #150 — Noto Sans JP for consistent CJK rendering across OEMs.
+  # `GoogleFonts.notoSansJpTextTheme` fetches the font on first use and
+  # caches it to disk; offline boots fall back to the platform default,
+  # matching the pre-#150 behaviour.
+  google_fonts: ^6.3.2
+
 # Pin transitive deps that break the build but aren't directly listed
 # above. Remove an entry as soon as the upstream issue resolves.
 dependency_overrides:
