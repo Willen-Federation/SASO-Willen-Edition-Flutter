@@ -310,9 +310,24 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     return '${flat.substring(0, 200)}…';
   }
 
+  /// Sign out the active session. For REST mode, this hits
+  /// `POST /api/v1/auth/logout` so the server-side refresh token is
+  /// revoked. For legacy / SSO modes, falls through to the service's
+  /// own teardown (cookie clear / SDK signOut / etc.). Local state is
+  /// cleared even when the server is unreachable.
   Future<void> logout() async {
     try {
-      await ref.read(authServiceProvider).logout();
+      final service = ref.read(authServiceProvider);
+      if (service is RestAuthService) {
+        // REST: revoke the refresh token server-side via /api/v1/auth/logout
+        // before the local-state clear. We pass the baseUrl explicitly
+        // because AuthService.logout() doesn't carry one — see
+        // RestAuthService.logoutFromServer() for the rationale.
+        final serverUrl = ref.read(serverConfigNotifierProvider).baseUrl;
+        await service.logoutFromServer(serverUrl);
+      } else {
+        await service.logout();
+      }
       await ref.read(serverConfigNotifierProvider.notifier).clearTokens();
     } catch (_) {}
     state = const AuthState.unauthenticated();

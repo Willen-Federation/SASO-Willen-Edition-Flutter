@@ -124,14 +124,15 @@ void main() {
       expect(service.currentUserId, 'alice');
       expect(service.currentExpiresAt, isNotNull);
 
-      // Tokens persisted via secure storage so a subsequent
-      // ServerConfigNotifier.load() can restore them.
+      // RestAuthService only writes the access-token signal that
+      // `AuthStateNotifier.loadStoredCredentials()` checks on restart.
+      // The refresh-token persistence is delegated to
+      // `ServerConfigNotifier.updateTokenPair` (called by the auth-state
+      // notifier after this method) so there's a single source of truth.
       verify(
         () => storage.write(AppConstants.jwtTokenKey, 'jwt-abc'),
       ).called(1);
-      verify(
-        () => storage.write(AppConstants.refreshTokenKey, 'opaque-xyz'),
-      ).called(1);
+      verifyNever(() => storage.write(AppConstants.refreshTokenKey, any()));
     });
 
     test('rejects http URL via UrlValidator', () async {
@@ -324,9 +325,8 @@ void main() {
     });
   });
 
-  group('RestAuthService.logout', () {
-    test('clears local state even when the server is unreachable', () async {
-      // Seed the service with a logged-in state by running a successful login first.
+  group('RestAuthService.logout / logoutFromServer', () {
+    Future<void> seedLoggedIn() async {
       whenPostReturns(
         http.Response(
           '{"access_token":"jwt","refresh_token":"r","device_id":1,'
@@ -341,22 +341,87 @@ void main() {
         password: 'pw',
       );
       expect(service.isAuthenticated, isTrue);
+    }
 
-      // Now make the logout POST throw — we still want the local state cleared.
-      whenPostThrows(Exception('network down'));
-      // No serverUrlKey persisted, so the service skips the network call
-      // entirely — even cleaner test: local state cleared regardless.
-      when(
-        () => storage.read(AppConstants.serverUrlKey),
-      ).thenAnswer((_) async => null);
+    test('logout() — local-only path, no server call', () async {
+      await seedLoggedIn();
+
+      // Reset the mock so any post call after seeding would be visible.
+      reset(httpClient);
 
       await service.logout();
 
       expect(service.isAuthenticated, isFalse);
-      expect(service.currentToken, isNull);
-      expect(service.currentRefreshToken, isNull);
+      verifyNever(
+        () => httpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      );
       verify(() => storage.delete(AppConstants.jwtTokenKey)).called(1);
       verify(() => storage.delete(AppConstants.refreshTokenKey)).called(1);
+    });
+
+    test('logoutFromServer — POSTs /api/v1/auth/logout with Bearer', () async {
+      await seedLoggedIn();
+
+      // Re-stub the post call to capture the logout request specifically.
+      whenPostReturns(http.Response('', 204));
+
+      await service.logoutFromServer('https://saso.example.com');
+
+      final captured = verify(
+        () => httpClient.post(
+          captureAny(),
+          headers: captureAny(named: 'headers'),
+          body: captureAny(named: 'body'),
+        ),
+      ).captured;
+
+      // verify captures every call — the last one is the logout POST.
+      final logoutUri = captured[captured.length - 3] as Uri;
+      final logoutHeaders =
+          captured[captured.length - 2] as Map<String, String>;
+      expect(
+        logoutUri.toString(),
+        'https://saso.example.com/api/v1/auth/logout',
+      );
+      expect(logoutHeaders['Authorization'], 'Bearer jwt');
+
+      expect(service.isAuthenticated, isFalse);
+    });
+
+    test(
+      'logoutFromServer — clears local state even when POST throws',
+      () async {
+        await seedLoggedIn();
+        whenPostThrows(Exception('network down'));
+
+        await service.logoutFromServer('https://saso.example.com');
+
+        expect(service.isAuthenticated, isFalse);
+        expect(service.currentToken, isNull);
+        expect(service.currentRefreshToken, isNull);
+        verify(() => storage.delete(AppConstants.jwtTokenKey)).called(1);
+        verify(() => storage.delete(AppConstants.refreshTokenKey)).called(1);
+      },
+    );
+
+    test('logoutFromServer — empty serverUrl skips the network call', () async {
+      await seedLoggedIn();
+      reset(httpClient);
+
+      await service.logoutFromServer('');
+
+      verifyNever(
+        () => httpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      );
+      expect(service.isAuthenticated, isFalse);
     });
   });
 

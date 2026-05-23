@@ -132,14 +132,16 @@ class RestAuthService implements AuthService {
         _userId = username;
         _expiresAt = expiresAt;
 
-        // Persist the refresh token + access token + device id via
-        // SecureStorage so the next app launch can restore the session.
-        // ServerConfigNotifier.updateTokenPair (called by the auth state
-        // notifier after this method returns) writes to SecureStorage too,
-        // but persisting here keeps the service independently usable from
-        // tests + future call sites.
+        // Persist the access token as the "REST session existed" signal
+        // that `AuthStateNotifier.loadStoredCredentials()` reads on app
+        // restart. Refresh-token persistence is intentionally delegated
+        // to `ServerConfigNotifier.updateTokenPair()` (called by the
+        // auth-state notifier right after this method returns) so there
+        // is a single source of truth for the refresh-token write and
+        // the same code path is exercised by both REST login and QR
+        // pairing. Writing the refresh token here too would double-write
+        // SecureStorage on every login for no benefit.
         await _secureStorage.write(AppConstants.jwtTokenKey, accessToken);
-        await _secureStorage.write(AppConstants.refreshTokenKey, refreshToken);
 
         return AuthResult.success(
           userId: username,
@@ -187,23 +189,45 @@ class RestAuthService implements AuthService {
     );
   }
 
+  /// [AuthService] contract: clears LOCAL state only.
+  ///
+  /// The `AuthService` interface predates the REST flow and does not
+  /// carry a `serverUrl` — every other implementation (legacy, Auth0,
+  /// OIDC, …) does its server-side teardown either against a known URL
+  /// (Auth0 / OIDC) or not at all (legacy form login). For the REST
+  /// flow we expose a separate [logoutFromServer] that takes the
+  /// `serverUrl` so the auth-state notifier can revoke the refresh
+  /// token server-side without changing the interface.
+  ///
+  /// Calling this directly skips the server-side revoke. Prefer
+  /// [logoutFromServer] when you have the serverUrl in hand (the
+  /// normal case from `AuthStateNotifier.logout()`).
   @override
   Future<void> logout() async {
-    // Try to notify the server so the refresh token is revoked. Any
-    // failure (network, 401, …) is logged and ignored — local state is
-    // ALWAYS cleared so the user is locally signed out even if the
-    // server is unreachable.
-    final base = _userId == null || _accessToken == null
-        ? null
-        : await _readServerBase();
-    if (base != null && _accessToken != null) {
-      final uri = base.replace(path: '${base.path}/api/v1/auth/logout');
+    await _clearLocalState();
+  }
+
+  /// REST-specific logout. POSTs `/api/v1/auth/logout` with the active
+  /// Bearer so the server revokes the refresh token bound to this
+  /// device, then clears local state.
+  ///
+  /// Local state is cleared UNCONDITIONALLY: a network failure or a
+  /// server error must not leave the user "stuck signed in" locally
+  /// after they explicitly asked to sign out. The trade-off is the
+  /// server-side refresh token remains valid until its natural TTL
+  /// expires when the network call fails — acceptable because the
+  /// local client can no longer use it.
+  Future<void> logoutFromServer(String serverUrl) async {
+    final accessToken = _accessToken;
+    if (accessToken != null && serverUrl.isNotEmpty) {
       try {
+        final base = UrlValidator.ensureHttpsOrLoopback(serverUrl);
+        final uri = base.replace(path: '${base.path}/api/v1/auth/logout');
         final response = await _http
             .post(
               uri,
               headers: {
-                'Authorization': 'Bearer $_accessToken',
+                'Authorization': 'Bearer $accessToken',
                 'Accept': 'application/json',
               },
             )
@@ -216,14 +240,21 @@ class RestAuthService implements AuthService {
         }
       } on TimeoutException {
         debugPrint('[RestAuth] logout timed out; clearing local state.');
+      } on ArgumentError catch (e) {
+        debugPrint(
+          '[RestAuth] logout skipped — invalid serverUrl: ${e.message}',
+        );
       } catch (e) {
         debugPrint(
-          '[RestAuth] logout network error: $e; '
-          'clearing local state.',
+          '[RestAuth] logout network error: $e; clearing local state.',
         );
       }
     }
 
+    await _clearLocalState();
+  }
+
+  Future<void> _clearLocalState() async {
     _accessToken = null;
     _refreshToken = null;
     _deviceId = null;
@@ -332,26 +363,6 @@ class RestAuthService implements AuthService {
   /// legacy implementation.
   @override
   Future<bool> refreshToken() async => isAuthenticated;
-
-  /// Read the server base URL from the application's persisted config.
-  /// Returns null if the URL can't be discovered (we'd skip the server
-  /// logout call in that case and just clear local state).
-  Future<Uri?> _readServerBase() async {
-    // The auth state notifier passes the serverUrl into login(); logout
-    // doesn't receive one because the AuthService interface doesn't take
-    // it. We keep the URL from login by stashing it; but to avoid extra
-    // state, we read from secure storage when present (set elsewhere)
-    // and fall back to null. In practice the caller's `ServerConfig.baseUrl`
-    // is the source of truth — this fallback is only relevant when the
-    // service is invoked outside the normal Riverpod-managed flow.
-    final stored = await _secureStorage.read(AppConstants.serverUrlKey);
-    if (stored == null || stored.isEmpty) return null;
-    try {
-      return UrlValidator.ensureHttpsOrLoopback(stored);
-    } on ArgumentError {
-      return null;
-    }
-  }
 
   static DateTime? _parseExpiresAt(Map<String, dynamic> json) {
     final raw = json['expires_at'];
