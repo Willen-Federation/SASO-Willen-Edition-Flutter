@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_provider_config.dart';
 import '../../../core/auth/auth_service.dart';
+import '../../../router/adaptive_page.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import 'mobile_setup_webview_page.dart';
@@ -110,7 +111,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
 
     final token = await Navigator.of(context).push<String?>(
-      MaterialPageRoute(
+      adaptivePageRoute<String?>(
         builder: (_) => MobileSetupWebViewPage(
           serverUrl: serverUrl,
           providerId: provider.id,
