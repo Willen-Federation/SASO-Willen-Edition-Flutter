@@ -239,7 +239,23 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
           ],
 
           // ── API Mode (hidden in production / REST mode) ────────────────
+          //
+          // Mode selector layout (PR-B2, deprecation phase):
+          //   • Primary radios: only mock + rest. These are the modes new
+          //     deployments should use.
+          //   • Collapsed "Compatibility mode (deprecated)" ExpansionTile:
+          //     holds the legacy radio, opened by default ONLY when legacy
+          //     is currently selected so existing users still see their
+          //     selection without an extra click.
+          //   • Deprecation banner: surfaces above the selector whenever
+          //     legacy is the active mode, regardless of expansion state.
+          //
+          // The ApiMode.legacy enum value carries @Deprecated; analyzer
+          // warnings inside this widget are suppressed because we render
+          // the chooser explicitly to let users migrate off the mode.
           if (!isProduction) ...[
+            // ignore: deprecated_member_use_from_same_package
+            if (_selectedMode == ApiMode.legacy) _LegacyDeprecationBanner(l10n),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -251,7 +267,8 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    ...ApiMode.values.map(
+                    // Primary, supported modes — mock + rest only.
+                    ...[ApiMode.mock, ApiMode.rest].map(
                       (mode) => RadioListTile<ApiMode>(
                         value: mode,
                         // ignore: deprecated_member_use
@@ -263,6 +280,49 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                           if (v != null) setState(() => _selectedMode = v);
                         },
                       ),
+                    ),
+                    const Divider(height: 24),
+                    // Deprecated mode — collapsed by default unless the
+                    // user is currently in legacy mode.
+                    ExpansionTile(
+                      key: const Key('compatibility_mode_section'),
+                      // ignore: deprecated_member_use_from_same_package
+                      initiallyExpanded: _selectedMode == ApiMode.legacy,
+                      tilePadding: EdgeInsets.zero,
+                      childrenPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        Icons.history_outlined,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      title: Text(
+                        l10n.compatibilityModeSection,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      subtitle: Text(
+                        l10n.compatibilityModeSubtitle,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      children: [
+                        RadioListTile<ApiMode>(
+                          // ignore: deprecated_member_use_from_same_package
+                          value: ApiMode.legacy,
+                          // ignore: deprecated_member_use
+                          groupValue: _selectedMode,
+                          // ignore: deprecated_member_use_from_same_package
+                          title: Text(_modeLabel(ApiMode.legacy, l10n)),
+                          // ignore: deprecated_member_use_from_same_package
+                          subtitle: Text(
+                            // ignore: deprecated_member_use_from_same_package
+                            _modeDescription(ApiMode.legacy, l10n),
+                          ),
+                          // ignore: deprecated_member_use
+                          onChanged: (v) {
+                            if (v != null) setState(() => _selectedMode = v);
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -513,15 +573,17 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
 
   String _modeLabel(ApiMode mode, AppLocalizations l10n) => switch (mode) {
     ApiMode.mock => l10n.apiModeMock,
+    // ignore: deprecated_member_use_from_same_package
     ApiMode.legacy => l10n.apiModeLegacy,
     ApiMode.rest => l10n.apiModeRest,
   };
 
   String _modeDescription(ApiMode mode, AppLocalizations l10n) =>
       switch (mode) {
-        ApiMode.mock => l10n.apiModeMock,
-        ApiMode.legacy => l10n.apiModeLegacy,
-        ApiMode.rest => l10n.apiModeRest,
+        ApiMode.mock => l10n.apiModeMockDescription,
+        // ignore: deprecated_member_use_from_same_package
+        ApiMode.legacy => l10n.apiModeLegacyDescription,
+        ApiMode.rest => l10n.apiModeRestDescription,
       };
 
   String _flagLabel(String key, AppLocalizations l10n) => switch (key) {
@@ -535,4 +597,42 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     FeatureFlags.labelPrint => l10n.flagLabelPrint,
     _ => key,
   };
+}
+
+/// Deprecation banner shown above the mode selector whenever the user is
+/// currently in legacy mode. Built as a standalone widget so it can be
+/// addressed by tests via [Key] and so the parent build method stays
+/// flat. See PR-B2 + the migration timeline in
+/// `docs/auth-migration.md` (added in PR-B3 once `/api/v1/auth/login`
+/// ships server-side).
+class _LegacyDeprecationBanner extends StatelessWidget {
+  const _LegacyDeprecationBanner(this.l10n);
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Card(
+        key: const Key('legacy_deprecation_banner'),
+        color: scheme.errorContainer,
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: Icon(
+            Icons.warning_amber_outlined,
+            color: scheme.onErrorContainer,
+          ),
+          title: Text(
+            l10n.apiModeLegacyDeprecationNotice,
+            style: TextStyle(
+              color: scheme.onErrorContainer,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

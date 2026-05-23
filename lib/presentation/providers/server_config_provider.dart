@@ -8,7 +8,24 @@ import '../../core/storage/secure_storage.dart';
 part 'server_config_provider.freezed.dart';
 part 'server_config_provider.g.dart';
 
-enum ApiMode { mock, legacy, rest }
+/// Which API surface the client talks to.
+///
+/// **Deprecation notice:** [legacy] is being retired. Marked `@Deprecated`
+/// in v2.5; the enum value will be removed in v3.0. New deployments must
+/// use [rest] (REST v1, JWT-based). Existing legacy installs continue to
+/// function during v2.5 with a one-time migration prompt on the login
+/// screen pointing users at the REST mode (`POST /api/v1/auth/login`).
+/// See the migration roadmap in `docs/auth-migration.md` and the
+/// 14-call-site removal tracker on PR-B4+.
+enum ApiMode {
+  mock,
+  @Deprecated(
+    'Legacy session-cookie auth will be removed in v3.0. Use ApiMode.rest '
+    'with POST /api/v1/auth/login. See docs/auth-migration.md.',
+  )
+  legacy,
+  rest,
+}
 
 @freezed
 abstract class ServerConfig with _$ServerConfig {
