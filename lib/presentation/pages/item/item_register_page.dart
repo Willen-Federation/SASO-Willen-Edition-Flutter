@@ -524,6 +524,7 @@ class _ProductInfoCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
+                  semanticLabel: '${product.displayName} の商品画像',
                   errorBuilder: (_, __, ___) =>
                       const Icon(Icons.inventory_2_outlined, size: 32),
                 ),
@@ -726,6 +727,7 @@ class _PriceHistorySheet extends ConsumerWidget {
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close),
+                tooltip: '閉じる',
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
@@ -780,6 +782,7 @@ class _ImageCaptureTile extends StatelessWidget {
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  semanticLabel: '選択された商品画像',
                 ),
               )
             else

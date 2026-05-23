@@ -82,6 +82,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                   'assets/images/branding/saso-full-512.png',
                   width: 240,
                   fit: BoxFit.contain,
+                  semanticLabel: 'SASO Willen ロゴ',
                 ),
                 const SizedBox(height: 32),
                 const CircularProgressIndicator(),

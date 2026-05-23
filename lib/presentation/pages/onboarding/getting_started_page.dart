@@ -144,6 +144,7 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                     'assets/images/branding/saso-full-512.png',
                     height: 96,
                     fit: BoxFit.contain,
+                    semanticLabel: 'SASO Willen ロゴ',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -232,6 +233,7 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                     prefixIcon: const Icon(Icons.language_outlined),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.clear),
+                      tooltip: 'URLをクリア',
                       onPressed: () => _urlController.clear(),
                     ),
                   ),

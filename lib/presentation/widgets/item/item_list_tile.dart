@@ -29,25 +29,30 @@ class ItemListTile extends StatelessWidget {
             fontFamily: 'monospace',
           ),
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            ItemStatusBadge(status: item.status, compact: true),
-            const SizedBox(height: 2),
-            Text(
-              '${item.features.length} バリエーション',
-              style: theme.textTheme.bodySmall,
-            ),
-            Text(
-              '在庫 ${item.totalStock}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: item.totalStock > 0
-                    ? Colors.green
-                    : theme.colorScheme.error,
+        // VoiceOver reads each child of the column individually by
+        // default. MergeSemantics collapses the status badge, variation
+        // count, and stock count into a single fluid utterance.
+        trailing: MergeSemantics(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              ItemStatusBadge(status: item.status, compact: true),
+              const SizedBox(height: 2),
+              Text(
+                '${item.features.length} バリエーション',
+                style: theme.textTheme.bodySmall,
               ),
-            ),
-          ],
+              Text(
+                '在庫 ${item.totalStock}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: item.totalStock > 0
+                      ? Colors.green
+                      : theme.colorScheme.error,
+                ),
+              ),
+            ],
+          ),
         ),
         onTap: onTap,
       ),

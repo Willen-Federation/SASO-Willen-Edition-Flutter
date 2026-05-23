@@ -205,6 +205,7 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
         ),
         IconButton(
           icon: const Icon(Icons.search),
+          tooltip: '検索',
           onPressed: () => _onSearch(_controller.text),
         ),
       ],
@@ -281,6 +282,7 @@ class _PhotoSearchBanner extends StatelessWidget {
               width: 48,
               height: 48,
               fit: BoxFit.cover,
+              semanticLabel: '検索に使用する写真',
             ),
           ),
           const SizedBox(width: 12),
