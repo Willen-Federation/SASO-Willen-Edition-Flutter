@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Dark-mode FCM notification accent colour. Picked from Material's
+        Blue 300 (#64B5F6) so the accent reads clearly against the dark
+        notification shade — the daytime Blue 800 (#1565C0) clips into
+        the background on AMOLED panels.
+
+        Mirrors ColorTokens.dark.info in lib/core/theme/color_tokens.dart
+        and keeps the brand identity recognisable across both modes.
+        Issue #148 (C9).
+    -->
+    <color name="notification_color">#64B5F6</color>
+</resources>

@@ -78,28 +78,16 @@ class _PriceSparkline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.primary;
+    final scheme = Theme.of(context).colorScheme;
+    final color = scheme.primary;
+    final dateLabelColor = scheme.onSurfaceVariant;
     final textDirection = Directionality.of(context);
-    // Derive axis-label styles from the textTheme so they pick up Dynamic
-    // Type scaling via [textScaler] below. `labelSmall` is the smallest
-    // semantically-meaningful textTheme slot and matches the original
-    // ~10pt visual weight.
-    final priceLabelStyle = theme.textTheme.labelSmall?.copyWith(
-      color: color.withValues(alpha: 0.8),
-    );
-    final dateLabelStyle = theme.textTheme.labelSmall?.copyWith(
-      color: Colors.grey.shade600,
-    );
-    final textScaler = MediaQuery.textScalerOf(context);
     return CustomPaint(
       painter: _SparklinePainter(
         entries: entries,
         color: color,
+        dateLabelColor: dateLabelColor,
         textDirection: textDirection,
-        priceLabelStyle: priceLabelStyle,
-        dateLabelStyle: dateLabelStyle,
-        textScaler: textScaler,
       ),
       child: const SizedBox.expand(),
     );
@@ -110,18 +98,14 @@ class _SparklinePainter extends CustomPainter {
   _SparklinePainter({
     required this.entries,
     required this.color,
+    required this.dateLabelColor,
     required this.textDirection,
-    required this.priceLabelStyle,
-    required this.dateLabelStyle,
-    required this.textScaler,
   });
 
   final List<PriceHistoryEntry> entries;
   final Color color;
+  final Color dateLabelColor;
   final TextDirection textDirection;
-  final TextStyle? priceLabelStyle;
-  final TextStyle? dateLabelStyle;
-  final TextScaler textScaler;
 
   static final _labelFmt = NumberFormat('#,###');
   static final _dateFmt = DateFormat('M/d');
@@ -180,14 +164,15 @@ class _SparklinePainter extends CustomPainter {
       canvas.drawCircle(toOffset(i, prices[i]), 3, dotPaint);
     }
 
-    // Y-axis labels (min / max). Styles flow in from the parent widget so
-    // they pick up [Theme.of(context).textTheme] + Dynamic Type via
-    // [textScaler]. See [_PriceSparkline.build].
+    // Y-axis labels (min / max).
+    final textStyle = TextStyle(
+      fontSize: 10,
+      color: color.withValues(alpha: 0.8),
+    );
     void drawLabel(String text, Offset anchor) {
       final tp = TextPainter(
-        text: TextSpan(text: text, style: priceLabelStyle),
+        text: TextSpan(text: text, style: textStyle),
         textDirection: textDirection,
-        textScaler: textScaler,
       )..layout();
       tp.paint(
         canvas,
@@ -199,11 +184,11 @@ class _SparklinePainter extends CustomPainter {
     drawLabel('¥${_labelFmt.format(minP.toInt())}', toOffset(0, minP));
 
     // X-axis date labels for first and last.
+    final dateStyle = TextStyle(fontSize: 9, color: dateLabelColor);
     void drawDateLabel(String text, double x, {bool right = false}) {
       final tp = TextPainter(
-        text: TextSpan(text: text, style: dateLabelStyle),
+        text: TextSpan(text: text, style: dateStyle),
         textDirection: textDirection,
-        textScaler: textScaler,
       )..layout();
       canvas.drawText(
         tp,
@@ -223,10 +208,8 @@ class _SparklinePainter extends CustomPainter {
   bool shouldRepaint(_SparklinePainter old) =>
       old.entries != entries ||
       old.color != color ||
-      old.textDirection != textDirection ||
-      old.priceLabelStyle != priceLabelStyle ||
-      old.dateLabelStyle != dateLabelStyle ||
-      old.textScaler != textScaler;
+      old.dateLabelColor != dateLabelColor ||
+      old.textDirection != textDirection;
 }
 
 extension on Canvas {
@@ -247,7 +230,7 @@ class _SourceChip extends StatelessWidget {
       _ => source,
     };
     return Chip(
-      label: Text(label, style: Theme.of(context).textTheme.labelSmall),
+      label: Text(label, style: const TextStyle(fontSize: 10)),
       padding: EdgeInsets.zero,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,

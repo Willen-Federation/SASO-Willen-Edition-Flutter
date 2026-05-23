@@ -8,8 +8,12 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
+<<<<<<< HEAD
 import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_spacing.dart';
+=======
+import '../../../core/theme/app_colors.dart';
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import '../../widgets/common/adaptive_dialog.dart';
@@ -189,11 +193,15 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     return l10n.error;
   }
 
-  Color _resultColor(ConnectionTestResult result) => switch (result) {
-    ConnectionTestSuccess() => Colors.green,
-    ConnectionTestFailure() => Colors.red,
-    ConnectionTestTimeout() => Colors.orange,
-  };
+  Color _resultColor(BuildContext context, ConnectionTestResult result) {
+    final tokens = context.semanticColors;
+    final scheme = Theme.of(context).colorScheme;
+    return switch (result) {
+      ConnectionTestSuccess() => tokens.success,
+      ConnectionTestFailure() => scheme.error,
+      ConnectionTestTimeout() => tokens.warning,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +226,6 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 'assets/images/branding/saso-full-512.png',
                 height: 56,
                 fit: BoxFit.contain,
-                semanticLabel: 'SASO Willen ロゴ',
               ),
             ),
           ),
@@ -400,7 +407,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                             child: Text(
                               _resultLabel(_lastTestResult!),
                               style: TextStyle(
-                                color: _resultColor(_lastTestResult!),
+                                color: _resultColor(context, _lastTestResult!),
                               ),
                             ),
                           ),
@@ -543,13 +550,22 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                               horizontal: 6,
                               vertical: 2,
                             ),
+<<<<<<< HEAD
                             decoration: const BoxDecoration(
                               color: Colors.amber,
                               borderRadius: AppRadii.smAll,
+=======
+                            decoration: BoxDecoration(
+                              color: context.semanticColors.warning,
+                              borderRadius: BorderRadius.circular(4),
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
                             ),
                             child: Text(
                               'DEBUG',
-                              style: Theme.of(context).textTheme.labelSmall,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: context.semanticColors.onWarning,
+                              ),
                             ),
                           ),
                       ],

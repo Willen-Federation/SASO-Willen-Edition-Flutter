@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/pending_registration_dao.dart';
 import '../../../data/datasources/local/price_history_dao.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
@@ -597,7 +598,11 @@ class _ProductInfoCard extends StatelessWidget {
           ].join(' · '),
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        trailing: const Icon(Icons.auto_awesome, size: 16, color: Colors.amber),
+        trailing: Icon(
+          Icons.auto_awesome,
+          size: 16,
+          color: context.semanticColors.warning,
+        ),
       ),
     );
   }
@@ -665,7 +670,11 @@ class _BookInfoCard extends StatelessWidget {
                   placeholder: (_, __) => Container(
                     width: 60,
                     height: 80,
+<<<<<<< HEAD
                     color: scheme.surfaceContainerHighest,
+=======
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
                     child: const Icon(Icons.book_outlined, size: 28),
                   ),
                   errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
@@ -676,7 +685,11 @@ class _BookInfoCard extends StatelessWidget {
                 width: 60,
                 height: 80,
                 decoration: BoxDecoration(
+<<<<<<< HEAD
                   color: scheme.surfaceContainerHighest,
+=======
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(Icons.book_outlined, size: 28),
@@ -705,11 +718,16 @@ class _BookInfoCard extends StatelessWidget {
                   if (book.publisher != null)
                     Text(
                       book.publisher!,
+<<<<<<< HEAD
                       // WCAG 2.1 AA: `onSurfaceVariant` is the M3 token for
                       // secondary text — guaranteed ≥4.5:1 against the
                       // Card surface in both light and dark themes.
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: scheme.onSurfaceVariant,
+=======
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -775,7 +793,11 @@ class _PriceHistorySheet extends ConsumerWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
+<<<<<<< HEAD
               color: scheme.onSurfaceVariant,
+=======
+              color: Theme.of(context).colorScheme.outlineVariant,
+>>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -945,10 +967,10 @@ class _SuccessView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle_outline,
                 size: 72,
-                color: Colors.green,
+                color: context.semanticColors.success,
               ),
               const SizedBox(height: 16),
               Text(
