@@ -67,42 +67,99 @@ void main() {
       expect(find.text('ユーザー名でログイン'), findsOneWidget);
     });
 
-    testWidgets('hides credential form when local is absent', (tester) async {
-      await tester.binding.setSurfaceSize(const Size(400, 1400));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+    testWidgets(
+      'hides credential form when local is absent in legacy API mode',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 1400));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await tester.pumpWidget(
-        _wrap(const LoginPage(), [
-          serverAuthDiscoveryNotifierProvider.overrideWith(
-            () => _FakeDiscoveryNotifier(
-              _discovery(
-                strategy: AuthStrategy.defaultOnly,
-                providers: const [
-                  AuthProviderSummary(
-                    id: 5,
-                    name: 'Corporate SSO',
-                    type: AuthProviderType.oidc,
-                    isDefault: true,
-                    enabled: true,
-                  ),
-                ],
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.defaultOnly,
+                  providers: const [
+                    AuthProviderSummary(
+                      id: 5,
+                      name: 'Corporate SSO',
+                      type: AuthProviderType.oidc,
+                      isDefault: true,
+                      enabled: true,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          serverConfigNotifierProvider.overrideWith(
-            () => _FakeServerConfigNotifier(),
-          ),
-          authStateNotifierProvider.overrideWith(
-            () => _FakeAuthStateNotifier(),
-          ),
-        ]),
-      );
-      await tester.pumpAndSettle();
+            serverConfigNotifierProvider.overrideWith(
+              // Legacy mode — discovery is the only signal that should
+              // surface the credential form. With no local in discovery
+              // we expect the form to be hidden.
+              () => _FakeServerConfigNotifier(apiMode: ApiMode.legacy),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('username_field')), findsNothing);
-      expect(find.byKey(const Key('provider_button_5')), findsOneWidget);
-      expect(find.text('Corporate SSO'), findsOneWidget);
-    });
+        expect(find.byKey(const Key('username_field')), findsNothing);
+        expect(find.byKey(const Key('provider_button_5')), findsOneWidget);
+        expect(find.text('Corporate SSO'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'shows credential form in REST mode even when discovery omits local',
+      (tester) async {
+        // Mirrors the current saso.sksl.jp production discovery payload:
+        // a single OIDC provider with no `local` entry. /api/v1/auth/login
+        // (PR-A3) is still available against this server, so the form
+        // MUST render to let the user authenticate with username/password.
+        await tester.binding.setSurfaceSize(const Size(400, 1400));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _wrap(const LoginPage(), [
+            serverAuthDiscoveryNotifierProvider.overrideWith(
+              () => _FakeDiscoveryNotifier(
+                _discovery(
+                  strategy: AuthStrategy.userChoice,
+                  providers: const [
+                    AuthProviderSummary(
+                      id: 1,
+                      name: 'デフォルトログイン',
+                      type: AuthProviderType.oidc,
+                      isDefault: false,
+                      enabled: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            serverConfigNotifierProvider.overrideWith(
+              // REST is the default for _FakeServerConfigNotifier; named
+              // here for documentation, matching the production saso.sksl.jp
+              // config.
+              // ignore: avoid_redundant_argument_values
+              () => _FakeServerConfigNotifier(apiMode: ApiMode.rest),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('username_field')), findsOneWidget);
+        expect(find.byKey(const Key('password_field')), findsOneWidget);
+        expect(find.byKey(const Key('login_submit_button')), findsOneWidget);
+        // The OIDC provider button must still be rendered alongside the
+        // credential form so the user can pick either path.
+        expect(find.byKey(const Key('provider_button_1')), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'shows both credential form and provider buttons on user-choice',
@@ -348,9 +405,15 @@ class _FakeDiscoveryNotifier extends ServerAuthDiscoveryNotifier {
 }
 
 class _FakeServerConfigNotifier extends ServerConfigNotifier {
+  _FakeServerConfigNotifier({this.apiMode = ApiMode.rest});
+
+  final ApiMode apiMode;
+
   @override
-  ServerConfig build() =>
-      const ServerConfig(baseUrl: 'https://saso.example.com');
+  ServerConfig build() => ServerConfig(
+    baseUrl: 'https://saso.example.com',
+    apiMode: apiMode,
+  );
 }
 
 class _FakeAuthStateNotifier extends AuthStateNotifier {
