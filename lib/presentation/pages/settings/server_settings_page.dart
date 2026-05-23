@@ -10,6 +10,7 @@ import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
+import '../../widgets/common/adaptive_dialog.dart';
 
 class ServerSettingsPage extends ConsumerStatefulWidget {
   const ServerSettingsPage({super.key});
@@ -140,22 +141,17 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
 
   Future<void> _logout() async {
     final l10n = AppLocalizations.of(context)!;
-    final confirm = await showDialog<bool>(
+    final confirm = await showSasoAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logout),
-        content: Text(l10n.logoutConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.logout),
-          ),
-        ],
-      ),
+      title: l10n.logout,
+      message: l10n.logoutConfirmMessage,
+      actions: [
+        AdaptiveDialogAction<bool>(label: l10n.cancel, value: false),
+        AdaptiveDialogAction<bool>.destructive(
+          label: l10n.logout,
+          value: true,
+        ),
+      ],
     );
     if (confirm != true) return;
     if (!mounted) return;

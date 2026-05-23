@@ -1,7 +1,3 @@
-import 'dart:io' show Platform;
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +9,7 @@ import '../../../core/auth/auth_service.dart';
 import '../../../core/network/url_validator.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
+import '../../widgets/common/adaptive_dialog.dart';
 
 /// QR code pairing page for SASO token exchange.
 ///
@@ -138,49 +135,20 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
   Future<void> _showPairingSuccess(String serverHost) async {
     final l10n = AppLocalizations.of(context)!;
     final navigator = GoRouter.of(context);
-    final useCupertino = !kIsWeb && Platform.isIOS;
 
-    await showDialog<void>(
+    await showSasoAdaptiveDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogCtx) {
-        const successIcon = Icon(
-          Icons.check_circle_outline,
-          color: Colors.green,
-          size: 48,
-        );
-
-        if (useCupertino) {
-          return CupertinoAlertDialog(
-            title: Column(
-              children: [
-                successIcon,
-                const SizedBox(height: 8),
-                Text(l10n.qrPairingSuccessTitle),
-              ],
-            ),
-            content: Text(l10n.qrPairingSuccessBody(serverHost)),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                onPressed: () => Navigator.of(dialogCtx).pop(),
-                child: Text(l10n.qrPairingContinue),
-              ),
-            ],
-          );
-        }
-        return AlertDialog(
-          icon: successIcon,
-          title: Text(l10n.qrPairingSuccessTitle),
-          content: Text(l10n.qrPairingSuccessBody(serverHost)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogCtx).pop(),
-              child: Text(l10n.qrPairingContinue),
-            ),
-          ],
-        );
-      },
+      icon: const Icon(
+        Icons.check_circle_outline,
+        color: Colors.green,
+        size: 48,
+      ),
+      title: l10n.qrPairingSuccessTitle,
+      message: l10n.qrPairingSuccessBody(serverHost),
+      actions: [
+        AdaptiveDialogAction.primary(label: l10n.qrPairingContinue),
+      ],
     );
     if (!mounted) return;
     navigator.go('/home');
