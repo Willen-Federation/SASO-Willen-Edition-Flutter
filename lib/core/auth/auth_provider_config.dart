@@ -55,7 +55,7 @@ AuthStrategy _strategyFromWire(String? raw) => switch (raw) {
 
 /// Provider kind reported by the server's discovery payload.
 ///
-/// `local` is the built-in username/password flow (POST `/auth/start`).
+/// `local` is the built-in username/password flow (POST `/auth/start/`).
 /// Everything else is a third-party IdP reached through the server's
 /// `/m/setup?provider_id=…` browser flow — the client does not embed
 /// per-provider OAuth / SAML config and never sees the client secret.

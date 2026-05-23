@@ -34,11 +34,11 @@ PR-93 follow-up that filled the editing / logout / storage-locations gaps).
 | 19 | `POST /api/v1/mobile/pairing-codes` | Admin-side QR generation | n/a | ⚪ Admin web `/mypage/devicePair` |
 | 20 | `GET / DELETE /api/v1/mobile/tokens[/{id}]` | Admin device-token audit | n/a | ⚪ Admin web `/mypage/devicePair` |
 
-## Legacy session-cookie endpoints (`/auth/*`, `/category/list.json`)
+## Legacy session-cookie endpoints (`/auth/start/`, `/category/list.json`)
 
 | # | Endpoint | Purpose | Flutter caller | Status |
 |---|---|---|---|---|
-| 21 | `POST /auth/start` | Username/password login → `Set-Cookie` | `LegacyAuthService.login` → `LoginPage` (when discovery indicates legacy) | ✅ |
+| 21 | `POST /auth/start/` | Username/password login → `Set-Cookie`. Trailing slash required: the server's form action is anchored on this absolute path so webviews can't drift the POST target via relative URL resolution | `LegacyAuthService.login` → `LoginPage` (when discovery indicates legacy) | ✅ |
 | 22 | `/auth/logout` | Session invalidation | `LegacyAuthService.logout` (clears local cookie; relies on server expiry) | ✅ (local) |
 | 23 | `GET /category/list.json` | Categories under session cookie | `LegacyApiClient.fetchCategories` + `ConnectionTester` legacy probe | ✅ |
 | 24 | `GET /item/start` | Item detail under session cookie | `LegacyApiClient.fetchItem` | ✅ |
@@ -70,8 +70,8 @@ These remain on the PHP server, reachable from the in-app `/mypage` link
 | Mode | Mechanism | Flutter file |
 |---|---|---|
 | Mock | No auth | `auth_state_provider.dart` mock branch |
-| Legacy | `POST /auth/start` → session cookie | `legacy_auth_service.dart` |
-| REST v1 — username/password | `POST /auth/start` then upgrade if local provider exists | discovered via `AuthDiscoveryService` |
+| Legacy | `POST /auth/start/` → session cookie | `legacy_auth_service.dart` |
+| REST v1 — username/password | `POST /auth/start/` then upgrade if local provider exists | discovered via `AuthDiscoveryService` |
 | REST v1 — QR pairing | `POST /api/v1/mobile/connect` | `qr_pairing_page.dart`, `LoginPage._loginWithManualToken` |
 | OIDC | `flutter_appauth` | `oidc_auth_service.dart` |
 | Auth0 | `auth0_flutter` Universal Login — gated on discovery returning `type: "auth0"` with public `config.domain` + `config.clientId`. No button is rendered without that signal. | `auth0_auth_service.dart`, `LoginPage._loginWithAuth0` |

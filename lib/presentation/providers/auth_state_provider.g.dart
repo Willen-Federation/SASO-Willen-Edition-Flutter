@@ -9,7 +9,7 @@ part of 'auth_state_provider.dart';
 String _$authServiceHash() => r'd17a736a9de9427b5d06ba5260920846a121ff33';
 
 /// Returns the local credential-based auth service that talks to the
-/// server's `/auth/start` endpoint with `{id, password}`.
+/// server's `/auth/start/` endpoint with `{id, password}`.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
