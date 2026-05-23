@@ -63,6 +63,10 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     // Dynamic Island area for us. Wrap the body in SafeArea so the logo
     // never collides with system insets on iPhone X+ / Android cutouts.
     //
+    // Issue #146 — Android 15 edge-to-edge also requires this SafeArea
+    // so the centred column is not pushed against the status-bar /
+    // gesture inset.
+    //
     // Pair this with AnnotatedRegion so the status bar icons stay dark on
     // the light (Scaffold background) splash; without this, devices that
     // launched the app in dark UI mode keep light icons and become

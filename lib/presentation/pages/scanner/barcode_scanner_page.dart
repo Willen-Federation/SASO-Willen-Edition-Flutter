@@ -148,6 +148,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+<<<<<<< HEAD
     return PopScope(
       // Issue #145: stop the mobile_scanner camera session as soon as the
       // Predictive Back gesture (Android 14+) commits to a pop. Without this
@@ -197,10 +198,53 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                       width: 2,
                     ),
                     borderRadius: BorderRadius.circular(12),
+=======
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_title(l10n)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on),
+            onPressed: _controller.toggleTorch,
+            tooltip: l10n.barcodeScannerTorchTooltip,
+          ),
+          IconButton(
+            icon: const Icon(Icons.flip_camera_ios),
+            onPressed: _controller.switchCamera,
+            tooltip: l10n.barcodeScannerSwitchCameraTooltip,
+          ),
+        ],
+      ),
+      // Issue #146 — Android 15 edge-to-edge. The camera preview itself
+      // fills behind the gesture inset, but the hint label must sit
+      // above it, so its bottom offset incorporates the gesture-bar
+      // padding from MediaQuery.viewPaddingOf.
+      body: Stack(
+        children: [
+          MobileScanner(controller: _controller, onDetect: _onDetect),
+          // Scan overlay — group the visual frame with its purpose so
+          // VoiceOver announces it as a single scanning region instead of
+          // an unlabeled rectangle. The camera preview underneath is always
+          // dark, so we use a fixed near-white token in both light and dark
+          // themes; a ColorScheme token would disappear against the camera.
+          Center(
+            child: Semantics(
+              container: true,
+              label: 'バーコードスキャン領域',
+              hint: 'バーコードをこの枠に合わせてください',
+              child: Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _kScannerOverlayForeground,
+                    width: 2,
+>>>>>>> d064458 (feat(android): enable edge-to-edge layout for Android 15 (B7))
                   ),
                 ),
               ),
             ),
+<<<<<<< HEAD
             if (_processing)
               const Center(
                 child: CircularProgressIndicator(color: Colors.white),
@@ -216,6 +260,21 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                   context,
                 ).textTheme.bodyMedium?.copyWith(color: Colors.white),
               ),
+=======
+          ),
+          if (_processing)
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
+          Positioned(
+            bottom: 48 + MediaQuery.viewPaddingOf(context).bottom,
+            left: 0,
+            right: 0,
+            child: Text(
+              _hint(l10n),
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+>>>>>>> d064458 (feat(android): enable edge-to-edge layout for Android 15 (B7))
             ),
           ],
         ),

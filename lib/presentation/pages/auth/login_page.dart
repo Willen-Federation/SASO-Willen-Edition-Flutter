@@ -72,10 +72,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, _) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, _) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -96,10 +97,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, _) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, _) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -170,10 +172,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!mounted) return;
     result.when(
       success: (_, __, ___, ____) => context.go('/home'),
-      failure: (msg, _) => setState(() {
-        _loading = false;
-        _errorMessage = msg;
-      }),
+      failure:
+          (msg, _) => setState(() {
+            _loading = false;
+            _errorMessage = msg;
+          }),
     );
   }
 
@@ -202,164 +205,177 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/branding/saso-full-512.png',
-                      height: 80,
-                      fit: BoxFit.contain,
-                      semanticLabel: 'SASO Willen ロゴ',
-                    ),
-                  ),
-                ),
-                if (config.baseUrl.isNotEmpty ||
-                    discovery.serverName.isNotEmpty)
+      // Issue #146 — Android 15 edge-to-edge: wrap body in SafeArea so
+      // ListView padding still clears the gesture inset, but the AppBar
+      // can draw through the status-bar area.
+      body: SafeArea(
+        top: false,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: Column(
-                      children: [
-                        if (discovery.serverName.isNotEmpty)
-                          Text(
-                            discovery.serverName,
-                            style: theme.textTheme.titleMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        if (config.baseUrl.isNotEmpty)
-                          Text(
-                            config.baseUrl,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.outline,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                      ],
-                    ),
-                  ),
-
-                if (_errorMessage != null)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    // SelectableText so the user can long-press and copy
-                    // the (potentially long) HTTP status + body snippet to
-                    // share with support.
-                    child: SelectableText(
-                      _errorMessage!,
-                      style: TextStyle(
-                        color: theme.colorScheme.onErrorContainer,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/branding/saso-full-512.png',
+                        height: 80,
+                        fit: BoxFit.contain,
+                        semanticLabel: 'SASO Willen ロゴ',
                       ),
                     ),
                   ),
+                  if (config.baseUrl.isNotEmpty ||
+                      discovery.serverName.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Column(
+                        children: [
+                          if (discovery.serverName.isNotEmpty)
+                            Text(
+                              discovery.serverName,
+                                style: theme.textTheme.titleMedium,
+                                textAlign: TextAlign.center,
+                              ),
+                            if (config.baseUrl.isNotEmpty)
+                              Text(
+                                config.baseUrl,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.outline,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                          ],
+                        ),
+                      ),
 
-                // ── 2-a. Username / password ─────────────────────────────
-                if (showCredentialForm) ...[
-                  const _SectionHeader(
-                    icon: Icons.lock_outline,
-                    label: 'ユーザー名でログイン',
-                  ),
-                  const SizedBox(height: 12),
-                  _CredentialForm(
-                    usernameController: _usernameController,
-                    passwordController: _passwordController,
-                    obscurePassword: _obscurePassword,
-                    onTogglePassword: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
-                    onSubmit: _loginWithCredentials,
-                  ),
-                ],
+                    if (_errorMessage != null)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        // SelectableText so the user can long-press and copy
+                        // the (potentially long) HTTP status + body snippet to
+                        // share with support.
+                        child: SelectableText(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
 
-                // ── 2-b. Auth0 (dedicated, native SDK) ───────────────────
-                if (auth0Provider != null) ...[
-                  if (showCredentialForm) const SizedBox(height: 24),
-                  const _SectionHeader(
-                    icon: Icons.verified_user,
-                    label: 'Auth0 でログイン',
-                  ),
-                  const SizedBox(height: 12),
-                  _Auth0Button(
-                    label: auth0Provider.name.isNotEmpty
-                        ? auth0Provider.name
-                        : 'Auth0 でログイン',
-                    onPressed: () => _loginWithAuth0(auth0Provider),
-                  ),
-                ],
+                    // ── 2-a. Username / password ─────────────────────────────
+                    if (showCredentialForm) ...[
+                      const _SectionHeader(
+                        icon: Icons.lock_outline,
+                        label: 'ユーザー名でログイン',
+                      ),
+                      const SizedBox(height: 12),
+                      _CredentialForm(
+                        usernameController: _usernameController,
+                        passwordController: _passwordController,
+                        obscurePassword: _obscurePassword,
+                        onTogglePassword:
+                            () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
+                        onSubmit: _loginWithCredentials,
+                      ),
+                    ],
 
-                // ── 2-c. Other server-configured providers ───────────────
-                if (externalProviders.isNotEmpty) ...[
-                  if (showCredentialForm || auth0Provider != null)
+                    // ── 2-b. Auth0 (dedicated, native SDK) ───────────────────
+                    if (auth0Provider != null) ...[
+                      if (showCredentialForm) const SizedBox(height: 24),
+                      const _SectionHeader(
+                        icon: Icons.verified_user,
+                        label: 'Auth0 でログイン',
+                      ),
+                      const SizedBox(height: 12),
+                      _Auth0Button(
+                        label:
+                            auth0Provider.name.isNotEmpty
+                                ? auth0Provider.name
+                                : 'Auth0 でログイン',
+                        onPressed: () => _loginWithAuth0(auth0Provider),
+                      ),
+                    ],
+
+                    // ── 2-c. Other server-configured providers ───────────────
+                    if (externalProviders.isNotEmpty) ...[
+                      if (showCredentialForm || auth0Provider != null)
+                        const SizedBox(height: 24),
+                      const _SectionHeader(
+                        icon: Icons.open_in_browser,
+                        label: 'サーバー設定のログイン方法',
+                      ),
+                      const SizedBox(height: 12),
+                      for (final provider in externalProviders) ...[
+                        _ProviderButton(
+                          provider: provider,
+                          onPressed: () => _loginWithProvider(provider),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ],
+
+                    // ── 2-d. QR / manual pairing token ───────────────────────
                     const SizedBox(height: 24),
-                  const _SectionHeader(
-                    icon: Icons.open_in_browser,
-                    label: 'サーバー設定のログイン方法',
-                  ),
-                  const SizedBox(height: 12),
-                  for (final provider in externalProviders) ...[
-                    _ProviderButton(
-                      provider: provider,
-                      onPressed: () => _loginWithProvider(provider),
+                    const _SectionHeader(
+                      icon: Icons.qr_code_scanner,
+                      label: 'QRコード / 手動トークン',
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      key: const Key('qr_pairing_button'),
+                      onPressed: () => context.push('/auth/qr'),
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('QRコードでペアリング'),
                     ),
                     const SizedBox(height: 8),
+                    TextButton(
+                      key: const Key('manual_token_toggle'),
+                      onPressed:
+                          () => setState(
+                            () => _showManualToken = !_showManualToken,
+                          ),
+                      child: Text(
+                        _showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力',
+                      ),
+                    ),
+                    if (_showManualToken) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'サーバー画面 (/mypage/devicePair) で発行したペアリングトークンを貼り付けてください。',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        key: const Key('manual_token_field'),
+                        controller: _manualTokenController,
+                        decoration: const InputDecoration(
+                          labelText: 'ペアリングトークン',
+                          hintText: 'SASO1:... もしくは生トークン',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 8),
+                      FilledButton(
+                        key: const Key('manual_token_submit'),
+                        onPressed: _loginWithManualToken,
+                        child: const Text('ペアリングを実行'),
+                      ),
+                    ],
                   ],
-                ],
-
-                // ── 2-d. QR / manual pairing token ───────────────────────
-                const SizedBox(height: 24),
-                const _SectionHeader(
-                  icon: Icons.qr_code_scanner,
-                  label: 'QRコード / 手動トークン',
                 ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  key: const Key('qr_pairing_button'),
-                  onPressed: () => context.push('/auth/qr'),
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('QRコードでペアリング'),
-                ),
-                const SizedBox(height: 8),
-                TextButton(
-                  key: const Key('manual_token_toggle'),
-                  onPressed: () =>
-                      setState(() => _showManualToken = !_showManualToken),
-                  child: Text(_showManualToken ? 'トークン入力を閉じる' : '手動でトークンを入力'),
-                ),
-                if (_showManualToken) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'サーバー画面 (/mypage/devicePair) で発行したペアリングトークンを貼り付けてください。',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    key: const Key('manual_token_field'),
-                    controller: _manualTokenController,
-                    decoration: const InputDecoration(
-                      labelText: 'ペアリングトークン',
-                      hintText: 'SASO1:... もしくは生トークン',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 8),
-                  FilledButton(
-                    key: const Key('manual_token_submit'),
-                    onPressed: _loginWithManualToken,
-                    child: const Text('ペアリングを実行'),
-                  ),
-                ],
-              ],
-            ),
+      ),
     );
   }
 }

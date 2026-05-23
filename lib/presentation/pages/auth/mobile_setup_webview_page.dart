@@ -90,39 +90,40 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
       },
     );
 
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (_) => setState(() => _loading = true),
-          onPageFinished: (_) => setState(() => _loading = false),
-          onNavigationRequest: (request) {
-            final uri = Uri.tryParse(request.url);
-            if (uri == null) return NavigationDecision.prevent;
+    _controller =
+        WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onPageStarted: (_) => setState(() => _loading = true),
+              onPageFinished: (_) => setState(() => _loading = false),
+              onNavigationRequest: (request) {
+                final uri = Uri.tryParse(request.url);
+                if (uri == null) return NavigationDecision.prevent;
 
-            if (uri.scheme == MobileSetupWebViewPage.callbackScheme) {
-              final token = _extractToken(uri);
-              Navigator.of(context).pop(token);
-              return NavigationDecision.prevent;
-            }
+                if (uri.scheme == MobileSetupWebViewPage.callbackScheme) {
+                  final token = _extractToken(uri);
+                  Navigator.of(context).pop(token);
+                  return NavigationDecision.prevent;
+                }
 
-            // Same-origin gate. The `/m/setup` flow may redirect to an
-            // external IdP — we relax the origin check to "either trusted
-            // origin OR HTTPS" so OIDC providers (login.microsoftonline.com,
-            // accounts.google.com, etc.) load while still rejecting plain
-            // http:// redirects.
-            if (_isSameOrigin(uri)) return NavigationDecision.navigate;
-            if (uri.scheme == 'https') return NavigationDecision.navigate;
+                // Same-origin gate. The `/m/setup` flow may redirect to an
+                // external IdP — we relax the origin check to "either trusted
+                // origin OR HTTPS" so OIDC providers (login.microsoftonline.com,
+                // accounts.google.com, etc.) load while still rejecting plain
+                // http:// redirects.
+                if (_isSameOrigin(uri)) return NavigationDecision.navigate;
+                if (uri.scheme == 'https') return NavigationDecision.navigate;
 
-            AppLogger.warn(
-              'MobileSetupWebView',
-              'blocked navigation to ${uri.scheme}://${uri.host}',
-            );
-            return NavigationDecision.prevent;
-          },
-        ),
-      )
-      ..loadRequest(setupUrl);
+                AppLogger.warn(
+                  'MobileSetupWebView',
+                  'blocked navigation to ${uri.scheme}://${uri.host}',
+                );
+                return NavigationDecision.prevent;
+              },
+            ),
+          )
+          ..loadRequest(setupUrl);
   }
 
   /// Pulls the raw pairing token out of a callback URI.
@@ -161,12 +162,12 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
     if (candidate.host.toLowerCase() != _trustedOrigin.host.toLowerCase()) {
       return false;
     }
-    final cPort = candidate.hasPort
-        ? candidate.port
-        : _defaultPort(candidate.scheme);
-    final tPort = _trustedOrigin.hasPort
-        ? _trustedOrigin.port
-        : _defaultPort(_trustedOrigin.scheme);
+    final cPort =
+        candidate.hasPort ? candidate.port : _defaultPort(candidate.scheme);
+    final tPort =
+        _trustedOrigin.hasPort
+            ? _trustedOrigin.port
+            : _defaultPort(_trustedOrigin.scheme);
     return cPort == tPort;
   }
 
@@ -190,9 +191,10 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.providerName == null
-        ? 'サーバーログイン'
-        : '${widget.providerName} でログイン';
+    final title =
+        widget.providerName == null
+            ? 'サーバーログイン'
+            : '${widget.providerName} でログイン';
 
     return Scaffold(
       appBar: AppBar(
@@ -203,6 +205,7 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
+<<<<<<< HEAD
       body: _initError != null
           ? Center(
               child: Padding(
@@ -210,15 +213,29 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
                 child: Text(
                   'サーバーURLが無効です: $_initError',
                   textAlign: TextAlign.center,
+=======
+      // Issue #146 — Android 15 edge-to-edge.
+      body: SafeArea(
+        top: false,
+        child:
+            _initError != null
+                ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      'サーバーURLが無効です: $_initError',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+                : Stack(
+                  children: [
+                    WebViewWidget(controller: _controller!),
+                    if (_loading) const LinearProgressIndicator(),
+                  ],
+>>>>>>> d064458 (feat(android): enable edge-to-edge layout for Android 15 (B7))
                 ),
-              ),
-            )
-          : Stack(
-              children: [
-                WebViewWidget(controller: _controller!),
-                if (_loading) const LinearProgressIndicator(),
-              ],
-            ),
+      ),
     );
   }
 }
