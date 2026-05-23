@@ -77,6 +77,8 @@ plugins:
             Flutter 必要 API 要件定義: Flutter API Requirements
             セキュリティ: Security
             2026-05-17 Medium 監査クローズ: 2026-05-17 medium audit closure
+            リリース: Release
+            App Links / Universal Links 公開ノート: App Links / Universal Links publishing notes
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -131,6 +133,8 @@ nav:
     - Flutter 必要 API 要件定義: api/flutter-requirements.md
   - セキュリティ:
     - 2026-05-17 Medium 監査クローズ: security/medium-audit-2026-05-17.md
+  - リリース:
+    - App Links / Universal Links 公開ノート: release/applinks.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
