@@ -455,7 +455,7 @@ class RestV1ApiClient implements SasoApiClient {
   /// Fetch one page of items for offline sync.
   ///
   /// Pass [cursor] = `null` for the first page; pass the value returned in
-  /// `next_cursor` for subsequent pages. Returns both the page contents and
+  /// `nextCursor` for subsequent pages. Returns both the page contents and
   /// the cursor for the next call (or `null` when no more pages remain).
   Future<({List<Map<String, dynamic>> items, int? nextCursor})>
   fetchAllItemsRaw({int? cursor, int limit = 200}) async {
@@ -473,7 +473,10 @@ class RestV1ApiClient implements SasoApiClient {
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     final data = (body['data'] as List<dynamic>? ?? [])
         .cast<Map<String, dynamic>>();
-    final nextCursor = body['next_cursor'] as int?;
+    // Per OpenAPI ItemList.nextCursor (camelCase). Accept snake_case
+    // `next_cursor` too in case an older server is still in front.
+    final nextCursor =
+        (body['nextCursor'] ?? body['next_cursor']) as int?;
     return (items: data, nextCursor: nextCursor);
   }
 
