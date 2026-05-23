@@ -21,8 +21,12 @@ class ItemStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final (fg, bg) = _palette(scheme);
+    final baseStyle = compact
+        ? theme.textTheme.labelSmall
+        : theme.textTheme.labelMedium;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 8 : 12,
@@ -34,11 +38,9 @@ class ItemStatusBadge extends StatelessWidget {
       ),
       child: Text(
         labelFor(status, context),
-        style: TextStyle(
-          color: fg,
-          fontSize: compact ? 11 : 12,
-          fontWeight: FontWeight.w600,
-        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: baseStyle?.copyWith(color: fg, fontWeight: FontWeight.w600),
       ),
     );
   }

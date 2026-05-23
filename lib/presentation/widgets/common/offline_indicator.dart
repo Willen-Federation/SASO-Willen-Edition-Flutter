@@ -52,12 +52,15 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
           children: [
             Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade900),
             const SizedBox(width: 4),
-            Text(
-              l10n.offlineBadge,
-              style: TextStyle(
-                color: Colors.orange.shade900,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                l10n.offlineBadge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Colors.orange.shade900,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
