@@ -12,8 +12,14 @@ import 'mobile_setup_webview_page.dart';
 ///
 /// Renders independent sections back-to-back, each gated on what the
 /// server's `/api/v1/auth/providers` discovery returned:
-///   1. Username / password form — shown when the server has the built-in
-///      `local` provider enabled.
+///   1. Username / password form — shown when the server advertises the
+///      built-in `local` provider in discovery, OR when the active
+///      [ApiMode] is [ApiMode.rest]. The REST-mode fallback exists
+///      because `POST /api/v1/auth/login` (PR-A3) is always available
+///      on REST-capable servers regardless of which IdP rows are
+///      registered in the `auth_provider` table — discovery only lists
+///      externally-configured IdPs (OIDC / SAML / Auth0 / …) and never
+///      synthesizes a `local` entry of its own.
 ///   2. Auth0 — dedicated branded button shown only when discovery
 ///      returned an enabled `auth0` provider with `domain` + `clientId`
 ///      in its `config` map. Drives Auth0 Universal Login through the
@@ -176,7 +182,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final discovery = ref.watch(serverAuthDiscoveryNotifierProvider);
     final theme = Theme.of(context);
 
-    final hasLocal = discovery.hasLocalLogin;
+    // Show the credential form when the server advertises a `local`
+    // provider, OR when the active API mode is `rest` — the REST
+    // `/api/v1/auth/login` endpoint is always available against a
+    // REST-capable server, even when discovery only lists external IdPs.
+    final showCredentialForm =
+        discovery.hasLocalLogin || config.apiMode == ApiMode.rest;
     final auth0Provider = discovery.auth0Provider;
     final externalProviders = discovery.externalProviders;
 
@@ -249,7 +260,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
 
                 // ── 2-a. Username / password ─────────────────────────────
-                if (hasLocal) ...[
+                if (showCredentialForm) ...[
                   const _SectionHeader(
                     icon: Icons.lock_outline,
                     label: 'ユーザー名でログイン',
@@ -267,7 +278,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 // ── 2-b. Auth0 (dedicated, native SDK) ───────────────────
                 if (auth0Provider != null) ...[
-                  if (hasLocal) const SizedBox(height: 24),
+                  if (showCredentialForm) const SizedBox(height: 24),
                   const _SectionHeader(
                     icon: Icons.verified_user,
                     label: 'Auth0 でログイン',
@@ -283,7 +294,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                 // ── 2-c. Other server-configured providers ───────────────
                 if (externalProviders.isNotEmpty) ...[
-                  if (hasLocal || auth0Provider != null)
+                  if (showCredentialForm || auth0Provider != null)
                     const SizedBox(height: 24),
                   const _SectionHeader(
                     icon: Icons.open_in_browser,
