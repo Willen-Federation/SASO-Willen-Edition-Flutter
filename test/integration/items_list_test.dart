@@ -19,7 +19,7 @@ void main() {
               'data': [
                 {'id': 1, 'name': 'a'},
               ],
-              'next_cursor': 1,
+              'nextCursor': 1,
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -31,14 +31,14 @@ void main() {
               'data': [
                 {'id': 2, 'name': 'b'},
               ],
-              'next_cursor': 2,
+              'nextCursor': 2,
             }),
             200,
             headers: {'content-type': 'application/json'},
           );
         }
         return http.Response(
-          jsonEncode({'data': <Map<String, dynamic>>[], 'next_cursor': null}),
+          jsonEncode({'data': <Map<String, dynamic>>[], 'nextCursor': null}),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -69,4 +69,41 @@ void main() {
       reason: 'first probe must not carry a cursor',
     );
   });
+
+  test(
+    'fetchAllItemsRaw still accepts the legacy snake_case next_cursor field',
+    () async {
+      final backend = FakeBackend({
+        'GET /api/v1/items': (http.Request req) {
+          final cursor = req.url.queryParameters['cursor'];
+          if (cursor == null) {
+            return http.Response(
+              jsonEncode({
+                'data': [
+                  {'id': 1, 'name': 'a'},
+                ],
+                'next_cursor': 7,
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response(
+            jsonEncode({'data': <Map<String, dynamic>>[], 'next_cursor': null}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        },
+      });
+
+      final client = RestV1ApiClient(
+        serverUrl: 'https://example.test',
+        jwtToken: 'access',
+        httpClient: backend.toClient(),
+      );
+
+      final firstPage = await client.fetchAllItemsRaw();
+      expect(firstPage.nextCursor, 7);
+    },
+  );
 }
