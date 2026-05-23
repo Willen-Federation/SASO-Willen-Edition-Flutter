@@ -310,13 +310,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSaved => 'Settings saved';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
-
-  @override
-  String get privacyPolicySubtitle =>
-      'How we handle your personal data (opens in browser)';
-
-  @override
   String get offlineBadge => 'Offline';
 
   @override
@@ -423,4 +416,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get flagLabelPrint => 'Label Printing';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle =>
+      'How we handle personal information (opens in your browser)';
+
+  @override
+  String privacyPolicyOpenFailed(String detail) {
+    return 'Could not open the privacy policy: $detail';
+  }
 }

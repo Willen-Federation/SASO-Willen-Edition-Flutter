@@ -99,46 +99,6 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     }
   }
 
-  /// Public-facing privacy policy URL submitted to App Store Connect and
-  /// Google Play Console. Hosted by the project's Netlify docs site;
-  /// source lives in `docs/privacy-policy.md` / `docs/privacy-policy.en.md`.
-  /// See [#122](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/issues/122).
-  static const _privacyPolicyUrlJa =
-      'https://saso-willen-flutter.netlify.app/privacy-policy/';
-  static const _privacyPolicyUrlEn =
-      'https://saso-willen-flutter.netlify.app/en/privacy-policy/';
-
-  Future<void> _openPrivacyPolicy() async {
-    final l10n = AppLocalizations.of(context)!;
-    final localeCode = Localizations.localeOf(context).languageCode;
-    final urlString = localeCode == 'ja'
-        ? _privacyPolicyUrlJa
-        : _privacyPolicyUrlEn;
-    Uri uri;
-    try {
-      uri = Uri.parse(urlString);
-    } on FormatException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.openWebPortalFailed(e.message))),
-      );
-      return;
-    }
-    try {
-      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!ok && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.openWebPortalFailed(uri.toString()))),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.openWebPortalFailed(e.toString()))),
-      );
-    }
-  }
-
   Future<void> _logout() async {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showSasoAdaptiveDialog<bool>(
@@ -155,6 +115,35 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     await ref.read(authStateNotifierProvider.notifier).logout();
     if (!mounted) return;
     context.go('/auth/login');
+  }
+
+  /// Open the Privacy Policy page in an external browser.
+  ///
+  /// Required by Google Play (Issue #142) and the App Store (Issue #122).
+  /// The locale-appropriate URL is selected from [AppConstants]; both URLs
+  /// resolve to the same Markdown source published at
+  /// `docs/legal/privacy-policy.md`. Errors are surfaced via SnackBar so
+  /// users on a kiosked device know to ask their administrator.
+  Future<void> _openPrivacyPolicy() async {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
+    final url = locale.languageCode == 'ja'
+        ? AppConstants.privacyPolicyUrlJa
+        : AppConstants.privacyPolicyUrlEn;
+    final uri = Uri.parse(url);
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.privacyPolicyOpenFailed(url))),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.privacyPolicyOpenFailed(e.toString()))),
+      );
+    }
   }
 
   Future<void> _testConnection() async {
@@ -579,21 +568,6 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               ),
             ),
 
-          // ── Privacy policy (always visible, App Store HIG requirement) ─
-          // The link opens the public Netlify-hosted policy in the system
-          // browser. URL chosen based on the active locale; see #122.
-          const SizedBox(height: 16),
-          Card(
-            child: ListTile(
-              key: const Key('privacy_policy_tile'),
-              leading: const Icon(Icons.privacy_tip_outlined),
-              title: Text(l10n.privacyPolicy),
-              subtitle: Text(l10n.privacyPolicySubtitle),
-              trailing: const Icon(Icons.open_in_new),
-              onTap: _openPrivacyPolicy,
-            ),
-          ),
-
           // ── Logout (hidden in mock mode) ───────────────────────────────
           if (_selectedMode != ApiMode.mock) ...[
             const SizedBox(height: 16),
@@ -615,6 +589,23 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
               ),
             ),
           ],
+
+          // ── Privacy Policy link (always visible) ───────────────────────
+          //
+          // Required by Google Play (Issue #142) and App Store (Issue #122).
+          // Must remain reachable in every API mode, including mock, so QA
+          // and reviewers can audit the link without signing in.
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              key: const Key('privacy_policy_tile'),
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.privacyPolicy),
+              subtitle: Text(l10n.privacyPolicySubtitle),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: _openPrivacyPolicy,
+            ),
+          ),
         ],
       ),
     );

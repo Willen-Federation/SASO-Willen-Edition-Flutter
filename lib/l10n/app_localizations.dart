@@ -650,18 +650,6 @@ abstract class AppLocalizations {
   /// **'設定を保存しました'**
   String get settingsSaved;
 
-  /// No description provided for @privacyPolicy.
-  ///
-  /// In ja, this message translates to:
-  /// **'プライバシーポリシー'**
-  String get privacyPolicy;
-
-  /// No description provided for @privacyPolicySubtitle.
-  ///
-  /// In ja, this message translates to:
-  /// **'個人データの取り扱いについて (ブラウザで開きます)'**
-  String get privacyPolicySubtitle;
-
   /// No description provided for @offlineBadge.
   ///
   /// In ja, this message translates to:
@@ -847,6 +835,24 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ラベル印刷'**
   String get flagLabelPrint;
+
+  /// Label for the privacy policy link shown in settings and onboarding. Required by Google Play and App Store for any app that handles personal data.
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシー'**
+  String get privacyPolicy;
+
+  /// Subtitle/description shown next to the privacy policy link in settings. Hints that the link opens an external browser.
+  ///
+  /// In ja, this message translates to:
+  /// **'個人情報の取り扱いについて（外部ブラウザで開きます）'**
+  String get privacyPolicySubtitle;
+
+  /// SnackBar shown when url_launcher fails to open the privacy policy URL. Placeholder is the underlying error message.
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシーを開けませんでした: {detail}'**
+  String privacyPolicyOpenFailed(String detail);
 }
 
 class _AppLocalizationsDelegate

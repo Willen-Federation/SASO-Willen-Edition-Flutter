@@ -84,6 +84,8 @@ plugins:
             App Links / Universal Links 公開ノート: App Links / Universal Links publishing notes
             App Privacy 栄養ラベル SDK マッピング: App Privacy Nutrition Label SDK Mapping
             バージョニング規約: Versioning policy
+            法務: Legal
+            プライバシーポリシー: Privacy Policy
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -147,10 +149,11 @@ nav:
     - App Links / Universal Links 公開ノート: release/applinks.md
     - App Privacy 栄養ラベル SDK マッピング: release/app-privacy-mapping.md
     - バージョニング規約: release/versioning.md
+  - 法務:
+    - プライバシーポリシー: legal/privacy-policy.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
-  - プライバシーポリシー: privacy-policy.md
   - リリースノート: release.md
 
 extra:
