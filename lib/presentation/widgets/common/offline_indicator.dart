@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:saso_willen_edition/core/theme/app_colors.dart';
 import 'package:saso_willen_edition/l10n/app_localizations.dart';
 
 /// Small badge that shows when the device has no network connectivity.
@@ -38,19 +39,20 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   Widget build(BuildContext context) {
     if (!_offline) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.semanticColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.orange.shade100,
+          color: colors.warningContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.shade700),
+          border: Border.all(color: colors.warning),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade900),
+            Icon(Icons.cloud_off, size: 16, color: colors.onWarningContainer),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
@@ -58,7 +60,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Colors.orange.shade900,
+                  color: colors.onWarningContainer,
                   fontWeight: FontWeight.w600,
                 ),
               ),

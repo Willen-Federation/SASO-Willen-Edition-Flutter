@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../presentation/providers/outbox_provider.dart';
 import '../../../presentation/providers/server_config_provider.dart';
 import '../../layout/responsive.dart';
@@ -65,26 +66,31 @@ class HomePage extends ConsumerWidget {
         slivers: [
           if (isMock)
             SliverToBoxAdapter(
-              child: Container(
-                color: colorScheme.tertiaryContainer,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.science_outlined,
-                      size: 16,
-                      color: colorScheme.onTertiaryContainer,
+              child: Builder(
+                builder: (context) {
+                  final colors = context.semanticColors;
+                  return Container(
+                    color: colors.warningContainer,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'モックモード（サーバー不要）',
-                      style: TextStyle(color: colorScheme.onTertiaryContainer),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.science_outlined,
+                          size: 16,
+                          color: colors.onWarningContainer,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'モックモード（サーバー不要）',
+                          style: TextStyle(color: colors.onWarningContainer),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           SliverPadding(

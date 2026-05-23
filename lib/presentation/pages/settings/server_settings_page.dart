@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 
@@ -205,11 +206,15 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     return l10n.error;
   }
 
-  Color _resultColor(ConnectionTestResult result) => switch (result) {
-    ConnectionTestSuccess() => Colors.green,
-    ConnectionTestFailure() => Colors.red,
-    ConnectionTestTimeout() => Colors.orange,
-  };
+  Color _resultColor(ConnectionTestResult result) {
+    final colors = context.semanticColors;
+    final scheme = Theme.of(context).colorScheme;
+    return switch (result) {
+      ConnectionTestSuccess() => colors.success,
+      ConnectionTestFailure() => scheme.error,
+      ConnectionTestTimeout() => colors.warning,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -553,19 +558,27 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                         ),
                         const SizedBox(width: 8),
                         if (kDebugMode)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'DEBUG',
-                              style: Theme.of(context).textTheme.labelSmall,
-                            ),
+                          Builder(
+                            builder: (context) {
+                              final colors = context.semanticColors;
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.warningContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'DEBUG',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colors.onWarningContainer,
+                                      ),
+                                ),
+                              );
+                            },
                           ),
                       ],
                     ),

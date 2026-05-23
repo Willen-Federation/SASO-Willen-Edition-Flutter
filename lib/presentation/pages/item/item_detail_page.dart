@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/entities/item_status.dart';
 import '../../../l10n/app_localizations.dart';
@@ -257,7 +258,9 @@ class _StockBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = count > 0 ? Colors.green : Colors.red;
+    final colors = context.semanticColors;
+    final scheme = Theme.of(context).colorScheme;
+    final color = count > 0 ? colors.success : scheme.error;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(

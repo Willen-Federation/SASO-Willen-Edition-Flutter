@@ -42,6 +42,14 @@ class BarcodeScannerPage extends StatefulWidget {
 }
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
+  // The scanner UI sits on top of the live camera preview, which is
+  // effectively a fixed dark backdrop regardless of the app's theme.
+  // We deliberately pin overlay colours to white here so the frame /
+  // hint text stay legible against arbitrary camera footage. This is
+  // the documented exception in issue #128 — overlay-on-dark, not a
+  // theme-aware semantic token.
+  static const Color _overlayColor = Colors.white;
+
   final MobileScannerController _controller = MobileScannerController();
   bool _processing = false;
 
