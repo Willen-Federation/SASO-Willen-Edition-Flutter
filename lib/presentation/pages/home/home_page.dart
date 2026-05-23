@@ -66,6 +66,11 @@ class HomePage extends ConsumerWidget {
           if (isMock)
             SliverToBoxAdapter(
               child: Container(
+                // WCAG 2.1 AA: tertiaryContainer/onTertiaryContainer is the
+                // Material 3 token pair guaranteed to meet 4.5:1 contrast
+                // in both light and dark schemes. Replaces `amber.shade100`
+                // + black text (~10:1 light, but the black text vanishes
+                // when the amber container shifts in dark mode).
                 color: colorScheme.tertiaryContainer,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,

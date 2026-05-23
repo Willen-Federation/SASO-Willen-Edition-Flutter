@@ -587,6 +587,10 @@ class _BookInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // WCAG 2.1 AA: theme-aware tokens. `surfaceContainerHighest` keeps the
+    // book-cover placeholder visible in both light and dark schemes, and
+    // `onSurfaceVariant` gives any text on top a ≥4.5:1 ratio.
+    final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
@@ -606,7 +610,7 @@ class _BookInfoCard extends StatelessWidget {
                   placeholder: (_, __) => Container(
                     width: 60,
                     height: 80,
-                    color: Colors.grey.shade200,
+                    color: scheme.surfaceContainerHighest,
                     child: const Icon(Icons.book_outlined, size: 28),
                   ),
                   errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
@@ -617,7 +621,7 @@ class _BookInfoCard extends StatelessWidget {
                 width: 60,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: scheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(Icons.book_outlined, size: 28),
@@ -646,9 +650,12 @@ class _BookInfoCard extends StatelessWidget {
                   if (book.publisher != null)
                     Text(
                       book.publisher!,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      // WCAG 2.1 AA: `onSurfaceVariant` is the M3 token for
+                      // secondary text — guaranteed ≥4.5:1 against the
+                      // Card surface in both light and dark themes.
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -702,16 +709,18 @@ class _PriceHistorySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(priceHistoryProvider(isbn));
 
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
-        // Drag handle
+        // Drag handle — `onSurfaceVariant` keeps the handle visible against
+        // the BottomSheet surface in both light and dark themes (WCAG 1.4.3).
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Container(
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: scheme.onSurfaceVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

@@ -38,6 +38,11 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   Widget build(BuildContext context) {
     if (!_offline) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    // WCAG 2.1 AA: use ColorScheme.errorContainer / onErrorContainer so the
+    // badge keeps a ≥4.5:1 contrast ratio in both light and dark themes.
+    // Previously hardcoded `Colors.orange.shade*` rendered the dark-mode
+    // AppBar with a near-invisible orange-on-orange combination.
+    final scheme = Theme.of(context).colorScheme;
     return Semantics(
       label: l10n.offlineBadge,
       liveRegion: true,
@@ -45,15 +50,15 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.orange.shade100,
+          color: scheme.errorContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.shade700),
+          border: Border.all(color: scheme.error),
         ),
         child: ExcludeSemantics(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade900),
+              Icon(Icons.cloud_off, size: 16, color: scheme.onErrorContainer),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
@@ -61,7 +66,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Colors.orange.shade900,
+                    color: scheme.onErrorContainer,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
