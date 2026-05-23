@@ -96,19 +96,25 @@ class _ItemDetail extends ConsumerWidget {
                     // itself stays visually compact; the InkWell expands to
                     // fill the constrained area so taps near the edges are
                     // still registered.
-                    InkWell(
-                      key: const Key('item_status_badge_button'),
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => _pickStatus(context, ref),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 44,
-                          minHeight: 44,
-                        ),
-                        child: Center(
-                          widthFactor: 1,
-                          heightFactor: 1,
-                          child: ItemStatusBadge(status: item.status),
+                    MergeSemantics(
+                      child: Semantics(
+                        button: true,
+                        label: 'ステータスを変更',
+                        child: InkWell(
+                          key: const Key('item_status_badge_button'),
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => _pickStatus(context, ref),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minWidth: 44,
+                              minHeight: 44,
+                            ),
+                            child: Center(
+                              widthFactor: 1,
+                              heightFactor: 1,
+                              child: ItemStatusBadge(status: item.status),
+                            ),
+                          ),
                         ),
                       ),
                     ),
