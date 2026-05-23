@@ -116,10 +116,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get apiModeMock => 'Mock (no server needed)';
 
   @override
-  String get apiModeLegacy => 'Legacy (compatibility mode)';
+  String get apiModeMockDescription =>
+      'In-memory data for local development. No network calls.';
+
+  @override
+  String get apiModeLegacy => 'Legacy (deprecated)';
+
+  @override
+  String get apiModeLegacyDescription =>
+      'Session-cookie auth against /auth/start/. Removed in v3.0.';
+
+  @override
+  String get apiModeLegacyDeprecationNotice =>
+      'Legacy session-cookie auth will be removed in v3.0. Please migrate to REST mode when your server supports it.';
 
   @override
   String get apiModeRest => 'REST v1';
+
+  @override
+  String get apiModeRestDescription =>
+      'JWT-based REST API. Recommended for production.';
+
+  @override
+  String get compatibilityModeSection => 'Compatibility mode (deprecated)';
+
+  @override
+  String get compatibilityModeSubtitle =>
+      'For older servers only. Will be removed in v3.0.';
 
   @override
   String get testConnection => 'Test Connection';
