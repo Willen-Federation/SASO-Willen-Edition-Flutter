@@ -14,6 +14,8 @@ Future<List<Category>> categories(Ref ref) async {
 
   final client = switch (config.apiMode) {
     ApiMode.mock => MockApiClient(),
+    // TODO(v3.0): drop with ApiMode.legacy removal — see docs/v3-migration.md.
+    // ignore: deprecated_member_use_from_same_package
     ApiMode.legacy => LegacyApiClient(
       serverUrl: config.baseUrl,
       sessionCookie: config.sessionCookie,

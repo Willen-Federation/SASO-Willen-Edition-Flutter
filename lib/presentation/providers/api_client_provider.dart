@@ -19,6 +19,9 @@ SasoApiClient sasoApiClient(Ref ref) {
   final config = ref.watch(serverConfigNotifierProvider);
   return switch (config.apiMode) {
     ApiMode.mock => MockApiClient(),
+    // TODO(v3.0): drop this arm together with ApiMode.legacy removal.
+    // See docs/v3-migration.md for the full Phase C plan.
+    // ignore: deprecated_member_use_from_same_package
     ApiMode.legacy => LegacyApiClient(
       serverUrl: config.baseUrl,
       sessionCookie: config.sessionCookie,

@@ -9,6 +9,15 @@ analyzer:
     missing_required_param: error
     missing_return: error
     todo: ignore
+    # Phase C (PR-B4+): surface every in-tree use of `@Deprecated` members
+    # — primarily `ApiMode.legacy`, `LegacyApiClient`, `LegacyAuthService`,
+    # and `ServerConfig.sessionCookie`. Set to `info` (not warning/error)
+    # so v2.5 still builds with legacy support; the 4 call sites that must
+    # remain in v2.5 carry explicit `// ignore: deprecated_member_use_from_same_package`
+    # comments tagged with `TODO(v3.0)`. Any NEW use of these symbols will
+    # also light up in analyzer output as a guidance signal.
+    # See docs/v3-migration.md for the deletion roadmap.
+    deprecated_member_use_from_same_package: info
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
