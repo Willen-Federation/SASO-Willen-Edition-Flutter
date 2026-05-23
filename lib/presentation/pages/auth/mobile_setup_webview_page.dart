@@ -3,6 +3,7 @@ import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/logging/app_logger.dart';
 import '../../../core/network/url_validator.dart';
 
 /// In-app WebView wrapping the server's `/m/setup` flow used to log in via
@@ -112,8 +113,9 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
             if (_isSameOrigin(uri)) return NavigationDecision.navigate;
             if (uri.scheme == 'https') return NavigationDecision.navigate;
 
-            debugPrint(
-              'MobileSetupWebView: blocked navigation to ${uri.scheme}://${uri.host}',
+            AppLogger.warn(
+              'MobileSetupWebView',
+              'blocked navigation to ${uri.scheme}://${uri.host}',
             );
             return NavigationDecision.prevent;
           },
@@ -134,8 +136,9 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
       final token = params['token'];
       final returnedState = params['state'];
       if (returnedState != _state) {
-        debugPrint(
-          'MobileSetupWebView: state mismatch (expected $_state, got $returnedState)',
+        AppLogger.warn(
+          'MobileSetupWebView',
+          'state mismatch (expected $_state, got $returnedState)',
         );
         return null;
       }

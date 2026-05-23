@@ -1,6 +1,7 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import '../../constants/app_constants.dart';
+import '../../logging/app_logger.dart';
 import '../feature_flag_service.dart';
 
 /// Firebase Remote Config provider.
@@ -30,13 +31,13 @@ class RemoteFlagProvider implements FlagProvider {
     try {
       await _config.fetchAndActivate();
     } catch (e) {
-      debugPrint('[FeatureFlags] Remote fetch failed, using defaults: $e');
+      AppLogger.warn('FeatureFlags', 'Remote fetch failed, using defaults', e);
     }
 
     // Real-time flag updates from infrastructure
     _config.onConfigUpdated.listen((_) async {
       await _config.activate();
-      debugPrint('[FeatureFlags] Remote config updated');
+      AppLogger.info('FeatureFlags', 'Remote config updated');
     });
   }
 

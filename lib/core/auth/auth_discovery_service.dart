@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../constants/app_constants.dart';
+import '../logging/app_logger.dart';
 import 'auth_provider_config.dart';
 
 /// Why discovery fell back to the local-only sentinel.
@@ -60,8 +60,9 @@ typedef AuthDiscoveryOutcome = ({
 /// mechanism. Falls back to [ServerAuthDiscovery.localOnly] on any error or
 /// non-200 status so the user can still attempt a username/password login.
 /// The fallback path is intentionally non-fatal so the UI keeps rendering,
-/// but each branch emits a `[AuthDiscovery]` debugPrint with the reason so
-/// the cause can still be inspected via `flutter logs`.
+/// but each branch emits an `[AuthDiscovery]` [AppLogger] entry (debug-only
+/// — see lib/core/logging/app_logger.dart) so the cause can still be
+/// inspected via `flutter logs`. Nothing leaks in release builds.
 ///
 /// Use [discoverWithOutcome] in new code to access the failure-reason
 /// metadata; [discover] is kept as a thin wrapper for legacy callers that
@@ -73,7 +74,8 @@ class AuthDiscoveryService {
   final http.Client _http;
 
   /// Backward-compatible entry point. Returns only the discovery payload;
-  /// failure reasons are still logged via debugPrint but not surfaced.
+  /// failure reasons are still logged via [AppLogger] (debug-only) but
+  /// not surfaced to the caller.
   Future<ServerAuthDiscovery> discover(String serverUrl) async {
     final outcome = await discoverWithOutcome(serverUrl);
     return outcome.discovery;
@@ -96,7 +98,7 @@ class AuthDiscoveryService {
 
     final uri = Uri.tryParse('$serverUrl/api/v1/auth/providers');
     if (uri == null || !uri.hasScheme) {
-      debugPrint('[AuthDiscovery] invalid serverUrl: $serverUrl');
+      AppLogger.warn('AuthDiscovery', 'invalid serverUrl: $serverUrl');
       return (
         discovery: ServerAuthDiscovery.localOnly,
         failureReason: AuthDiscoveryFailureReason.invalidUrl,
@@ -110,7 +112,7 @@ class AuthDiscoveryService {
           .get(uri, headers: const {'Accept': 'application/json'})
           .timeout(AppConstants.httpTimeout);
     } catch (e) {
-      debugPrint('[AuthDiscovery] GET $uri failed: $e');
+      AppLogger.warn('AuthDiscovery', 'GET $uri failed', e);
       return (
         discovery: ServerAuthDiscovery.localOnly,
         failureReason: AuthDiscoveryFailureReason.networkError,
@@ -127,13 +129,15 @@ class AuthDiscoveryService {
         // APP_KEY is missing or invalid; until ops repair the `.env` the
         // SSO chooser cannot render. Admins: run `php tools/repair-app-key.php`
         // on the server and reload PHP-FPM, or set APP_KEY manually.
-        debugPrint(
-          '[AuthDiscovery] Server misconfigured (SASO-INFRA-9000): '
-          'APP_KEY missing or invalid in server .env. '
-          'Falling back to local credentials. '
-          'Server admin: run `php tools/repair-app-key.php` on the server, '
-          'or set APP_KEY in .env (32 random bytes, base64-encoded) and '
-          'reload PHP-FPM. traceId=${problem.traceId ?? '(none)'}',
+        AppLogger.error(
+          'AuthDiscovery',
+          'Server misconfigured (SASO-INFRA-9000): '
+              'APP_KEY missing or invalid in server .env. '
+              'Falling back to local credentials. '
+              'Server admin: run `php tools/repair-app-key.php` on the server, '
+              'or set APP_KEY in .env (32 random bytes, base64-encoded) and '
+              'reload PHP-FPM. traceId=${problem.traceId ?? '(none)'}',
+          'SASO-INFRA-9000',
         );
         return (
           discovery: ServerAuthDiscovery.localOnly,
@@ -144,9 +148,10 @@ class AuthDiscoveryService {
         );
       }
 
-      debugPrint(
-        '[AuthDiscovery] GET $uri returned HTTP ${response.statusCode}: '
-        '${_snippet(response.body)}',
+      AppLogger.warn(
+        'AuthDiscovery',
+        'GET $uri returned HTTP ${response.statusCode}: '
+            '${_snippet(response.body)}',
       );
       return (
         discovery: ServerAuthDiscovery.localOnly,
@@ -177,9 +182,11 @@ class AuthDiscoveryService {
         failureDetail: null,
       );
     } catch (e) {
-      debugPrint(
-        '[AuthDiscovery] could not parse response from $uri: $e. '
-        'Body: ${_snippet(response.body)}',
+      AppLogger.warn(
+        'AuthDiscovery',
+        'could not parse response from $uri. '
+            'Body: ${_snippet(response.body)}',
+        e,
       );
       return (
         discovery: ServerAuthDiscovery.localOnly,

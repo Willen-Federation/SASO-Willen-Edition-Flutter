@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,6 +12,7 @@ import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/auth/providers/rest_auth_service.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/storage/secure_storage.dart';
 import 'server_config_provider.dart';
 
@@ -224,7 +224,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
   }) async {
     state = const AuthState.loading();
     final uri = Uri.parse('$serverUrl/api/v1/mobile/connect');
-    debugPrint('[QrPairing] POST $uri');
+    AppLogger.debug('QrPairing', 'POST $uri');
 
     final http.Response response;
     try {
@@ -246,17 +246,20 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       final msg =
           'Network timeout after ${AppConstants.httpTimeout.inSeconds}s '
           '(POST $uri)';
-      debugPrint('[QrPairing] $msg');
+      AppLogger.warn('QrPairing', msg);
       return AuthResult.failure(message: msg);
     } catch (e) {
       state = const AuthState.unauthenticated();
       final msg = 'Network error: $e (POST $uri)';
-      debugPrint('[QrPairing] $msg');
+      AppLogger.warn('QrPairing', msg);
       return AuthResult.failure(message: msg);
     }
 
     final status = response.statusCode;
-    debugPrint('[QrPairing] HTTP $status (${response.body.length} bytes body)');
+    AppLogger.debug(
+      'QrPairing',
+      'HTTP $status (${response.body.length} bytes body)',
+    );
 
     if (status == 200 || status == 201) {
       try {
@@ -286,7 +289,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         final msg =
             'Pairing failed: server returned HTTP $status but the response '
             'body could not be parsed ($e). Body: ${_snippet(response.body)}';
-        debugPrint('[QrPairing] $msg');
+        AppLogger.warn('QrPairing', msg);
         return AuthResult.failure(message: msg);
       }
     }
@@ -302,7 +305,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     final msg =
         'Pairing failed (HTTP $status$hint): ${_snippet(response.body)} '
         '(POST $uri)';
-    debugPrint('[QrPairing] $msg');
+    AppLogger.warn('QrPairing', msg);
     return AuthResult.failure(message: msg);
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../data/models/config_bundle_model.dart';
 import '../constants/app_constants.dart';
+import '../logging/app_logger.dart';
 import 'providers/debug_flag_provider.dart';
 import 'providers/remote_flag_provider.dart';
 
@@ -47,9 +48,7 @@ class FeatureFlagService {
     await _provider.initialize();
     _initialized = true;
 
-    if (kDebugMode) {
-      debugPrint('[FeatureFlags] Using ${_provider.name} (debug mode)');
-    }
+    AppLogger.info('FeatureFlags', 'Using ${_provider.name}');
   }
 
   bool getBool(String key) {
@@ -66,9 +65,10 @@ class FeatureFlagService {
     _serverBundleFlags = {
       for (final flag in bundle.featureFlags) flag.key: flag.enabled,
     };
-    debugPrint(
-      '[FeatureFlags] Server config bundle v${bundle.version} applied'
-      ' (${_serverBundleFlags.length} flags)',
+    AppLogger.info(
+      'FeatureFlags',
+      'Server config bundle v${bundle.version} applied'
+          ' (${_serverBundleFlags.length} flags)',
     );
   }
 
