@@ -274,6 +274,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSaved => 'Settings saved';
 
   @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle =>
+      'How we handle your personal data (opens in browser)';
+
+  @override
   String get offlineBadge => 'Offline';
 
   @override

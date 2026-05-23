@@ -584,6 +584,18 @@ abstract class AppLocalizations {
   /// **'設定を保存しました'**
   String get settingsSaved;
 
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシー'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicySubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'個人データの取り扱いについて (ブラウザで開きます)'**
+  String get privacyPolicySubtitle;
+
   /// No description provided for @offlineBadge.
   ///
   /// In ja, this message translates to:
