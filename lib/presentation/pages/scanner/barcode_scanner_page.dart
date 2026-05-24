@@ -8,6 +8,7 @@ import '../../../domain/value_objects/feature_code.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../domain/value_objects/shelf_id.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/common/adaptive_dialog.dart';
 
 /// Foreground color used for the scan-frame border, hint text and processing
 /// spinner that sit on top of the camera preview.
@@ -112,29 +113,24 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
 
   void _offerItemRegistration(String janCode) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog<void>(
+    showSasoAdaptiveDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.barcodeScannerUnrecognizedTitle),
-        content: Text(l10n.barcodeScannerUnrecognizedMessage(janCode)),
-        actions: [
-          TextButton(
-            onPressed: () => ctx.pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              ctx.pop();
-              context.pushReplacement(
-                '/items/register?janCode=${Uri.encodeComponent(janCode)}',
-              );
-            },
-            icon: const Icon(Icons.add_box_outlined),
-            label: Text(l10n.barcodeScannerRegisterItem),
-          ),
-        ],
-      ),
-    );
+      title: l10n.barcodeScannerUnrecognizedTitle,
+      message: l10n.barcodeScannerUnrecognizedMessage(janCode),
+      actions: [
+        AdaptiveDialogAction<bool>(label: l10n.cancel, value: false),
+        AdaptiveDialogAction<bool>.primary(
+          label: l10n.barcodeScannerRegisterItem,
+          value: true,
+          icon: Icons.add_box_outlined,
+        ),
+      ],
+    ).then((confirmed) {
+      if (!mounted || confirmed != true) return;
+      context.pushReplacement(
+        '/items/register?janCode=${Uri.encodeComponent(janCode)}',
+      );
+    });
   }
 
   String _title(AppLocalizations l10n) => switch (widget.mode) {
@@ -195,9 +191,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             ),
           ),
           if (_processing)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
           Positioned(
             bottom: 48,
             left: 0,

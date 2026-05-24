@@ -217,11 +217,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       info: Color.lerp(info, other.info, t)!,
       onInfo: Color.lerp(onInfo, other.onInfo, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
-      onInfoContainer: Color.lerp(
-        onInfoContainer,
-        other.onInfoContainer,
-        t,
-      )!,
+      onInfoContainer: Color.lerp(onInfoContainer, other.onInfoContainer, t)!,
     );
   }
 }

@@ -11,6 +11,7 @@ import '../../../domain/value_objects/feature_code.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../providers/mcp_provider.dart';
 import '../../providers/server_config_provider.dart';
+import '../../widgets/common/adaptive_dialog.dart';
 
 enum _Phase { shelf, item, adjust }
 
@@ -229,92 +230,80 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
     }
   }
 
-  void _manualEnterShelf() {
+  Future<void> _manualEnterShelf() async {
     final controller = TextEditingController();
-    showDialog<void>(
+    // The dialog returns the submitted shelf code, or null on cancel.
+    // We use [showSasoAdaptiveDialogBuilder] so the "確定" button can read
+    // the live `controller.text` at tap time (an [AdaptiveDialogAction]'s
+    // `value` is captured at construction and would be the empty initial
+    // string otherwise).
+    final result = await showSasoAdaptiveDialogBuilder<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('棚番号を入力'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.characters,
-          decoration: const InputDecoration(
-            hintText: '例: A-01',
-            labelText: '棚番号',
-          ),
-          onSubmitted: (v) {
-            ctx.pop();
-            if (v.isNotEmpty) {
-              setState(() {
-                _scannedShelfId = v;
-                _phase = _Phase.item;
-              });
-            }
-          },
+      title: '棚番号を入力',
+      contentBuilder: (dialogCtx) => TextField(
+        controller: controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.characters,
+        decoration: const InputDecoration(
+          hintText: '例: A-01',
+          labelText: '棚番号',
         ),
-        actions: [
-          TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
-          FilledButton(
-            onPressed: () {
-              ctx.pop();
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _scannedShelfId = controller.text;
-                  _phase = _Phase.item;
-                });
-              }
-            },
-            child: const Text('確定'),
-          ),
-        ],
+        onSubmitted: (v) => Navigator.of(dialogCtx).pop(v),
       ),
+      actionsBuilder: (dialogCtx) => [
+        AdaptiveDialogActionBuilder<String>(
+          label: 'キャンセル',
+          onPressed: () => Navigator.of(dialogCtx).pop(),
+        ),
+        AdaptiveDialogActionBuilder<String>.primary(
+          label: '確定',
+          onPressed: () => Navigator.of(dialogCtx).pop(controller.text),
+        ),
+      ],
     );
+    if (!mounted) return;
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _scannedShelfId = result;
+        _phase = _Phase.item;
+      });
+    }
   }
 
-  void _manualEnterItem() {
+  Future<void> _manualEnterItem() async {
     final controller = TextEditingController();
-    showDialog<void>(
+    final result = await showSasoAdaptiveDialogBuilder<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('商品コードを入力'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            hintText: '例: 00001234',
-            labelText: '商品コード / JANコード',
-          ),
-          onSubmitted: (v) {
-            ctx.pop();
-            if (v.isNotEmpty) {
-              setState(() {
-                _scannedItemCode = v;
-                _phase = _Phase.adjust;
-              });
-              _resolveItem(v);
-            }
-          },
+      title: '商品コードを入力',
+      contentBuilder: (dialogCtx) => TextField(
+        controller: controller,
+        autofocus: true,
+        keyboardType: TextInputType.text,
+        decoration: const InputDecoration(
+          hintText: '例: 00001234',
+          labelText: '商品コード / JANコード',
         ),
-        actions: [
-          TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
-          FilledButton(
-            onPressed: () {
-              ctx.pop();
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _scannedItemCode = controller.text;
-                  _phase = _Phase.adjust;
-                });
-                _resolveItem(controller.text);
-              }
-            },
-            child: const Text('確定'),
-          ),
-        ],
+        onSubmitted: (v) => Navigator.of(dialogCtx).pop(v),
       ),
+      actionsBuilder: (dialogCtx) => [
+        AdaptiveDialogActionBuilder<String>(
+          label: 'キャンセル',
+          onPressed: () => Navigator.of(dialogCtx).pop(),
+        ),
+        AdaptiveDialogActionBuilder<String>.primary(
+          label: '確定',
+          onPressed: () => Navigator.of(dialogCtx).pop(controller.text),
+        ),
+      ],
     );
+    if (!mounted) return;
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _scannedItemCode = result;
+        _phase = _Phase.adjust;
+      });
+      await _resolveItem(result);
+    }
   }
 
   @override

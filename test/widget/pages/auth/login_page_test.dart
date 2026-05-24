@@ -410,10 +410,8 @@ class _FakeServerConfigNotifier extends ServerConfigNotifier {
   final ApiMode apiMode;
 
   @override
-  ServerConfig build() => ServerConfig(
-    baseUrl: 'https://saso.example.com',
-    apiMode: apiMode,
-  );
+  ServerConfig build() =>
+      ServerConfig(baseUrl: 'https://saso.example.com', apiMode: apiMode);
 }
 
 class _FakeAuthStateNotifier extends AuthStateNotifier {

@@ -16,28 +16,18 @@ void main() {
       final label = entry.key;
       final theme = entry.value();
 
-      test(
-        '$label theme uses VisualDensity.adaptivePlatformDensity',
-        () {
-          expect(theme.visualDensity, VisualDensity.adaptivePlatformDensity);
-        },
-      );
+      test('$label theme uses VisualDensity.adaptivePlatformDensity', () {
+        expect(theme.visualDensity, VisualDensity.adaptivePlatformDensity);
+      });
 
-      test(
-        '$label theme enforces 48×48 minimum size on IconButton',
-        () {
-          final style = theme.iconButtonTheme.style;
-          expect(
-            style,
-            isNotNull,
-            reason: 'iconButtonTheme.style must be set',
-          );
-          final minSize = style!.minimumSize?.resolve(<WidgetState>{});
-          expect(minSize, isNotNull);
-          expect(minSize!.width, greaterThanOrEqualTo(48));
-          expect(minSize.height, greaterThanOrEqualTo(48));
-        },
-      );
+      test('$label theme enforces 48×48 minimum size on IconButton', () {
+        final style = theme.iconButtonTheme.style;
+        expect(style, isNotNull, reason: 'iconButtonTheme.style must be set');
+        final minSize = style!.minimumSize?.resolve(<WidgetState>{});
+        expect(minSize, isNotNull);
+        expect(minSize!.width, greaterThanOrEqualTo(48));
+        expect(minSize.height, greaterThanOrEqualTo(48));
+      });
     }
   });
 }
