@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -57,20 +58,38 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'assets/images/branding/saso-full-512.png',
-            width: 240,
-            fit: BoxFit.contain,
+  Widget build(BuildContext context) {
+    // Splash has no AppBar, so Flutter does not auto-clear the notch /
+    // Dynamic Island area for us. Wrap the body in SafeArea so the logo
+    // never collides with system insets on iPhone X+ / Android cutouts.
+    //
+    // Pair this with AnnotatedRegion so the status bar icons stay dark on
+    // the light (Scaffold background) splash; without this, devices that
+    // launched the app in dark UI mode keep light icons and become
+    // invisible against the white background.
+    final overlayStyle = Theme.of(context).brightness == Brightness.dark
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/branding/saso-full-512.png',
+                  width: 240,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 32),
+                const CircularProgressIndicator(),
+              ],
+            ),
           ),
-          const SizedBox(height: 32),
-          const CircularProgressIndicator(),
-        ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
