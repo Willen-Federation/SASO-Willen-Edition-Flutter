@@ -16,10 +16,10 @@ class ErrorDisplayWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline,
             size: AppIconSize.xxLarge,
-            color: Colors.red,
+            color: Theme.of(context).colorScheme.error,
           ),
           const SizedBox(height: AppSpacing.md),
           Text(

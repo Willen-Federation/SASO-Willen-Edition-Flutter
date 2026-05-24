@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/feature_flags/feature_flag_service.dart';
 import '../../../core/feature_flags/providers/local_flag_provider.dart';
 import '../../../core/network/connection_tester.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../providers/auth_state_provider.dart';
@@ -189,11 +190,14 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     return l10n.error;
   }
 
-  Color _resultColor(ConnectionTestResult result) => switch (result) {
-    ConnectionTestSuccess() => Colors.green,
-    ConnectionTestFailure() => Colors.red,
-    ConnectionTestTimeout() => Colors.orange,
-  };
+  Color _resultColor(BuildContext context, ConnectionTestResult result) {
+    final semantics = context.semanticColors;
+    return switch (result) {
+      ConnectionTestSuccess() => semantics.success,
+      ConnectionTestFailure() => semantics.error,
+      ConnectionTestTimeout() => semantics.warning,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -400,7 +404,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                             child: Text(
                               _resultLabel(_lastTestResult!),
                               style: TextStyle(
-                                color: _resultColor(_lastTestResult!),
+                                color: _resultColor(context, _lastTestResult!),
                               ),
                             ),
                           ),
@@ -543,13 +547,18 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                               horizontal: 6,
                               vertical: 2,
                             ),
-                            decoration: const BoxDecoration(
-                              color: Colors.amber,
+                            decoration: BoxDecoration(
+                              color: context.semanticColors.warningContainer,
                               borderRadius: AppRadii.smAll,
                             ),
                             child: Text(
                               'DEBUG',
-                              style: Theme.of(context).textTheme.labelSmall,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: context
+                                        .semanticColors
+                                        .onWarningContainer,
+                                  ),
                             ),
                           ),
                       ],
