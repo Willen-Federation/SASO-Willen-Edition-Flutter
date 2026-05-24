@@ -303,6 +303,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSaved => '設定を保存しました';
 
   @override
+  String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String get privacyPolicySubtitle => '個人データの取り扱いについて (ブラウザで開きます)';
+
+  @override
   String get offlineBadge => 'オフライン';
 
   @override

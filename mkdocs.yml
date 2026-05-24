@@ -85,6 +85,8 @@ plugins:
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
+            プライバシーポリシー: Privacy Policy
+            リリースノート: Release notes
 
 markdown_extensions:
   - admonition
@@ -144,6 +146,8 @@ nav:
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
+  - プライバシーポリシー: privacy-policy.md
+  - リリースノート: release.md
 
 extra:
   social:

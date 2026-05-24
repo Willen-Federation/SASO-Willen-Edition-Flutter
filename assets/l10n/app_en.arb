@@ -113,6 +113,8 @@
   },
 
   "settingsSaved": "Settings saved",
+  "privacyPolicy": "Privacy Policy",
+  "privacyPolicySubtitle": "How we handle your personal data (opens in browser)",
   "offlineBadge": "Offline",
   "offlineMode": "Offline mode",
   "offlineModeDescription": "When ON, writes are queued locally instead of being sent to the server.",

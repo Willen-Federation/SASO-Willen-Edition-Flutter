@@ -171,6 +171,8 @@
   },
 
   "settingsSaved": "設定を保存しました",
+  "privacyPolicy": "プライバシーポリシー",
+  "privacyPolicySubtitle": "個人データの取り扱いについて (ブラウザで開きます)",
   "offlineBadge": "オフライン",
   "offlineMode": "オフラインモード",
   "offlineModeDescription": "ONにすると書き込みをキューに蓄積し、サーバーへ送らない",
