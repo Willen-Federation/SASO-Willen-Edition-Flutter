@@ -67,6 +67,7 @@ plugins:
             Android デプロイ: Android deployment
             リリース: Release
             Android リリース署名: Android release signing
+            Android 16 KB page size 検証: Android 16 KB page size check
             機能ガイド: Feature guides
             バーコードスキャン: Barcode scanning
             アイテム検索: Item search
@@ -129,6 +130,7 @@ nav:
     - Android デプロイ: setup/android.md
   - リリース:
     - Android リリース署名: release/android-signing.md
+    - Android 16 KB page size 検証: troubleshooting/android-16kb-page-size.md
   - 機能ガイド:
     - バーコードスキャン: features/barcode.md
     - アイテム検索: features/search.md

@@ -81,6 +81,11 @@ flutter build appbundle --release
 すると Gradle がエラーで停止します (debug keystore へのフォールバックは
 意図せぬ本番出荷を防ぐため `Release` タスクでは無効です)。
 
+!!! info "16 KB page size 検証 (Play Store 提出前必須)"
+    2025-11-01 以降に targetSdk 35 で Play Store 提出する AAB は、
+    すべての 64bit native `.so` が 16 KB ページサイズに対応している必要があります。
+    手順は [Android 16 KB page size 検証](../troubleshooting/android-16kb-page-size.md) 参照。
+
 ---
 
 ## トラブルシューティング

@@ -128,6 +128,27 @@ android {
             )
         }
     }
+
+    // 16 KB page size support (issue #147).
+    //
+    // Google Play requires apps targeting Android 15 (API 35) submitted
+    // or updated on/after 2025-11-01 to be compatible with 16 KB memory
+    // page sizes on 64-bit devices (Pixel 8/9-class hardware ships ROMs
+    // that boot only 16 KB-aligned native code).
+    //
+    // Disabling legacy JNI packaging makes AGP store `.so` files
+    // uncompressed and **page-aligned** inside the APK, which is the
+    // prerequisite the runtime needs to memory-map them at 16 KB
+    // boundaries. Combined with AGP 8.9.x + NDK 27+ (current Flutter
+    // default) this lets bundletool produce 16 KB-compatible splits.
+    //
+    // Verification procedure (bundletool + objdump LOAD segments):
+    // see docs/troubleshooting/android-16kb-page-size.md.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
 }
 
 flutter {
