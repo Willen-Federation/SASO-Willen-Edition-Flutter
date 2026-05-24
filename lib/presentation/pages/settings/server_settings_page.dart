@@ -105,6 +105,46 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     }
   }
 
+  /// Public-facing privacy policy URL submitted to App Store Connect and
+  /// Google Play Console. Hosted by the project's Netlify docs site;
+  /// source lives in `docs/privacy-policy.md` / `docs/privacy-policy.en.md`.
+  /// See [#122](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/issues/122).
+  static const _privacyPolicyUrlJa =
+      'https://saso-willen-flutter.netlify.app/privacy-policy/';
+  static const _privacyPolicyUrlEn =
+      'https://saso-willen-flutter.netlify.app/en/privacy-policy/';
+
+  Future<void> _openPrivacyPolicy() async {
+    final l10n = AppLocalizations.of(context)!;
+    final localeCode = Localizations.localeOf(context).languageCode;
+    final urlString = localeCode == 'ja'
+        ? _privacyPolicyUrlJa
+        : _privacyPolicyUrlEn;
+    Uri uri;
+    try {
+      uri = Uri.parse(urlString);
+    } on FormatException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.openWebPortalFailed(e.message))),
+      );
+      return;
+    }
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.openWebPortalFailed(uri.toString()))),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.openWebPortalFailed(e.toString()))),
+      );
+    }
+  }
+
   Future<void> _logout() async {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showSasoAdaptiveDialog<bool>(
@@ -193,13 +233,12 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     return l10n.error;
   }
 
-  Color _resultColor(BuildContext context, ConnectionTestResult result) {
-    final tokens = context.semanticColors;
-    final scheme = Theme.of(context).colorScheme;
+  Color _resultColor(ConnectionTestResult result) {
+    final colors = context.semanticColors;
     return switch (result) {
-      ConnectionTestSuccess() => tokens.success,
-      ConnectionTestFailure() => scheme.error,
-      ConnectionTestTimeout() => tokens.warning,
+      ConnectionTestSuccess() => colors.success,
+      ConnectionTestFailure() => colors.error,
+      ConnectionTestTimeout() => colors.warning,
     };
   }
 
@@ -226,6 +265,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 'assets/images/branding/saso-full-512.png',
                 height: 56,
                 fit: BoxFit.contain,
+                semanticLabel: 'SASO Willen ロゴ',
               ),
             ),
           ),
@@ -407,7 +447,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                             child: Text(
                               _resultLabel(_lastTestResult!),
                               style: TextStyle(
-                                color: _resultColor(context, _lastTestResult!),
+                                color: _resultColor(_lastTestResult!),
                               ),
                             ),
                           ),
@@ -562,10 +602,10 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                             ),
                             child: Text(
                               'DEBUG',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: context.semanticColors.onWarning,
-                              ),
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: context.semanticColors.onWarning,
+                                  ),
                             ),
                           ),
                       ],
@@ -586,6 +626,21 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 ),
               ),
             ),
+
+          // ── Privacy policy (always visible, App Store HIG requirement) ─
+          // The link opens the public Netlify-hosted policy in the system
+          // browser. URL chosen based on the active locale; see #122.
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              key: const Key('privacy_policy_tile'),
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.privacyPolicy),
+              subtitle: Text(l10n.privacyPolicySubtitle),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: _openPrivacyPolicy,
+            ),
+          ),
 
           // ── Logout (hidden in mock mode) ───────────────────────────────
           if (_selectedMode != ApiMode.mock) ...[
