@@ -212,45 +212,52 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
         ),
       ],
     ),
-    body: Column(
-      children: [
-        // ── Photo preview + analysing indicator ──────────────────────────
-        if (_searchPhoto != null)
-          _PhotoSearchBanner(
-            photo: _searchPhoto!,
-            analysing: _analyzingPhoto,
-            onClear: () => setState(() {
-              _searchPhoto = null;
-              _query = '';
-              _barcode = null;
-              _isbn = null;
-              _labelCode = null;
-              _controller.clear();
-            }),
-          ),
+    // Issue #146 — Android 15 edge-to-edge. The photo-source bottom
+    // sheet above wraps its own content in SafeArea separately.
+    body: SafeArea(
+      top: false,
+      child: Column(
+        children: [
+          // ── Photo preview + analysing indicator ──────────────────────────
+          if (_searchPhoto != null)
+            _PhotoSearchBanner(
+              photo: _searchPhoto!,
+              analysing: _analyzingPhoto,
+              onClear: () => setState(() {
+                _searchPhoto = null;
+                _query = '';
+                _barcode = null;
+                _isbn = null;
+                _labelCode = null;
+                _controller.clear();
+              }),
+            ),
 
-        // ── Results ──────────────────────────────────────────────────────
-        Expanded(
-          child: _analyzingPhoto
-              ? const Center(child: LoadingWidget())
-              : _query.isEmpty
-              ? const Center(
-                  child: Text(
-                    'キーワードを入力・バーコードをスキャン\nまたは写真で検索',
-                    textAlign: TextAlign.center,
+          // ── Results ──────────────────────────────────────────────────────
+          Expanded(
+            child: _analyzingPhoto
+                ? const Center(child: LoadingWidget())
+                : _query.isEmpty
+                ? const Center(
+                    child: Text(
+                      'キーワードを入力・バーコードをスキャン\nまたは写真で検索',
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : _SearchResults(
+                    query:
+                        (_barcode == null &&
+                            _isbn == null &&
+                            _labelCode == null)
+                        ? _query
+                        : null,
+                    barcode: _barcode,
+                    isbn: _isbn,
+                    labelCode: _labelCode,
                   ),
-                )
-              : _SearchResults(
-                  query:
-                      (_barcode == null && _isbn == null && _labelCode == null)
-                      ? _query
-                      : null,
-                  barcode: _barcode,
-                  isbn: _isbn,
-                  labelCode: _labelCode,
-                ),
-        ),
-      ],
+          ),
+        ],
+      ),
     ),
   );
 }

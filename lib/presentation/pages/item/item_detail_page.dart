@@ -51,13 +51,18 @@ class ItemDetailPage extends ConsumerWidget {
           ),
         ],
       ),
-      body: itemAsync.when(
-        loading: () => const LoadingWidget(),
-        error: (e, _) => ErrorDisplayWidget(
-          error: e,
-          onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+      // Issue #146 — Android 15 edge-to-edge. The inner bottom-sheet
+      // already wraps its content in SafeArea (see _pickStatus below).
+      body: SafeArea(
+        top: false,
+        child: itemAsync.when(
+          loading: () => const LoadingWidget(),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+          ),
+          data: (item) => _ItemDetail(item: item),
         ),
-        data: (item) => _ItemDetail(item: item),
       ),
     );
   }

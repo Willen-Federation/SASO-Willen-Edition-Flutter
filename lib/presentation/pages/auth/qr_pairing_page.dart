@@ -157,6 +157,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     final l10n = AppLocalizations.of(context)!;
     // Camera preview fills the screen — force light status-bar icons so
     // they stay readable against the (typically dark) live feed.
+    //
+    // Issue #146 — Android 15 edge-to-edge. The camera fills the whole
+    // window. The bottom status overlay is wrapped in SafeArea so its
+    // text isn't covered by the gesture-bar inset.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(

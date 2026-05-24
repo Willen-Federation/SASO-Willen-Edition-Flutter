@@ -22,13 +22,17 @@ class ItemEditPage extends ConsumerWidget {
     final itemAsync = ref.watch(itemByIdProvider(itemId));
     return Scaffold(
       appBar: AppBar(title: const Text('アイテムを編集')),
-      body: itemAsync.when(
-        loading: () => const LoadingWidget(),
-        error: (e, _) => ErrorDisplayWidget(
-          error: e,
-          onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+      // Issue #146 — Android 15 edge-to-edge.
+      body: SafeArea(
+        top: false,
+        child: itemAsync.when(
+          loading: () => const LoadingWidget(),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+          ),
+          data: (item) => _ItemEditForm(item: item),
         ),
-        data: (item) => _ItemEditForm(item: item),
       ),
     );
   }

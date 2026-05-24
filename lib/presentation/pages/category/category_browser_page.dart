@@ -24,15 +24,19 @@ class CategoryBrowserPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('カテゴリ')),
-      body: categoriesAsync.when(
-        loading: () => const LoadingWidget(),
-        error: (e, _) => ErrorDisplayWidget(
-          error: e,
-          onRetry: () => ref.invalidate(categoriesProvider),
-        ),
-        data: (cats) => ListView.builder(
-          itemCount: cats.length,
-          itemBuilder: (_, i) => _CategoryTile(category: cats[i]),
+      // Issue #146 — Android 15 edge-to-edge.
+      body: SafeArea(
+        top: false,
+        child: categoriesAsync.when(
+          loading: () => const LoadingWidget(),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(categoriesProvider),
+          ),
+          data: (cats) => ListView.builder(
+            itemCount: cats.length,
+            itemBuilder: (_, i) => _CategoryTile(category: cats[i]),
+          ),
         ),
       ),
     );
