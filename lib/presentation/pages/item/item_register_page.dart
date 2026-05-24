@@ -189,18 +189,14 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder:
-          (_) => DraggableScrollableSheet(
-            initialChildSize: 0.55,
-            minChildSize: 0.3,
-            maxChildSize: 0.9,
-            expand: false,
-            builder:
-                (_, scrollController) => _PriceHistorySheet(
-                  isbn: isbn,
-                  scrollController: scrollController,
-                ),
-          ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollController) =>
+            _PriceHistorySheet(isbn: isbn, scrollController: scrollController),
+      ),
     );
   }
 
@@ -228,19 +224,20 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
     });
 
     final name = _nameController.text.trim();
-    final rawCode =
-        _janController.text.trim().isEmpty ? null : _janController.text.trim();
+    final rawCode = _janController.text.trim().isEmpty
+        ? null
+        : _janController.text.trim();
     // Route the scanned code to the correct field: ISBN-13/10 → isbnCode,
     // everything else (JAN/EAN) → janCode.
     final bool codeIsIsbn =
         rawCode != null && IsbnLookupService.isIsbn(rawCode);
-    final String? isbn =
-        codeIsIsbn ? IsbnLookupService.normalize(rawCode) : null;
+    final String? isbn = codeIsIsbn
+        ? IsbnLookupService.normalize(rawCode)
+        : null;
     final String? janCode = codeIsIsbn ? null : rawCode;
-    final String? labelCode =
-        _labelCodeController.text.trim().isEmpty
-            ? null
-            : _labelCodeController.text.trim();
+    final String? labelCode = _labelCodeController.text.trim().isEmpty
+        ? null
+        : _labelCodeController.text.trim();
     final price = int.tryParse(_priceController.text) ?? 0;
     final stock = int.tryParse(_stockController.text) ?? 0;
 
@@ -403,167 +400,157 @@ class _ItemRegisterPageState extends ConsumerState<ItemRegisterPage> {
   Widget _buildScaffold() {
     return Scaffold(
       appBar: AppBar(title: const Text('アイテム登録')),
-      // Issue #146 — Android 15 edge-to-edge.
-      body: SafeArea(
-        top: false,
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Image capture
-              _ImageCaptureTile(
-                image: _capturedImage,
-                onCamera: () => _pickImage(ImageSource.camera),
-                onGallery: () => _pickImage(ImageSource.gallery),
-              ),
-              const SizedBox(height: 16),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Image capture
+            _ImageCaptureTile(
+              image: _capturedImage,
+              onCamera: () => _pickImage(ImageSource.camera),
+              onGallery: () => _pickImage(ImageSource.gallery),
+            ),
+            const SizedBox(height: 16),
 
-              // Name
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'アイテム名 *',
-                  hintText: '例: メンズジャケット ネイビー',
-                  border: OutlineInputBorder(),
-                ),
-                textCapitalization: TextCapitalization.sentences,
-                validator:
-                    (v) =>
-                        (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
+            // Name
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'アイテム名 *',
+                hintText: '例: メンズジャケット ネイビー',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 12),
+              textCapitalization: TextCapitalization.sentences,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
+            ),
+            const SizedBox(height: 12),
 
-              // JAN / ISBN code
-              TextFormField(
-                controller: _janController,
-                decoration: InputDecoration(
-                  labelText: 'JAN / バーコード / ISBN',
-                  hintText: '例: 9784101092058',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
-                    tooltip: 'スキャンして入力',
-                    onPressed:
-                        () => context.push('/scanner/jan').then((code) {
-                          if (code is String) _janController.text = code;
-                        }),
-                  ),
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              ),
-              const SizedBox(height: 12),
-
-              // ── Label code field ───────────────────────────────────────────
-              TextFormField(
-                controller: _labelCodeController,
-                decoration: InputDecoration(
-                  labelText: 'ラベルコード (任意)',
-                  hintText: '例: SHF-001-A',
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.label_outline),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
-                    tooltip: 'ラベルをスキャン',
-                    onPressed:
-                        () => context.push('/scanner/jan').then((code) {
-                          if (code is String) _labelCodeController.text = code;
-                        }),
-                  ),
+            // JAN / ISBN code
+            TextFormField(
+              controller: _janController,
+              decoration: InputDecoration(
+                labelText: 'JAN / バーコード / ISBN',
+                hintText: '例: 9784101092058',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'スキャンして入力',
+                  onPressed: () => context.push('/scanner/jan').then((code) {
+                    if (code is String) _janController.text = code;
+                  }),
                 ),
               ),
-              const SizedBox(height: 8),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+            const SizedBox(height: 12),
 
-              // ── ISBN auto-fill banner (tap to fetch, hidden while loading) ──
-              if (_janIsIsbn && _bookInfo == null && !_fetchingIsbn)
-                _IsbnFetchBanner(onFetch: _fetchIsbnInfo),
-
-              // ── Loading indicator shared by ISBN + JAN lookups ─────────────
-              if (_fetchingIsbn || _fetchingProduct)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: LinearProgressIndicator(),
+            // ── Label code field ───────────────────────────────────────────
+            TextFormField(
+              controller: _labelCodeController,
+              decoration: InputDecoration(
+                labelText: 'ラベルコード (任意)',
+                hintText: '例: SHF-001-A',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.label_outline),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'ラベルをスキャン',
+                  onPressed: () => context.push('/scanner/jan').then((code) {
+                    if (code is String) _labelCodeController.text = code;
+                  }),
                 ),
-
-              // ── Book info card ─────────────────────────────────────────────
-              if (_bookInfo != null) ...[
-                _BookInfoCard(
-                  book: _bookInfo!,
-                  onViewHistory: () => _showPriceHistory(_bookInfo!.isbn),
-                ),
-                const SizedBox(height: 4),
-              ],
-
-              // ── JAN product info card ──────────────────────────────────────
-              if (_productInfo != null) ...[
-                _ProductInfoCard(product: _productInfo!),
-                const SizedBox(height: 4),
-              ],
-
-              // Category picker
-              _CategoryPickerTile(
-                selected: _selectedCategory,
-                onSelected: (cat) => setState(() => _selectedCategory = cat),
               ),
-              const SizedBox(height: 12),
+            ),
+            const SizedBox(height: 8),
 
-              // Price / Stock row
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _priceController,
-                      decoration: const InputDecoration(
-                        labelText: '価格 (円)',
-                        border: OutlineInputBorder(),
-                        prefixText: '¥ ',
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _stockController,
-                      decoration: const InputDecoration(
-                        labelText: '初期在庫数',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    ),
-                  ),
-                ],
+            // ── ISBN auto-fill banner (tap to fetch, hidden while loading) ──
+            if (_janIsIsbn && _bookInfo == null && !_fetchingIsbn)
+              _IsbnFetchBanner(onFetch: _fetchIsbnInfo),
+
+            // ── Loading indicator shared by ISBN + JAN lookups ─────────────
+            if (_fetchingIsbn || _fetchingProduct)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: LinearProgressIndicator(),
               ),
-              const SizedBox(height: 16),
 
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ),
-
-              FilledButton.icon(
-                onPressed: _saving ? null : _save,
-                icon:
-                    _saving
-                        ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.save_outlined),
-                label: Text(_saving ? '登録中…' : '登録する'),
+            // ── Book info card ─────────────────────────────────────────────
+            if (_bookInfo != null) ...[
+              _BookInfoCard(
+                book: _bookInfo!,
+                onViewHistory: () => _showPriceHistory(_bookInfo!.isbn),
               ),
+              const SizedBox(height: 4),
             ],
-          ),
+
+            // ── JAN product info card ──────────────────────────────────────
+            if (_productInfo != null) ...[
+              _ProductInfoCard(product: _productInfo!),
+              const SizedBox(height: 4),
+            ],
+
+            // Category picker
+            _CategoryPickerTile(
+              selected: _selectedCategory,
+              onSelected: (cat) => setState(() => _selectedCategory = cat),
+            ),
+            const SizedBox(height: 12),
+
+            // Price / Stock row
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _priceController,
+                    decoration: const InputDecoration(
+                      labelText: '価格 (円)',
+                      border: OutlineInputBorder(),
+                      prefixText: '¥ ',
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextFormField(
+                    controller: _stockController,
+                    decoration: const InputDecoration(
+                      labelText: '初期在庫数',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+
+            FilledButton.icon(
+              onPressed: _saving ? null : _save,
+              icon: _saving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.save_outlined),
+              label: Text(_saving ? '登録中…' : '登録する'),
+            ),
+          ],
         ),
       ),
     );
@@ -675,22 +662,12 @@ class _BookInfoCard extends StatelessWidget {
                   width: 60,
                   height: 80,
                   fit: BoxFit.cover,
-<<<<<<< HEAD
                   placeholder: (_, __) => Container(
                     width: 60,
                     height: 80,
                     color: scheme.surfaceContainerHighest,
                     child: const Icon(Icons.book_outlined, size: 28),
                   ),
-=======
-                  placeholder:
-                      (_, __) => Container(
-                        width: 60,
-                        height: 80,
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.book_outlined, size: 28),
-                      ),
->>>>>>> d064458 (feat(android): enable edge-to-edge layout for Android 15 (B7))
                   errorWidget: (_, __, ___) => const Icon(Icons.book_outlined),
                 ),
               )
@@ -825,11 +802,10 @@ class _PriceHistorySheet extends ConsumerWidget {
           child: historyAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('取得失敗: $e')),
-            data:
-                (entries) => ListView(
-                  controller: scrollController,
-                  children: [PriceHistoryChart(entries: entries)],
-                ),
+            data: (entries) => ListView(
+              controller: scrollController,
+              children: [PriceHistoryChart(entries: entries)],
+            ),
           ),
         ),
       ],
@@ -923,33 +899,30 @@ class _CategoryPickerTile extends ConsumerWidget {
 
     return categoriesAsync.when(
       loading: () => const LinearProgressIndicator(),
-      error:
-          (e, _) => Text(
-            'カテゴリ取得失敗: $e',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-      data:
-          (categories) => DropdownButtonFormField<Category>(
-            decoration: const InputDecoration(
-              labelText: 'カテゴリ *',
-              border: OutlineInputBorder(),
-            ),
-            // ignore: deprecated_member_use
-            value: selected,
-            hint: const Text('カテゴリを選択'),
-            items:
-                categories
-                    .map(
-                      (cat) => DropdownMenuItem(
-                        value: cat,
-                        child: Text('${'　' * cat.depth}${cat.name}'),
-                      ),
-                    )
-                    .toList(),
-            onChanged: (v) {
-              if (v != null) onSelected(v);
-            },
-          ),
+      error: (e, _) => Text(
+        'カテゴリ取得失敗: $e',
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+      data: (categories) => DropdownButtonFormField<Category>(
+        decoration: const InputDecoration(
+          labelText: 'カテゴリ *',
+          border: OutlineInputBorder(),
+        ),
+        // ignore: deprecated_member_use
+        value: selected,
+        hint: const Text('カテゴリを選択'),
+        items: categories
+            .map(
+              (cat) => DropdownMenuItem(
+                value: cat,
+                child: Text('${'　' * cat.depth}${cat.name}'),
+              ),
+            )
+            .toList(),
+        onChanged: (v) {
+          if (v != null) onSelected(v);
+        },
+      ),
     );
   }
 }
@@ -966,51 +939,47 @@ class _SuccessView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('登録完了')),
-      // Issue #146 — Android 15 edge-to-edge.
-      body: SafeArea(
-        top: false,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.check_circle_outline,
-                  size: 72,
-                  color: Colors.green,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  item.name,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.id == 0
-                      ? '保留中 (ローカル保存済み)  在庫: ${item.stock}'
-                      : 'ID: ${item.id}  在庫: ${item.stock}',
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () => context.replace('/items/register'),
-                      icon: const Icon(Icons.add),
-                      label: const Text('続けて登録'),
-                    ),
-                    const SizedBox(width: 12),
-                    FilledButton.icon(
-                      onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.home_outlined),
-                      label: const Text('ホームへ'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.check_circle_outline,
+                size: 72,
+                color: Colors.green,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                item.name,
+                style: Theme.of(context).textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                item.id == 0
+                    ? '保留中 (ローカル保存済み)  在庫: ${item.stock}'
+                    : 'ID: ${item.id}  在庫: ${item.stock}',
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => context.replace('/items/register'),
+                    icon: const Icon(Icons.add),
+                    label: const Text('続けて登録'),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: () => context.go('/home'),
+                    icon: const Icon(Icons.home_outlined),
+                    label: const Text('ホームへ'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

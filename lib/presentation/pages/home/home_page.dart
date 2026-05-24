@@ -61,7 +61,6 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
-<<<<<<< HEAD
       body: CustomScrollView(
         slivers: [
           if (isMock)
@@ -90,96 +89,53 @@ class HomePage extends ConsumerWidget {
                       style: TextStyle(color: colorScheme.onTertiaryContainer),
                     ),
                   ],
-=======
-      // Issue #146 — Android 15 edge-to-edge: SafeArea keeps the menu
-      // grid clear of the status bar at the top. `bottom: false` so
-      // the CustomScrollView extends behind the FAB; the final
-      // SliverPadding below adds the gesture-bar inset.
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
-          slivers: [
-            if (isMock)
-              SliverToBoxAdapter(
-                child: Container(
-                  color: colorScheme.tertiaryContainer,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.science_outlined,
-                        size: 16,
-                        color: colorScheme.onTertiaryContainer,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'モックモード（サーバー不要）',
-                        style: TextStyle(
-                          color: colorScheme.onTertiaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
->>>>>>> d064458 (feat(android): enable edge-to-edge layout for Android 15 (B7))
                 ),
               ),
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverGrid.count(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                children: [
-                  _MenuCard(
-                    key: const Key('menu_search'),
-                    icon: Icons.search,
-                    label: 'アイテム検索',
-                    onTap: () => context.push('/items/search'),
-                  ),
-                  _MenuCard(
-                    key: const Key('menu_scanner'),
-                    icon: Icons.qr_code_scanner,
-                    label: 'バーコードスキャン',
-                    onTap: () => context.push('/scanner'),
-                  ),
-                  _MenuCard(
-                    icon: Icons.add_box_outlined,
-                    label: 'アイテム登録',
-                    onTap: () => context.push('/items/register'),
-                  ),
-                  _MenuCard(
-                    icon: Icons.warehouse_outlined,
-                    label: '場所管理',
-                    onTap: () => context.push('/locations'),
-                  ),
-                  _MenuCard(
-                    icon: Icons.category_outlined,
-                    label: 'カテゴリ',
-                    onTap: () => context.push('/categories'),
-                  ),
-                  _MenuCard(
-                    key: const Key('menu_inventory_scan'),
-                    icon: Icons.inventory_2_outlined,
-                    label: '入出庫スキャン',
-                    onTap: () => context.push('/scanner?mode=inventory'),
-                  ),
-                ],
-              ),
             ),
-            // Issue #146 — extra sliver padding for the gesture-bar inset
-            // (we set the outer SafeArea bottom to false so the FAB can
-            // be anchored by Scaffold). The 88px lift keeps the final
-            // grid row clear of the extended FAB.
-            SliverPadding(
-              padding: EdgeInsets.only(
-                bottom: 88 + MediaQuery.viewPaddingOf(context).bottom,
-              ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverGrid.count(
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              children: [
+                _MenuCard(
+                  key: const Key('menu_search'),
+                  icon: Icons.search,
+                  label: 'アイテム検索',
+                  onTap: () => context.push('/items/search'),
+                ),
+                _MenuCard(
+                  key: const Key('menu_scanner'),
+                  icon: Icons.qr_code_scanner,
+                  label: 'バーコードスキャン',
+                  onTap: () => context.push('/scanner'),
+                ),
+                _MenuCard(
+                  icon: Icons.add_box_outlined,
+                  label: 'アイテム登録',
+                  onTap: () => context.push('/items/register'),
+                ),
+                _MenuCard(
+                  icon: Icons.warehouse_outlined,
+                  label: '場所管理',
+                  onTap: () => context.push('/locations'),
+                ),
+                _MenuCard(
+                  icon: Icons.category_outlined,
+                  label: 'カテゴリ',
+                  onTap: () => context.push('/categories'),
+                ),
+                _MenuCard(
+                  key: const Key('menu_inventory_scan'),
+                  icon: Icons.inventory_2_outlined,
+                  label: '入出庫スキャン',
+                  onTap: () => context.push('/scanner?mode=inventory'),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         key: const Key('search_fab'),
