@@ -103,11 +103,16 @@
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>
 		<string>Main</string>
+		<!--
+		  Issue #126 — iPhone is Portrait-only (handheld inventory terminal,
+		  one-handed barcode scanning). iPad keeps all 4 orientations per HIG
+		  recommendation for tablets. If you reintroduce landscape on iPhone,
+		  every screen must be verified at landscape geometry (scanner overlay,
+		  forms with keyboard, etc.) — see #126 for the rationale.
+		-->
 		<key>UISupportedInterfaceOrientations</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>UISupportedInterfaceOrientations~ipad</key>
 		<array>
