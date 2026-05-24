@@ -30,6 +30,19 @@ import 'package:google_fonts/google_fonts.dart';
 /// default (which is exactly the current behaviour), so no regression is
 /// possible.
 abstract final class AppTextTheme {
+  /// Skip the `GoogleFonts.notoSansJpTextTheme` call when `true`.
+  ///
+  /// `google_fonts` fetches the font over HTTP on first use; that doesn't
+  /// work in `flutter test` runners (no network) and the failure surfaces
+  /// asynchronously *after* unit tests assert, breaking them with a
+  /// "failed after test completion" report.
+  ///
+  /// `flutter_test_config.dart` flips this to `true` before any test runs,
+  /// so [resolve] returns the platform-default typescale — which is
+  /// already what the offline-first production path does until the font
+  /// finishes downloading. Production code never touches this flag.
+  static bool skipFontFetchForTests = false;
+
   /// Resolves the [TextTheme] for the given base — pass the brightness-
   /// appropriate [ColorScheme]-derived defaults from [ThemeData] and the
   /// helper layers Noto Sans JP on top.
@@ -40,6 +53,7 @@ abstract final class AppTextTheme {
   /// [GoogleFonts.notoSansJpTextTheme]. The font face change preserves
   /// every other property of [base].
   static TextTheme resolve(TextTheme base) {
+    if (skipFontFetchForTests) return base;
     return GoogleFonts.notoSansJpTextTheme(base);
   }
 }
