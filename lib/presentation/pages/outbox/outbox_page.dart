@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
@@ -160,17 +161,17 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : total == 0
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.check_circle_outline,
                     size: AppIconSize.display,
-                    color: Colors.green,
+                    color: context.semanticColors.success,
                   ),
-                  SizedBox(height: AppSpacing.md),
-                  Text('保留中のデータはありません'),
+                  const SizedBox(height: AppSpacing.md),
+                  const Text('保留中のデータはありません'),
                 ],
               ),
             )
@@ -373,15 +374,16 @@ class _StatusIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final semantics = context.semanticColors;
     return switch (status) {
-      'completed' => const Icon(Icons.check_circle, color: Colors.green),
-      'failed' => const Icon(Icons.error_outline, color: Colors.red),
+      'completed' => Icon(Icons.check_circle, color: semantics.success),
+      'failed' => Icon(Icons.error_outline, color: semantics.error),
       'syncing' => const SizedBox(
         width: 24,
         height: 24,
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
-      _ => const Icon(Icons.schedule, color: Colors.orange),
+      _ => Icon(Icons.schedule, color: semantics.warning),
     };
   }
 }

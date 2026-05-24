@@ -7,9 +7,21 @@ import 'package:saso_willen_edition/l10n/app_localizations.dart';
 
 import '../../../core/auth/auth_service.dart';
 import '../../../core/network/url_validator.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import '../../widgets/common/adaptive_dialog.dart';
+
+/// Foreground / background colours used for the QR-scan overlay that sits on
+/// top of the live camera preview. The camera feed is effectively a fixed
+/// dark surface so these intentionally do not follow `ColorScheme`; using a
+/// theme token here would make the overlay disappear in dark mode. Declared
+/// as `const` constants so the choice is explicit (per #128 ACs) rather than
+/// scattered `Colors.white` / `Colors.black54` literals.
+const Color _kPairingOverlayForeground = Color(0xFFFFFFFF);
+const Color _kPairingOverlayMutedForeground = Color(0xB3FFFFFF); // white70
+const Color _kPairingOverlayScrim = Color(0x8A000000); // black54
+const Color _kPairingOverlayError = Color(0xFFEF5350); // red 400
 
 /// QR code pairing page for SASO token exchange.
 ///
@@ -139,9 +151,9 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
     await showSasoAdaptiveDialog<void>(
       context: context,
       barrierDismissible: false,
-      icon: const Icon(
+      icon: Icon(
         Icons.check_circle_outline,
-        color: Colors.green,
+        color: context.semanticColors.success,
         size: 48,
       ),
       title: l10n.qrPairingSuccessTitle,
@@ -197,7 +209,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                   width: 260,
                   height: 260,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(
+                      color: _kPairingOverlayForeground,
+                      width: 2,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
@@ -214,7 +229,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
               child: SafeArea(
                 top: false,
                 child: Container(
-                  color: Colors.black54,
+                  color: _kPairingOverlayScrim,
                   padding: const EdgeInsets.all(16),
                   child: _processing
                       ? Row(
@@ -225,13 +240,15 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: _kPairingOverlayForeground,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.qrPairingInProgress,
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(
+                                color: _kPairingOverlayForeground,
+                              ),
                             ),
                           ],
                         )
@@ -241,14 +258,18 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                             if (_errorMessage != null) ...[
                               Text(
                                 _errorMessage!,
-                                style: const TextStyle(color: Colors.red),
+                                style: const TextStyle(
+                                  color: _kPairingOverlayError,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
                             ],
                             Text(
                               l10n.qrPairingInstruction,
-                              style: const TextStyle(color: Colors.white70),
+                              style: const TextStyle(
+                                color: _kPairingOverlayMutedForeground,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ],

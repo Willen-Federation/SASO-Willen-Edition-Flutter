@@ -476,8 +476,13 @@ class _Auth0Button extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  // Auth0 brand orange (https://auth0.com/brand).
+  // Auth0 brand orange (https://auth0.com/brand). The foreground is pinned to
+  // white because Auth0's brand guidelines specify white-on-orange for the
+  // primary CTA — it does not follow `ColorScheme` in either theme. Both are
+  // declared as named constants so the brand exception is explicit (per #128
+  // acceptance criterion 5) rather than scattered `Colors.white` literals.
   static const _brand = Color(0xFFEB5424);
+  static const _onBrand = Color(0xFFFFFFFF);
 
   @override
   Widget build(BuildContext context) {
@@ -488,7 +493,7 @@ class _Auth0Button extends StatelessWidget {
         onPressed: onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: _brand,
-          foregroundColor: Colors.white,
+          foregroundColor: _onBrand,
           padding: const EdgeInsets.symmetric(vertical: 14),
         ),
         icon: const Icon(Icons.verified_user),

@@ -203,7 +203,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             ),
             if (_processing)
               const Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: CircularProgressIndicator(
+                  color: _kScannerOverlayForeground,
+                ),
               ),
             Positioned(
               bottom: 48,
@@ -212,9 +214,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               child: Text(
                 _hint(l10n),
                 textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: _kScannerOverlayForeground,
+                ),
               ),
             ),
           ],
