@@ -7,6 +7,17 @@ import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../domain/value_objects/feature_code.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../domain/value_objects/shelf_id.dart';
+import '../../../l10n/app_localizations.dart';
+
+/// Foreground color used for the scan-frame border, hint text and processing
+/// spinner that sit on top of the camera preview.
+///
+/// The camera feed is always dark, so a near-white token gives the same legible
+/// contrast in both light and dark app themes — using a `colorScheme` token
+/// here would make the overlay disappear when the user's theme matches the
+/// camera image. Declared as a `const` so the choice is explicit (per #135 ACs)
+/// rather than a stray `Colors.white` literal.
+const Color _kScannerOverlayForeground = Color(0xFFFFFFFF);
 
 /// Determines what happens when a barcode is successfully detected.
 enum ScannerMode {
@@ -100,13 +111,17 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   }
 
   void _offerItemRegistration(String janCode) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('コードを認識できません'),
-        content: Text('$janCode\n\nこのコードで新しいアイテムを登録しますか？'),
+        title: Text(l10n.barcodeScannerUnrecognizedTitle),
+        content: Text(l10n.barcodeScannerUnrecognizedMessage(janCode)),
         actions: [
-          TextButton(onPressed: () => ctx.pop(), child: const Text('キャンセル')),
+          TextButton(
+            onPressed: () => ctx.pop(),
+            child: Text(l10n.cancel),
+          ),
           FilledButton.icon(
             onPressed: () {
               ctx.pop();
@@ -115,61 +130,61 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               );
             },
             icon: const Icon(Icons.add_box_outlined),
-            label: const Text('アイテム登録'),
+            label: Text(l10n.barcodeScannerRegisterItem),
           ),
         ],
       ),
     );
   }
 
-  String get _title => switch (widget.mode) {
-    ScannerMode.search => 'バーコードスキャン',
-    ScannerMode.register => 'バーコード読み取り',
-    ScannerMode.inventory => '入出庫スキャン',
+  String _title(AppLocalizations l10n) => switch (widget.mode) {
+    ScannerMode.search => l10n.barcodeScannerTitleSearch,
+    ScannerMode.register => l10n.barcodeScannerTitleRegister,
+    ScannerMode.inventory => l10n.barcodeScannerTitleInventory,
   };
 
-  String get _hint => switch (widget.mode) {
-    ScannerMode.search => 'バーコードをフレーム内に合わせてください',
-    ScannerMode.register => '読み取るバーコードをフレーム内に合わせてください',
-    ScannerMode.inventory => '棚または商品のバーコードをスキャンしてください',
+  String _hint(AppLocalizations l10n) => switch (widget.mode) {
+    ScannerMode.search => l10n.barcodeScannerHintSearch,
+    ScannerMode.register => l10n.barcodeScannerHintRegister,
+    ScannerMode.inventory => l10n.barcodeScannerHintInventory,
   };
 
   @override
-  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
-    // Camera feed fills the background — force light status-bar icons so
-    // the time / battery indicators stay readable over the (typically
-    // dark) live preview regardless of platform theme.
-    value: SystemUiOverlayStyle.light,
-    child: Scaffold(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
       appBar: AppBar(
-        title: Text(_title),
+        title: Text(_title(l10n)),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
             onPressed: _controller.toggleTorch,
-            tooltip: 'フラッシュ',
+            tooltip: l10n.barcodeScannerTorchTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.flip_camera_ios),
             onPressed: _controller.switchCamera,
-            tooltip: 'カメラ切替',
+            tooltip: l10n.barcodeScannerSwitchCameraTooltip,
           ),
         ],
       ),
-      // The camera preview should fill the whole body (notch included)
-      // for the best framing experience, but the hint text overlay must
-      // not collide with the home indicator on iPhone X+ devices. Wrap
-      // the overlays in a SafeArea (preview stays outside it).
       body: Stack(
         children: [
           MobileScanner(controller: _controller, onDetect: _onDetect),
-          // Scan overlay (centered — naturally inside safe bounds).
+          // Scan overlay — the camera preview underneath is always dark, so we
+          // use a fixed near-white token (see _kScannerOverlayForeground) in
+          // both light and dark themes. This keeps the frame and hint visible
+          // on top of any camera image without depending on the surrounding
+          // ColorScheme.
           Center(
             child: Container(
               width: 240,
               height: 240,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(
+                  color: _kScannerOverlayForeground,
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -190,6 +205,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
