@@ -2,14 +2,24 @@ import 'package:flutter/material.dart';
 
 /// Screen-width breakpoints used across the app.
 ///
-/// Phones are below [mobile]; tablets sit between [mobile] and [tablet];
-/// desktops/web exceed [tablet]. The thresholds were chosen to match the
-/// Material 3 size class boundaries.
+/// Phones are below [mobile]; tablets sit between [mobile] and [desktop];
+/// desktops/web exceed [desktop]. The thresholds match the Material 3
+/// window size class boundaries (compact / medium+expanded / large+).
+///
+/// See: https://m3.material.io/foundations/layout/applying-layout/window-size-classes
 class Breakpoints {
   const Breakpoints._();
 
+  /// Below this width: compact (phones, foldable closed).
   static const double mobile = 600;
-  static const double tablet = 1024;
+
+  /// At or above this width but below [desktop]: medium / expanded
+  /// (tablets in portrait, foldable unfolded, large phones in landscape).
+  static const double tablet = 840;
+
+  /// At or above this width: large / extra-large (desktop, large tablets in
+  /// landscape).
+  static const double desktop = 1200;
 }
 
 enum ScreenSize { mobile, tablet, desktop }
@@ -25,7 +35,7 @@ class Responsive {
 
   static Responsive of(BuildContext context) {
     final w = MediaQuery.sizeOf(context).width;
-    if (w >= Breakpoints.tablet) return Responsive._(ScreenSize.desktop, w);
+    if (w >= Breakpoints.desktop) return Responsive._(ScreenSize.desktop, w);
     if (w >= Breakpoints.mobile) return Responsive._(ScreenSize.tablet, w);
     return Responsive._(ScreenSize.mobile, w);
   }

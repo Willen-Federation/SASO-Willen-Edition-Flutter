@@ -56,10 +56,58 @@ void main() {
       expect(find.byKey(const Key('search_fab')), findsOneWidget);
     });
 
-    testWidgets('displays 4 feature cards in initial viewport', (tester) async {
+    testWidgets('uses 2 columns on mobile viewport', (tester) async {
+      // Phone-sized viewport (<600 logical width) -> 2 columns.
+      tester.view.physicalSize = const Size(390 * 3, 844 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(_buildApp(ApiMode.mock));
       await tester.pumpAndSettle();
-      expect(find.byType(Card), findsNWidgets(4));
+
+      final gridFinder = find.byType(SliverGrid);
+      expect(gridFinder, findsOneWidget);
+      final grid = tester.widget<SliverGrid>(gridFinder);
+      final delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 2);
+    });
+
+    testWidgets('uses 3 columns on tablet viewport', (tester) async {
+      // Tablet-sized viewport (>=600 and <1200 logical width) -> 3 columns.
+      tester.view.physicalSize = const Size(900, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(_buildApp(ApiMode.mock));
+      await tester.pumpAndSettle();
+
+      final gridFinder = find.byType(SliverGrid);
+      expect(gridFinder, findsOneWidget);
+      final grid = tester.widget<SliverGrid>(gridFinder);
+      final delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 3);
+    });
+
+    testWidgets('uses 4 columns on desktop viewport', (tester) async {
+      // Desktop-sized viewport (>=1200 logical width) -> 4 columns.
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(_buildApp(ApiMode.mock));
+      await tester.pumpAndSettle();
+
+      final gridFinder = find.byType(SliverGrid);
+      expect(gridFinder, findsOneWidget);
+      final grid = tester.widget<SliverGrid>(gridFinder);
+      final delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 4);
     });
 
     testWidgets(
