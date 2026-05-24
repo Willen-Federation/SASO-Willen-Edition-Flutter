@@ -77,7 +77,15 @@ make test-all       # 全テスト
 make analyze        # 静的解析
 make fmt            # フォーマット
 make build-ios-sim  # iOSシミュレータービルド
+
+# Android
+make run-android              # 接続中のAndroid端末/エミュレーターで起動
+make build-aab                # Google Play 提出用 Android App Bundle (.aab) ビルド
+make build-apk                # 直接配布テスト用 APK (ABI 分割) ビルド
+make test-android-integration # Androidエミュレーターで結合テスト
 ```
+
+リリースタグ (`v*`) をプッシュすると [`.github/workflows/android_release.yml`](.github/workflows/android_release.yml) が自動的に AAB をビルドし、アーティファクトとして保存します。
 
 ## フィーチャーフラグ
 

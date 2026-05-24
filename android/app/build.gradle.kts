@@ -40,7 +40,13 @@ if (isReleaseArtifactTask && keystoreProperties["storeFile"] == null) {
 
 android {
     namespace = "jp.willen.saso.saso_willen_edition"
-    compileSdk = flutter.compileSdkVersion
+    // Explicit compileSdk pinned to Android 15 (API 35). Google Play requires
+    // targetSdk >= 35 for new app submissions and updates from 2025-08-31.
+    // See https://developer.android.com/google/play/requirements/target-sdk.
+    // Pinning compileSdk to the same level keeps build-time API surface aligned
+    // with the runtime target and prevents Flutter SDK upgrades from silently
+    // bumping the value.
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -59,8 +65,21 @@ android {
 
     defaultConfig {
         applicationId = "jp.willen.saso.saso_willen_edition"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // Explicit SDK levels (issue #140) — do not delegate to
+        // `flutter.minSdkVersion` / `flutter.targetSdkVersion` because those
+        // track the installed Flutter SDK and would shift unexpectedly on
+        // `flutter pub upgrade --major-versions` or Flutter channel changes.
+        //
+        // minSdk 21 (Android 5.0) — kept in sync with
+        // `flutter_launcher_icons.min_sdk_android: 21` in pubspec.yaml.
+        // Amplify SDK uses Java 8 API surface (java.time, …) which works on
+        // API 21 only via the desugaring enabled above (compileOptions).
+        //
+        // targetSdk 35 (Android 15) — required by Google Play from 2025-08-31
+        // for new submissions and updates.
+        // https://developer.android.com/google/play/requirements/target-sdk
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
