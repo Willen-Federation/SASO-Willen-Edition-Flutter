@@ -1,4 +1,5 @@
 /* Localized Info.plist strings — Japanese */
 
 "NSCameraUsageDescription" = "バーコードスキャンのためにカメラを使用します。";
+"NSPhotoLibraryUsageDescription" = "在庫アイテムの登録時に商品画像を選択するため、写真ライブラリへのアクセスを使用します。";
 "CFBundleDisplayName" = "SASO Willen";

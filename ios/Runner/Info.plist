@@ -31,6 +31,13 @@
 	     respects the device language on iPhone 17 / iOS 26.5. -->
 		<key>NSCameraUsageDescription</key>
 		<string>Used to scan barcodes during inventory work.</string>
+		<!-- Issue #121 — required because image_picker is invoked with
+	     ImageSource.gallery (item_register_page.dart, item_search_page.dart).
+	     Missing this key causes an immediate crash on first gallery access
+	     and is a hard App Store Review reject (Guideline 5.1.1).
+	     Localized overrides live in <locale>.lproj/InfoPlist.strings. -->
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Used to attach product photos to inventory items.</string>
 		<key>CFBundleLocalizations</key>
 		<array>
 			<string>en</string>
