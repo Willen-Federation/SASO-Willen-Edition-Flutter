@@ -61,6 +61,18 @@
       should be exfiltrated to Google Drive / a device-transfer cable
       automatically. Re-pairing on a new device is cheap.
     -->
+    <!--
+      Issue #145 — Predictive Back gesture (Android 14+).
+      `enableOnBackInvokedCallback="true"` opts the app into the
+      `OnBackInvokedCallback` API, which is what Flutter uses to
+      drive Material You's "back preview" animation on Android 14+.
+      Without this attribute the OS falls back to the legacy
+      `KEYCODE_BACK` dispatch path and Predictive Back is silently
+      disabled — making the app feel non-native on Pixel/Material You
+      devices (and outright broken once Android 15 makes Predictive
+      Back the default).
+      See: https://docs.flutter.dev/release/breaking-changes/android-predictive-back
+    -->
     <application
         android:label="saso_willen_edition"
         android:name="${applicationName}"
@@ -69,6 +81,7 @@
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
