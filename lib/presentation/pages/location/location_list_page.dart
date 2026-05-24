@@ -106,18 +106,25 @@ class _EmptyView extends StatelessWidget {
   const _EmptyView();
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.warehouse_outlined, size: 64, color: Colors.grey),
-        const SizedBox(height: 12),
-        Text('場所が登録されていません', style: Theme.of(context).textTheme.bodyLarge),
-        const SizedBox(height: 4),
-        const Text('サーバーでストレージロケーションを作成してください'),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.warehouse_outlined,
+            size: 64,
+            color: scheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 12),
+          Text('場所が登録されていません', style: Theme.of(context).textTheme.bodyLarge),
+          const SizedBox(height: 4),
+          const Text('サーバーでストレージロケーションを作成してください'),
+        ],
+      ),
+    );
+  }
 }
 
 class _ErrorView extends StatelessWidget {
@@ -126,20 +133,23 @@ class _ErrorView extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.error_outline, size: 48, color: Colors.red),
-        const SizedBox(height: 8),
-        Text('取得失敗: $error'),
-        const SizedBox(height: 12),
-        FilledButton.icon(
-          onPressed: onRetry,
-          icon: const Icon(Icons.refresh),
-          label: const Text('再試行'),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: scheme.error),
+          const SizedBox(height: 8),
+          Text('取得失敗: $error'),
+          const SizedBox(height: 12),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('再試行'),
+          ),
+        ],
+      ),
+    );
+  }
 }

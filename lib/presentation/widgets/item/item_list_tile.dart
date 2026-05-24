@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/item.dart';
 import 'item_status_badge.dart';
 
@@ -58,7 +59,7 @@ class ItemListTile extends StatelessWidget {
                     '在庫 ${item.totalStock}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: item.totalStock > 0
-                          ? Colors.green
+                          ? context.semanticColors.success
                           : theme.colorScheme.error,
                     ),
                   ),

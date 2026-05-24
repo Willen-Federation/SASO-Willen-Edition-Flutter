@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- FCM notification accent colour — SASO brand blue -->
-    <color name="notification_color">#1976D2</color>
+    <!--
+        FCM notification accent colour — must stay in lock-step with the
+        Flutter seed colour declared in lib/core/theme/app_theme.dart
+        (Color(0xFF1565C0), Material "Blue 800"). The dark-mode override
+        for this token lives in values-night/colors.xml.
+
+        Issue #148 (C9): the previous value (#1976D2 / Blue 700) drifted
+        from the seed and produced two slightly different brand blues on
+        the notification shade vs. the in-app theme.
+    -->
+    <color name="notification_color">#1565C0</color>
 </resources>

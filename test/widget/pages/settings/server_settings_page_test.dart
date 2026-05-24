@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:saso_willen_edition/core/auth/auth_service.dart';
 import 'package:saso_willen_edition/core/feature_flags/feature_flag_service.dart';
 import 'package:saso_willen_edition/core/feature_flags/providers/debug_flag_provider.dart';
+import 'package:saso_willen_edition/core/theme/app_theme.dart';
 import 'package:saso_willen_edition/l10n/app_localizations.dart';
 import 'package:saso_willen_edition/presentation/pages/settings/server_settings_page.dart';
 import 'package:saso_willen_edition/presentation/providers/auth_state_provider.dart';
@@ -22,6 +23,7 @@ import 'package:saso_willen_edition/presentation/providers/server_config_provide
 Widget _wrap(Widget child, List<Override> overrides) => ProviderScope(
   overrides: overrides,
   child: MaterialApp(
+    theme: AppTheme.light,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
