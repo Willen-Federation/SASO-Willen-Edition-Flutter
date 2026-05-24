@@ -206,6 +206,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                       : Icons.flash_on,
                 ),
               ),
+              tooltip: 'フラッシュ切替',
               onPressed: _controller.toggleTorch,
             ),
           ],
@@ -214,14 +215,21 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
           children: [
             MobileScanner(controller: _controller, onDetect: _onDetect),
 
-            // Scanning overlay (centered — naturally inside safe bounds).
+            // Scanning overlay — group the visual frame with its purpose so
+            // VoiceOver announces a single QR scanning region instead of an
+            // unlabeled rectangle.
             Center(
-              child: Container(
-                width: 260,
-                height: 260,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 2),
-                  borderRadius: BorderRadius.circular(12),
+              child: Semantics(
+                container: true,
+                label: 'QRコードスキャン領域',
+                hint: 'QRコードをこの枠に合わせてください',
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),

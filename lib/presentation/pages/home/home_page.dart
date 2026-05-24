@@ -29,10 +29,15 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset(
-              'assets/images/branding/saso-compact-rounded-256.png',
-              height: 28,
-              fit: BoxFit.contain,
+            // Title text already conveys "SASO Willen"; exclude the logo
+            // from the AppBar semantics tree so VoiceOver doesn't read the
+            // brand name twice.
+            ExcludeSemantics(
+              child: Image.asset(
+                'assets/images/branding/saso-compact-rounded-256.png',
+                height: 28,
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(width: 8),
             const Text('SASO Willen'),

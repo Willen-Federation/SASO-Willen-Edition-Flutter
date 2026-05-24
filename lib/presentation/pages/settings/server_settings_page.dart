@@ -234,6 +234,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                 'assets/images/branding/saso-full-512.png',
                 height: 56,
                 fit: BoxFit.contain,
+                semanticLabel: 'SASO Willen ロゴ',
               ),
             ),
           ),
