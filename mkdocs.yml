@@ -79,6 +79,9 @@ plugins:
             Flutter 必要 API 要件定義: Flutter API Requirements
             セキュリティ: Security
             2026-05-17 Medium 監査クローズ: 2026-05-17 medium audit closure
+            リリース: Release
+            App Links / Universal Links 公開ノート: App Links / Universal Links publishing notes
+            App Privacy 栄養ラベル SDK マッピング: App Privacy Nutrition Label SDK Mapping
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -136,6 +139,7 @@ nav:
   - セキュリティ:
     - 2026-05-17 Medium 監査クローズ: security/medium-audit-2026-05-17.md
   - リリース:
+    - App Links / Universal Links 公開ノート: release/applinks.md
     - App Privacy 栄養ラベル SDK マッピング: release/app-privacy-mapping.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md

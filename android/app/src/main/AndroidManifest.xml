@@ -98,7 +98,10 @@
              - The custom-scheme filter is kept as a compatibility fallback
                until the assetlinks.json is published.
              TODO(infra): publish assetlinks.json at auth.willen.jp before
-             retiring the custom-scheme filter.
+             retiring the custom-scheme filter. See docs/release/applinks.md
+             for the full JSON body, fingerprint sourcing, verification
+             checklist, and the mobile-side cleanup steps to run once the
+             infra publish is live (issue #144).
 
              Issue #26-MED-002 — hardening:
              * `launchMode="singleTask"` ensures only one CallbackActivity
