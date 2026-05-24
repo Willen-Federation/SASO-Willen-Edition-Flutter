@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 abstract final class AppTheme {
   /// Material 3 minimum touch target size (48 dp).
   ///
@@ -32,6 +34,11 @@ abstract final class AppTheme {
       border: OutlineInputBorder(),
       filled: true,
     ),
+    // Issue #131 — register semantic colour tokens (success / warning /
+    // error / info) as a ThemeExtension so callers can read them via
+    // `context.semanticColors` without scattering hardcoded Colors.green
+    // etc. across the codebase.
+    extensions: <ThemeExtension<dynamic>>[AppSemanticColors.light()],
   );
 
   static ThemeData get dark => ThemeData(
@@ -51,5 +58,7 @@ abstract final class AppTheme {
       border: OutlineInputBorder(),
       filled: true,
     ),
+    // Issue #131 — dark-mode variant of the semantic colour tokens.
+    extensions: <ThemeExtension<dynamic>>[AppSemanticColors.dark()],
   );
 }

@@ -32,3 +32,36 @@
 
 # mobile_scanner — AVFoundation/Vision Java bridge classes.
 -keep class dev.steenbakker.mobile_scanner.** { *; }
+
+# webview_flutter — WebChromeClient / WebViewClient subclasses are
+# instantiated via reflection by the platform when loading WebViews;
+# R8 must not rename or strip these.
+-keep class io.flutter.plugins.webviewflutter.** { *; }
+-keep class * extends android.webkit.WebChromeClient { *; }
+-keep class * extends android.webkit.WebViewClient { *; }
+
+# connectivity_plus — registers a BroadcastReceiver whose class name is
+# referenced from the manifest at runtime.
+-keep class dev.fluttercommunity.plus.connectivity.** { *; }
+
+# image_picker — FileProvider / Intent extras serialised by name.
+-keep class io.flutter.plugins.imagepicker.** { *; }
+
+# url_launcher — Intent serialisation across processes.
+-keep class io.flutter.plugins.urllauncher.** { *; }
+
+# shared_preferences — preferences XML deserialised by class name.
+-keep class io.flutter.plugins.sharedpreferences.** { *; }
+
+# Catch-all for Flutter plugin registrants and the embedding engine
+# plugin lifecycle. Defends against transitive plugin classes that are
+# referenced reflectively from generated GeneratedPluginRegistrant.
+-keep class io.flutter.plugins.** { *; }
+-keep class io.flutter.embedding.engine.plugins.** { *; }
+
+# Parcelable CREATOR fields are read reflectively by the framework when
+# unmarshalling Parcels. Without this rule R8 may rename or strip them
+# from app-defined Parcelable subclasses.
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}

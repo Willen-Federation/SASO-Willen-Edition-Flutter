@@ -131,6 +131,8 @@ nav:
     - Flutter 必要 API 要件定義: api/flutter-requirements.md
   - セキュリティ:
     - 2026-05-17 Medium 監査クローズ: security/medium-audit-2026-05-17.md
+  - リリース:
+    - App Privacy 栄養ラベル SDK マッピング: release/app-privacy-mapping.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
