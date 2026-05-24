@@ -93,15 +93,15 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
     try {
       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('プライバシーポリシーを開けませんでした: $url')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('プライバシーポリシーを開けませんでした: $url')));
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('プライバシーポリシーを開けませんでした: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('プライバシーポリシーを開けませんでした: $e')));
     }
   }
 
