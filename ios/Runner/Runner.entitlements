@@ -35,6 +35,9 @@
       Team ID + bundle identifier before flipping the SSO flow to use
       https callbacks. Until then, the custom scheme in Info.plist is the
       only callback path that works — kept as compatibility fallback.
+      See docs/release/applinks.md for the AASA body, hosting requirements,
+      verification checklist, and the iOS-side cleanup steps to run once
+      the infra publish is live (issue #144).
     -->
     <key>com.apple.developer.associated-domains</key>
     <array>

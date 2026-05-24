@@ -12,6 +12,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(serverConfigNotifierProvider);
     final isMock = config.apiMode == ApiMode.mock;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final pendingCountAsync = ref.watch(pendingCountProvider);
     final pendingCount = pendingCountAsync.when(
@@ -56,16 +57,23 @@ class HomePage extends ConsumerWidget {
           if (isMock)
             SliverToBoxAdapter(
               child: Container(
-                color: Colors.amber.shade100,
+                color: colorScheme.tertiaryContainer,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.science_outlined, size: 16, color: Colors.amber),
-                    SizedBox(width: 8),
-                    Text('モックモード（サーバー不要）'),
+                    Icon(
+                      Icons.science_outlined,
+                      size: 16,
+                      color: colorScheme.onTertiaryContainer,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'モックモード（サーバー不要）',
+                      style: TextStyle(color: colorScheme.onTertiaryContainer),
+                    ),
                   ],
                 ),
               ),
@@ -81,39 +89,33 @@ class HomePage extends ConsumerWidget {
                   key: const Key('menu_search'),
                   icon: Icons.search,
                   label: 'アイテム検索',
-                  color: Colors.blue,
                   onTap: () => context.push('/items/search'),
                 ),
                 _MenuCard(
                   key: const Key('menu_scanner'),
                   icon: Icons.qr_code_scanner,
                   label: 'バーコードスキャン',
-                  color: Colors.green,
                   onTap: () => context.push('/scanner'),
                 ),
                 _MenuCard(
                   icon: Icons.add_box_outlined,
                   label: 'アイテム登録',
-                  color: Colors.teal,
                   onTap: () => context.push('/items/register'),
                 ),
                 _MenuCard(
                   icon: Icons.warehouse_outlined,
                   label: '場所管理',
-                  color: Colors.indigo,
                   onTap: () => context.push('/locations'),
                 ),
                 _MenuCard(
                   icon: Icons.category_outlined,
                   label: 'カテゴリ',
-                  color: Colors.orange,
                   onTap: () => context.push('/categories'),
                 ),
                 _MenuCard(
                   key: const Key('menu_inventory_scan'),
                   icon: Icons.inventory_2_outlined,
                   label: '入出庫スキャン',
-                  color: Colors.deepOrange,
                   onTap: () => context.push('/scanner?mode=inventory'),
                 ),
               ],
@@ -136,35 +138,39 @@ class _MenuCard extends StatelessWidget {
     super.key,
     required this.icon,
     required this.label,
-    required this.color,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
-  final Color color;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Card(
-    clipBehavior: Clip.hardEdge,
-    child: InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-          ],
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      color: colorScheme.primaryContainer,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: colorScheme.onPrimaryContainer),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
