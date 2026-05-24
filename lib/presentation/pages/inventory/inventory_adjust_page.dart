@@ -3,12 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/storage/database_helper.dart';
-<<<<<<< HEAD
 import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
-=======
-import '../../../core/theme/app_colors.dart';
->>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
 import '../../../data/models/mcp_item_model.dart';
 import '../../../data/models/pending_adjustment.dart';
@@ -638,15 +634,10 @@ class _SuccessView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.check_circle_outline,
-<<<<<<< HEAD
               size: 72, // hero check-mark, larger than display token
               color: Colors.green,
-=======
-              size: 72,
-              color: context.semanticColors.success,
->>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

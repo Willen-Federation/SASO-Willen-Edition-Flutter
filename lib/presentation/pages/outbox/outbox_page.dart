@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/storage/database_helper.dart';
-<<<<<<< HEAD
 import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
-=======
-import '../../../core/theme/app_colors.dart';
->>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
 import '../../../data/datasources/local/pending_registration_dao.dart';
 import '../../../data/models/pending_adjustment.dart';
@@ -164,25 +160,17 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : total == 0
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.check_circle_outline,
-<<<<<<< HEAD
                     size: AppIconSize.display,
                     color: Colors.green,
                   ),
                   SizedBox(height: AppSpacing.md),
                   Text('保留中のデータはありません'),
-=======
-                    size: 64,
-                    color: context.semanticColors.success,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('保留中のデータはありません'),
->>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
                 ],
               ),
             )
@@ -385,17 +373,15 @@ class _StatusIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.semanticColors;
-    final scheme = Theme.of(context).colorScheme;
     return switch (status) {
-      'completed' => Icon(Icons.check_circle, color: tokens.success),
-      'failed' => Icon(Icons.error_outline, color: scheme.error),
+      'completed' => const Icon(Icons.check_circle, color: Colors.green),
+      'failed' => const Icon(Icons.error_outline, color: Colors.red),
       'syncing' => const SizedBox(
         width: 24,
         height: 24,
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
-      _ => Icon(Icons.schedule, color: tokens.warning),
+      _ => const Icon(Icons.schedule, color: Colors.orange),
     };
   }
 }

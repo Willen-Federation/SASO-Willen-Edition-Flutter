@@ -16,21 +16,12 @@ class ErrorDisplayWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-<<<<<<< HEAD
           const Icon(
             Icons.error_outline,
             size: AppIconSize.xxLarge,
             color: Colors.red,
           ),
           const SizedBox(height: AppSpacing.md),
-=======
-          Icon(
-            Icons.error_outline,
-            size: 48,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          const SizedBox(height: 16),
->>>>>>> b0ef396 (feat(theme): migrate hardcoded colors to ColorTokens / ColorScheme (Android compliance))
           Text(
             error.toString(),
             textAlign: TextAlign.center,
