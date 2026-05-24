@@ -166,6 +166,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanResult => 'Scan Result';
 
   @override
+  String get barcodeScannerTitleSearch => 'Scan barcode';
+
+  @override
+  String get barcodeScannerTitleRegister => 'Read barcode';
+
+  @override
+  String get barcodeScannerTitleInventory => 'Inventory scan';
+
+  @override
+  String get barcodeScannerHintSearch => 'Center the barcode inside the frame';
+
+  @override
+  String get barcodeScannerHintRegister =>
+      'Center the barcode you want to read inside the frame';
+
+  @override
+  String get barcodeScannerHintInventory => 'Scan a shelf or item barcode';
+
+  @override
+  String get barcodeScannerTorchTooltip => 'Flashlight';
+
+  @override
+  String get barcodeScannerSwitchCameraTooltip => 'Switch camera';
+
+  @override
+  String get barcodeScannerUnrecognizedTitle => 'Code not recognized';
+
+  @override
+  String barcodeScannerUnrecognizedMessage(String code) {
+    return '$code\n\nRegister a new item with this code?';
+  }
+
+  @override
+  String get barcodeScannerRegisterItem => 'Register item';
+
+  @override
   String get loading => 'Loading...';
 
   @override
@@ -272,6 +308,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSaved => 'Settings saved';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle =>
+      'How we handle your personal data (opens in browser)';
 
   @override
   String get offlineBadge => 'Offline';

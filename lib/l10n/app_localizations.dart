@@ -398,6 +398,72 @@ abstract class AppLocalizations {
   /// **'スキャン結果'**
   String get scanResult;
 
+  /// AppBar title for the barcode scanner in search mode (navigates to matching item/shelf/feature). Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'バーコードスキャン'**
+  String get barcodeScannerTitleSearch;
+
+  /// AppBar title for the barcode scanner in register mode (returns scanned code to caller). Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'バーコード読み取り'**
+  String get barcodeScannerTitleRegister;
+
+  /// AppBar title for the barcode scanner in inventory mode (navigates to inventory adjustment). Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'入出庫スキャン'**
+  String get barcodeScannerTitleInventory;
+
+  /// Hint text shown over camera preview in search mode. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'バーコードをフレーム内に合わせてください'**
+  String get barcodeScannerHintSearch;
+
+  /// Hint text shown over camera preview in register mode. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'読み取るバーコードをフレーム内に合わせてください'**
+  String get barcodeScannerHintRegister;
+
+  /// Hint text shown over camera preview in inventory mode. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'棚または商品のバーコードをスキャンしてください'**
+  String get barcodeScannerHintInventory;
+
+  /// Tooltip for the torch toggle button in the scanner AppBar. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'フラッシュ'**
+  String get barcodeScannerTorchTooltip;
+
+  /// Tooltip for the camera switch button in the scanner AppBar. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'カメラ切替'**
+  String get barcodeScannerSwitchCameraTooltip;
+
+  /// Dialog title when scanned code does not match any item/shelf/feature/ISBN format. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'コードを認識できません'**
+  String get barcodeScannerUnrecognizedTitle;
+
+  /// Dialog body offering to register a new item from an unrecognized scan. Placeholder is the raw scanned code. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'{code}\n\nこのコードで新しいアイテムを登録しますか？'**
+  String barcodeScannerUnrecognizedMessage(String code);
+
+  /// Confirmation button label that navigates to item registration with the scanned code. Issue #135.
+  ///
+  /// In ja, this message translates to:
+  /// **'アイテム登録'**
+  String get barcodeScannerRegisterItem;
+
   /// No description provided for @loading.
   ///
   /// In ja, this message translates to:
@@ -583,6 +649,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'設定を保存しました'**
   String get settingsSaved;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシー'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicySubtitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'個人データの取り扱いについて (ブラウザで開きます)'**
+  String get privacyPolicySubtitle;
 
   /// No description provided for @offlineBadge.
   ///

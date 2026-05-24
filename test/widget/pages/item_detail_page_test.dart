@@ -148,6 +148,26 @@ void main() {
       expect(find.text('アクティブ'), findsOneWidget);
     });
 
+    testWidgets('status badge button meets HIG 44x44 minimum touch target '
+        '(issue #134)', (tester) async {
+      await tester.pumpWidget(_buildPage());
+      await tester.pumpAndSettle();
+
+      final size = tester.getSize(
+        find.byKey(const Key('item_status_badge_button')),
+      );
+      expect(
+        size.width,
+        greaterThanOrEqualTo(44),
+        reason: 'Touch target width must be ≥44pt per HIG/WCAG',
+      );
+      expect(
+        size.height,
+        greaterThanOrEqualTo(44),
+        reason: 'Touch target height must be ≥44pt per HIG/WCAG',
+      );
+    });
+
     testWidgets('tapping badge opens picker and selecting a status invokes '
         'repository.updateStatus', (tester) async {
       final repo = _StubItemRepository(item: _testItem);

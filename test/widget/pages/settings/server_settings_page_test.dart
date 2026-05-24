@@ -131,6 +131,53 @@ void main() {
       },
     );
   });
+
+  group('ServerSettingsPage — privacy policy (#122)', () {
+    testWidgets(
+      'privacy policy tile is rendered in mock mode so it is reachable '
+      'before the user logs in',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(800, 3000));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          _wrap(const ServerSettingsPage(), [
+            serverConfigNotifierProvider.overrideWith(
+              () => _FakeServerConfig(ApiMode.mock),
+            ),
+            authStateNotifierProvider.overrideWith(
+              () => _FakeAuthStateNotifier(),
+            ),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('privacy_policy_tile')), findsOneWidget);
+        expect(find.text('Privacy Policy'), findsOneWidget);
+      },
+    );
+
+    testWidgets('privacy policy tile is also rendered in REST mode', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 3000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        _wrap(const ServerSettingsPage(), [
+          serverConfigNotifierProvider.overrideWith(
+            () => _FakeServerConfig(ApiMode.rest),
+          ),
+          authStateNotifierProvider.overrideWith(
+            () => _FakeAuthStateNotifier(),
+          ),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('privacy_policy_tile')), findsOneWidget);
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------

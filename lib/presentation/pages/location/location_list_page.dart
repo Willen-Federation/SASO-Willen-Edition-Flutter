@@ -65,10 +65,9 @@ class _LocationTile extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         child: Text(
           location.code.substring(0, location.code.length.clamp(0, 2)),
-          style: TextStyle(
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.bold,
-            fontSize: 12,
           ),
         ),
       ),

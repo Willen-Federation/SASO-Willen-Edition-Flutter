@@ -55,6 +55,21 @@
   "cancel": "Cancel",
   "scanBarcode": "Scan Barcode",
   "scanResult": "Scan Result",
+
+  "barcodeScannerTitleSearch": "Scan barcode",
+  "barcodeScannerTitleRegister": "Read barcode",
+  "barcodeScannerTitleInventory": "Inventory scan",
+  "barcodeScannerHintSearch": "Center the barcode inside the frame",
+  "barcodeScannerHintRegister": "Center the barcode you want to read inside the frame",
+  "barcodeScannerHintInventory": "Scan a shelf or item barcode",
+  "barcodeScannerTorchTooltip": "Flashlight",
+  "barcodeScannerSwitchCameraTooltip": "Switch camera",
+  "barcodeScannerUnrecognizedTitle": "Code not recognized",
+  "barcodeScannerUnrecognizedMessage": "{code}\n\nRegister a new item with this code?",
+  "@barcodeScannerUnrecognizedMessage": {
+    "placeholders": { "code": { "type": "String" } }
+  },
+  "barcodeScannerRegisterItem": "Register item",
   "loading": "Loading...",
   "noData": "No data",
   "error": "Error",
@@ -98,6 +113,8 @@
   },
 
   "settingsSaved": "Settings saved",
+  "privacyPolicy": "Privacy Policy",
+  "privacyPolicySubtitle": "How we handle your personal data (opens in browser)",
   "offlineBadge": "Offline",
   "offlineMode": "Offline mode",
   "offlineModeDescription": "When ON, writes are queued locally instead of being sent to the server.",

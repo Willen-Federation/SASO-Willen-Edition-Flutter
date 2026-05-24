@@ -77,7 +77,15 @@ make test-all       # 全テスト
 make analyze        # 静的解析
 make fmt            # フォーマット
 make build-ios-sim  # iOSシミュレータービルド
+
+# Android
+make run-android              # 接続中のAndroid端末/エミュレーターで起動
+make build-aab                # Google Play 提出用 Android App Bundle (.aab) ビルド
+make build-apk                # 直接配布テスト用 APK (ABI 分割) ビルド
+make test-android-integration # Androidエミュレーターで結合テスト
 ```
+
+リリースタグ (`v*`) をプッシュすると [`.github/workflows/android_release.yml`](.github/workflows/android_release.yml) が自動的に AAB をビルドし、アーティファクトとして保存します。
 
 ## フィーチャーフラグ
 
@@ -105,6 +113,19 @@ Firebase機能（FCM・Firebase Auth・Remote Config）を使用するには、�
 
 これらのファイルは `.gitignore` で除外されています。テンプレートは `ios/Runner/GoogleService-Info.plist.template` を参照してください。
 
+## リリース / Release
+
+Android のリリース署名 (`.aab` 生成、keystore 管理、Play App Signing への
+移行検討など) は [docs/release/android-signing.md](docs/release/android-signing.md)
+にまとめています。`android/key.properties.template` をコピーして実値を
+埋めた上で `flutter build appbundle --release` を実行してください。
+
+The Android release signing guide (keystore generation, `.aab` build,
+Play App Signing migration) lives in
+[docs/release/android-signing.md](docs/release/android-signing.md).
+Copy `android/key.properties.template` to `android/key.properties`, fill
+in the credentials, then run `flutter build appbundle --release`.
+
 ## コントリビューション
 
 [CONTRIBUTING.md](CONTRIBUTING.md) をご参照ください。
@@ -116,6 +137,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 このプロジェクトは [Contributor Covenant v2.1](CODE_OF_CONDUCT.md) を行動規範として採用しています。
 This project adopts the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md) as its code of conduct.
+
+---
+
+## プライバシーポリシー / Privacy Policy
+
+App Store / Google Play 提出時に登録する公開プライバシーポリシー URL:
+Public privacy policy URLs registered with App Store / Google Play submissions:
+
+- 日本語: <https://saso-willen-flutter.netlify.app/privacy-policy/>
+- English: <https://saso-willen-flutter.netlify.app/en/privacy-policy/>
+
+ソースは [`docs/privacy-policy.md`](docs/privacy-policy.md) (JA) / [`docs/privacy-policy.en.md`](docs/privacy-policy.en.md) (EN)。リリース提出手順は [`docs/release.md`](docs/release.md) を参照してください。
+Source files: [`docs/privacy-policy.md`](docs/privacy-policy.md) (JA) / [`docs/privacy-policy.en.md`](docs/privacy-policy.en.md) (EN). Submission notes: [`docs/release.md`](docs/release.md).
 
 ---
 

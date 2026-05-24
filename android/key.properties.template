@@ -1,0 +1,14 @@
+# Copy this file to android/key.properties and fill in the values.
+# NEVER commit key.properties to git — it's in .gitignore.
+#
+# See docs/release/android-signing.md for the keystore generation
+# walkthrough, secure-storage policy, and the full release process.
+#
+# storeFile is resolved relative to the android/app directory
+# (where build.gradle.kts lives), so the default below points at a
+# sibling `keystore/` folder beside `android/`. Adjust to match
+# wherever your signing keystore is kept locally.
+storeFile=../keystore/saso-release.jks
+storePassword=__FILL_IN__
+keyAlias=saso
+keyPassword=__FILL_IN__
