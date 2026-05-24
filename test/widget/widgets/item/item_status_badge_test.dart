@@ -60,5 +60,28 @@ void main() {
       final text = tester.widget<Text>(find.text('発送済み'));
       expect(text.style?.fontSize, 11);
     });
+
+    // Issue #151 / #132 — TalkBack & VoiceOver must announce the badge.
+    testWidgets('exposes a semantic label for screen readers', (tester) async {
+      await tester.pumpWidget(
+        _wrap(const ItemStatusBadge(status: ItemStatus.inUse)),
+      );
+      await tester.pumpAndSettle();
+
+      // The badge wraps its content in a Semantics widget whose `label`
+      // mirrors the visible status text — that's what TalkBack and
+      // VoiceOver announce. We assert on the widget tree directly so
+      // the test doesn't need `ensureSemantics()` (which can interact
+      // unpredictably with Material's own semantic nodes).
+      final node = tester.widget<Semantics>(
+        find
+            .ancestor(
+              of: find.text('利用中'),
+              matching: find.byType(Semantics),
+            )
+            .first,
+      );
+      expect(node.properties.label, '利用中');
+    });
   });
 }

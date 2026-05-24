@@ -125,5 +125,94 @@ void main() {
         expect(find.text('入出庫スキャン'), findsOneWidget);
       },
     );
+
+    // ───────────────────────────────────────────────────────────────────
+    // TalkBack / VoiceOver accessibility (Issue #151, #132).
+    //
+    // Verify that every interactive element on the home screen surfaces
+    // a semantics node screen readers can announce. Without these, the
+    // Google Play Pre-launch report fires an a11y warning and
+    // partially-sighted users cannot navigate the app.
+    // ───────────────────────────────────────────────────────────────────
+    testWidgets('every menu card has a Semantics(button: true) wrapper', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(_buildApp(ApiMode.mock));
+      await tester.pumpAndSettle();
+
+      // Each `_MenuCard` is wrapped in `MergeSemantics > Semantics`.
+      // The widget tree also has many *implicit* Semantics nodes (from
+      // Card, InkWell etc.), so we filter to the explicit ones that
+      // declare a label — these are the ones screen readers announce
+      // for the cards.
+      const menuLabels = {
+        'アイテム検索',
+        'バーコードスキャン',
+        'アイテム登録',
+        '場所管理',
+        'カテゴリ',
+        '入出庫スキャン',
+      };
+      final explicitMenuSemantics = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .where((s) => menuLabels.contains(s.properties.label))
+          .toList();
+
+      // All six menu cards must be present and announced as buttons.
+      expect(
+        explicitMenuSemantics.map((s) => s.properties.label).toSet(),
+        menuLabels,
+      );
+      for (final s in explicitMenuSemantics) {
+        expect(
+          s.properties.button,
+          isTrue,
+          reason:
+              'Menu card "${s.properties.label}" must be announced as a button',
+        );
+      }
+    });
+
+    testWidgets('AppBar settings icon button carries a tooltip', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildApp(ApiMode.mock));
+      await tester.pumpAndSettle();
+
+      // IconButton's `tooltip` parameter wires the string into the
+      // widget tree as a Tooltip — TalkBack and VoiceOver pick it up
+      // through Tooltip's built-in semantics. Asserting the tooltip is
+      // present is the unit-test equivalent of confirming the AppBar
+      // icon is announced.
+      final settingsButton = tester.widget<IconButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.settings_outlined),
+          matching: find.byType(IconButton),
+        ),
+      );
+      expect(settingsButton.tooltip, '設定');
+    });
+
+    testWidgets('SASO logo image carries a semantic label', (tester) async {
+      await tester.pumpWidget(_buildApp(ApiMode.mock));
+      await tester.pumpAndSettle();
+
+      // Image.asset's `semanticLabel` is surfaced via the Image widget's
+      // own semantics node, making the branding readable for screen
+      // readers (otherwise the logo would be silent).
+      final image = tester.widget<Image>(
+        find.image(
+          const AssetImage(
+            'assets/images/branding/saso-compact-rounded-256.png',
+          ),
+        ),
+      );
+      expect(image.semanticLabel, 'SASO ロゴ');
+    });
   });
 }

@@ -38,8 +38,10 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   Widget build(BuildContext context) {
     if (!_offline) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    return Semantics(
+      label: l10n.offlineBadge,
+      liveRegion: true,
+      container: true,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -47,23 +49,25 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.orange.shade700),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade900),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                l10n.offlineBadge,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Colors.orange.shade900,
-                  fontWeight: FontWeight.w600,
+        child: ExcludeSemantics(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.cloud_off, size: 16, color: Colors.orange.shade900),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  l10n.offlineBadge,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Colors.orange.shade900,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
