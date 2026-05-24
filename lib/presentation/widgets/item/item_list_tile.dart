@@ -33,9 +33,7 @@ class ItemListTile extends StatelessWidget {
                 backgroundColor: theme.colorScheme.primaryContainer,
                 child: Text(
                   item.name.substring(0, 1),
-                  style: TextStyle(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                  style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
                 ),
               ),
               title: Text(item.name),
