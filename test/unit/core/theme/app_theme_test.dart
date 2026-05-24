@@ -30,4 +30,24 @@ void main() {
       });
     }
   });
+
+  // Issue #124 — iOS native feel: Cupertino theme overlay must be wired
+  // so CupertinoButton / CupertinoAlertDialog / CupertinoPageRoute use
+  // the SASO brand seed (0xFF1565C0), not the Material 3 derived
+  // primary, and must track Material light/dark brightness.
+  group('AppTheme cupertinoOverrideTheme', () {
+    test('light theme exposes a Cupertino override with brand primary', () {
+      final cupertino = AppTheme.light.cupertinoOverrideTheme;
+      expect(cupertino, isNotNull);
+      expect(cupertino!.brightness, Brightness.light);
+      expect(cupertino.primaryColor, const Color(0xFF1565C0));
+    });
+
+    test('dark theme exposes a Cupertino override with dark brightness', () {
+      final cupertino = AppTheme.dark.cupertinoOverrideTheme;
+      expect(cupertino, isNotNull);
+      expect(cupertino!.brightness, Brightness.dark);
+      expect(cupertino.primaryColor, const Color(0xFF1565C0));
+    });
+  });
 }

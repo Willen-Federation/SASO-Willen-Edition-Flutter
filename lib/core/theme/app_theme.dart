@@ -1,9 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 import 'text_theme.dart';
 
 abstract final class AppTheme {
+  /// Brand seed colour used to derive both the Material [ColorScheme] and
+  /// the Cupertino primary tint. Centralised so light/dark/iOS variants
+  /// stay aligned.
+  static const Color _seedColor = Color(0xFF1565C0);
+
   /// Material 3 minimum touch target size (48 dp).
   ///
   /// Used by [IconButton] via [iconButtonTheme] to guarantee that every icon
@@ -18,6 +24,28 @@ abstract final class AppTheme {
     style: IconButton.styleFrom(minimumSize: _minTouchTarget),
   );
 
+  /// Cupertino theme overlay applied to the Material [ThemeData].
+  ///
+  /// `MaterialApp` derives a default [CupertinoThemeData] from its Material
+  /// theme, but the derived palette loses the brand seed colour because
+  /// [ColorScheme.fromSeed] reshuffles roles for Material 3. By passing an
+  /// explicit `cupertinoOverrideTheme` we make sure every Cupertino widget
+  /// (`CupertinoButton`, `CupertinoSwitch`, `CupertinoAlertDialog`,
+  /// `CupertinoPageRoute` swipe-back chrome, etc.) tints with the SASO
+  /// brand colour instead of the Material 3 derived primary, and tracks
+  /// light/dark brightness alongside the Material theme.
+  static CupertinoThemeData _cupertinoOverride(Brightness brightness) {
+    return CupertinoThemeData(
+      brightness: brightness,
+      primaryColor: _seedColor,
+      // Let the rest of the palette flow from Cupertino's defaults so
+      // standard iOS chrome (translucent nav bar, grouped backgrounds,
+      // separator colours) stays platform-native — only the accent
+      // colour is overridden.
+      applyThemeToAll: true,
+    );
+  }
+
   static ThemeData get light {
     // Build the base first so we can layer Noto Sans JP on top of the
     // Material 3 typescale that ThemeData would otherwise hand us.
@@ -29,7 +57,8 @@ abstract final class AppTheme {
       // rather than shrinking below the Material 48 dp baseline.
       visualDensity: VisualDensity.adaptivePlatformDensity,
       iconButtonTheme: _iconButtonTheme,
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+      colorScheme: ColorScheme.fromSeed(seedColor: _seedColor),
+      cupertinoOverrideTheme: _cupertinoOverride(Brightness.light),
     );
     return base.copyWith(
       textTheme: AppTextTheme.resolve(base.textTheme),
@@ -56,9 +85,10 @@ abstract final class AppTheme {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       iconButtonTheme: _iconButtonTheme,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF1565C0),
+        seedColor: _seedColor,
         brightness: Brightness.dark,
       ),
+      cupertinoOverrideTheme: _cupertinoOverride(Brightness.dark),
     );
     return base.copyWith(
       textTheme: AppTextTheme.resolve(base.textTheme),
