@@ -65,6 +65,8 @@ plugins:
             AWS Amplify Pinpoint: AWS Amplify Pinpoint
             iOS デプロイ: iOS deployment
             Android デプロイ: Android deployment
+            リリース: Release
+            Android リリース署名: Android release signing
             機能ガイド: Feature guides
             バーコードスキャン: Barcode scanning
             アイテム検索: Item search
@@ -77,6 +79,9 @@ plugins:
             Flutter 必要 API 要件定義: Flutter API Requirements
             セキュリティ: Security
             2026-05-17 Medium 監査クローズ: 2026-05-17 medium audit closure
+            リリース: Release
+            App Links / Universal Links 公開ノート: App Links / Universal Links publishing notes
+            App Privacy 栄養ラベル SDK マッピング: App Privacy Nutrition Label SDK Mapping
             行動規範: Code of Conduct
             コントリビューション: Contributing
             変更履歴: Changelog
@@ -119,6 +124,8 @@ nav:
     - AWS Amplify Pinpoint: setup/amplify.md
     - iOS デプロイ: setup/ios.md
     - Android デプロイ: setup/android.md
+  - リリース:
+    - Android リリース署名: release/android-signing.md
   - 機能ガイド:
     - バーコードスキャン: features/barcode.md
     - アイテム検索: features/search.md
@@ -131,6 +138,9 @@ nav:
     - Flutter 必要 API 要件定義: api/flutter-requirements.md
   - セキュリティ:
     - 2026-05-17 Medium 監査クローズ: security/medium-audit-2026-05-17.md
+  - リリース:
+    - App Links / Universal Links 公開ノート: release/applinks.md
+    - App Privacy 栄養ラベル SDK マッピング: release/app-privacy-mapping.md
   - 行動規範: code-of-conduct.md
   - コントリビューション: contributing.md
   - 変更履歴: changelog.md
