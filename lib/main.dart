@@ -8,6 +8,28 @@ import 'core/feature_flags/feature_flag_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Issue #126 — Portrait-only operation across iPhone / iPad / Android.
+  //
+  // SASO Willen Edition is a handheld inventory terminal: barcode scanning
+  // is performed one-handed, the camera viewfinder and forms are laid out
+  // vertically, and we have not designed/verified landscape layouts for
+  // the scanner overlay, soft-keyboard forms, or settings drill-downs.
+  // Locking the preferred orientations here is the cross-platform
+  // counterpart to the iOS `UISupportedInterfaceOrientations` declaration
+  // in `ios/Runner/Info.plist` and Android's
+  // `android:screenOrientation="portrait"` on `MainActivity`.
+  //
+  // `portraitUp` + `portraitDown` is intentional: the OS naturally avoids
+  // rotating to upside-down on iPhones with a Home indicator, while still
+  // allowing rotation on iPads / split-view scenarios where the system
+  // honours auto-rotate. To strictly forbid upside-down across the board,
+  // remove `portraitDown` — but be aware that this also blocks the
+  // accessibility "rotation lock = upside-down" feature.
+  await SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // Issue #146 — Android 15 edge-to-edge enforcement.
   //
   // Starting with Android 15 (API 35) the system draws app content behind

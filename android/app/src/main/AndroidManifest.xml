@@ -83,6 +83,15 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="false">
+        <!--
+          Issue #126 — Lock MainActivity to portrait. The Flutter-side
+          `SystemChrome.setPreferredOrientations` call in `lib/main.dart`
+          covers the runtime case, but declaring
+          `android:screenOrientation="portrait"` here ensures the system
+          never even starts the activity in landscape (e.g. when the app
+          is cold-launched while the device is held sideways, or on
+          foldables transitioning between postures).
+        -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -90,6 +99,7 @@
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:screenOrientation="portrait"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <meta-data

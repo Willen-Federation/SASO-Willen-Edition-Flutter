@@ -104,11 +104,15 @@
 		<key>UIMainStoryboardFile</key>
 		<string>Main</string>
 		<!--
-		  Issue #126 — iPhone is Portrait-only (handheld inventory terminal,
-		  one-handed barcode scanning). iPad keeps all 4 orientations per HIG
-		  recommendation for tablets. If you reintroduce landscape on iPhone,
-		  every screen must be verified at landscape geometry (scanner overlay,
-		  forms with keyboard, etc.) — see #126 for the rationale.
+		  Issue #126 — Portrait-only across iPhone *and* iPad. The app is a
+		  handheld inventory terminal used one-handed: every screen
+		  (scanner overlay, soft-keyboard forms, drill-down navigation) is
+		  laid out and verified at portrait geometry only. iPad keeps both
+		  portrait orientations (right-side-up and upside-down) so the
+		  device's auto-rotation accessibility setting still works, but
+		  landscape is intentionally excluded until landscape layouts are
+		  designed and audited. The Flutter-side counterpart is the
+		  `SystemChrome.setPreferredOrientations` call in `lib/main.dart`.
 		-->
 		<key>UISupportedInterfaceOrientations</key>
 		<array>
@@ -118,8 +122,6 @@
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>NSAppTransportSecurity</key>
 		<dict>
@@ -129,6 +131,18 @@
 		     production. See SECURITY.md. -->
 		</dict>
 		<key>UIStatusBarHidden</key>
+		<false/>
+		<!--
+		  App Store Connect export-compliance shortcut. Setting this to
+		  <false/> declares the app uses only standard encryption (HTTPS /
+		  TLS via Apple system frameworks), which is exempt from the U.S.
+		  Bureau of Industry and Security annual self-classification
+		  report. Without this key every TestFlight upload prompts the
+		  release manager to answer the encryption questionnaire by hand,
+		  which is both error-prone and slows the release cadence.
+		  See: https://developer.apple.com/documentation/security/complying_with_encryption_export_regulations
+		-->
+		<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 	</dict>
 </plist>
