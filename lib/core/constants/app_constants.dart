@@ -21,6 +21,22 @@ abstract final class AppConstants {
 
   static const Duration httpTimeout = Duration(seconds: 30);
   static const Duration cacheMaxAge = Duration(hours: 24);
+
+  // ── Privacy Policy URLs (Issue #142 / Issue #122) ──────────────────────
+  //
+  // The same Markdown source lives at docs/legal/privacy-policy.md and is
+  // published by Netlify under both locale paths. Google Play and the App
+  // Store require a publicly reachable, HTTPS, non-geofenced URL, so these
+  // constants must always point at the live site (not a localhost or
+  // tenant-specific URL).
+  //
+  // Both URLs are referenced from server_settings_page.dart and
+  // getting_started_page.dart and chosen by the active locale at link
+  // tap time.
+  static const String privacyPolicyUrlJa =
+      'https://saso-willen-flutter.netlify.app/legal/privacy-policy/';
+  static const String privacyPolicyUrlEn =
+      'https://saso-willen-flutter.netlify.app/en/legal/privacy-policy/';
 }
 
 abstract final class FeatureFlags {

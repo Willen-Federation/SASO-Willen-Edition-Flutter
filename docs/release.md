@@ -9,8 +9,8 @@ This page collects the URLs and references required when submitting the App to t
 
 | 項目 | URL |
 |---|---|
-| プライバシーポリシー（日本語） / Privacy Policy (JA) | <https://saso-willen-flutter.netlify.app/privacy-policy/> |
-| Privacy Policy (English) | <https://saso-willen-flutter.netlify.app/en/privacy-policy/> |
+| プライバシーポリシー（日本語） / Privacy Policy (JA) | <https://saso-willen-flutter.netlify.app/legal/privacy-policy/> |
+| Privacy Policy (English) | <https://saso-willen-flutter.netlify.app/en/legal/privacy-policy/> |
 | サポート URL（GitHub Issues） | <https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/issues> |
 | マーケティング URL（ドキュメントトップ） | <https://saso-willen-flutter.netlify.app/> |
 | ソースコード | <https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter> |
@@ -23,14 +23,14 @@ The Japanese URL above is the canonical URL submitted to App Store Connect ("App
 
 ## ドキュメントサイトへの公開
 
-`docs/privacy-policy.md`（日本語）および `docs/privacy-policy.en.md`（英語）は MkDocs Material の `i18n` プラグインで自動的に多言語化され、`main` ブランチへのマージ後に Netlify へ自動デプロイされます。
+`docs/legal/privacy-policy.md`（日本語）および `docs/legal/privacy-policy.en.md`（英語）は MkDocs Material の `i18n` プラグインで自動的に多言語化され、`main` ブランチへのマージ後に Netlify へ自動デプロイされます。
 
 ローカルでのプレビュー:
 
 ```bash
 pip install -r requirements.txt
 mkdocs serve
-# http://127.0.0.1:8000/privacy-policy/ で表示確認
+# http://127.0.0.1:8000/legal/privacy-policy/ で表示確認
 ```
 
 ---

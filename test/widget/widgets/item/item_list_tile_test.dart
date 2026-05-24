@@ -30,8 +30,9 @@ Item _fakeItem() => Item(
 /// installs around its `Card`. There are many other implicit Semantics
 /// nodes in the widget tree (ListTile, Card, InkWell etc.); we want the
 /// one with a non-null label that starts with the item name.
-Semantics _outerSemantics(WidgetTester tester) =>
-    tester.widgetList<Semantics>(find.byType(Semantics)).firstWhere(
+Semantics _outerSemantics(WidgetTester tester) => tester
+    .widgetList<Semantics>(find.byType(Semantics))
+    .firstWhere(
       (s) =>
           s.properties.label != null &&
           s.properties.label!.startsWith('テストアイテム'),
@@ -39,24 +40,20 @@ Semantics _outerSemantics(WidgetTester tester) =>
 
 void main() {
   group('ItemListTile semantics (Issue #151 / #132)', () {
-    testWidgets(
-      'announces a combined name + status label for screen readers',
-      (tester) async {
-        await tester.pumpWidget(
-          _wrap(ItemListTile(item: _fakeItem(), onTap: () {})),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('announces a combined name + status label for screen readers', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(ItemListTile(item: _fakeItem(), onTap: () {})),
+      );
+      await tester.pumpAndSettle();
 
-        // The composed semantic label is one continuous utterance so
-        // TalkBack/VoiceOver don't read fragments separately.
-        final node = _outerSemantics(tester);
-        expect(
-          node.properties.label,
-          startsWith('テストアイテム, 0 バリエーション, 在庫 0,'),
-        );
-        expect(node.properties.button, isTrue);
-      },
-    );
+      // The composed semantic label is one continuous utterance so
+      // TalkBack/VoiceOver don't read fragments separately.
+      final node = _outerSemantics(tester);
+      expect(node.properties.label, startsWith('テストアイテム, 0 バリエーション, 在庫 0,'));
+      expect(node.properties.button, isTrue);
+    });
 
     testWidgets('label is still announced when onTap is null', (tester) async {
       await tester.pumpWidget(_wrap(ItemListTile(item: _fakeItem())));

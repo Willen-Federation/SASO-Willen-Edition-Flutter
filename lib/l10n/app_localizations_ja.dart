@@ -303,12 +303,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSaved => '設定を保存しました';
 
   @override
-  String get privacyPolicy => 'プライバシーポリシー';
-
-  @override
-  String get privacyPolicySubtitle => '個人データの取り扱いについて (ブラウザで開きます)';
-
-  @override
   String get offlineBadge => 'オフライン';
 
   @override
@@ -411,4 +405,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flagLabelPrint => 'ラベル印刷';
+
+  @override
+  String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String get privacyPolicySubtitle => '個人情報の取り扱いについて（外部ブラウザで開きます）';
+
+  @override
+  String privacyPolicyOpenFailed(String detail) {
+    return 'プライバシーポリシーを開けませんでした: $detail';
+  }
 }

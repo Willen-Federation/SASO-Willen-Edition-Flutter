@@ -145,11 +145,11 @@ This project adopts the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md) as its c
 App Store / Google Play 提出時に登録する公開プライバシーポリシー URL:
 Public privacy policy URLs registered with App Store / Google Play submissions:
 
-- 日本語: <https://saso-willen-flutter.netlify.app/privacy-policy/>
-- English: <https://saso-willen-flutter.netlify.app/en/privacy-policy/>
+- 日本語: <https://saso-willen-flutter.netlify.app/legal/privacy-policy/>
+- English: <https://saso-willen-flutter.netlify.app/en/legal/privacy-policy/>
 
-ソースは [`docs/privacy-policy.md`](docs/privacy-policy.md) (JA) / [`docs/privacy-policy.en.md`](docs/privacy-policy.en.md) (EN)。リリース提出手順は [`docs/release.md`](docs/release.md) を参照してください。
-Source files: [`docs/privacy-policy.md`](docs/privacy-policy.md) (JA) / [`docs/privacy-policy.en.md`](docs/privacy-policy.en.md) (EN). Submission notes: [`docs/release.md`](docs/release.md).
+ソースは [`docs/legal/privacy-policy.md`](docs/legal/privacy-policy.md) (JA) / [`docs/legal/privacy-policy.en.md`](docs/legal/privacy-policy.en.md) (EN)。リリース提出手順は [`docs/release.md`](docs/release.md) を参照してください。
+Source files: [`docs/legal/privacy-policy.md`](docs/legal/privacy-policy.md) (JA) / [`docs/legal/privacy-policy.en.md`](docs/legal/privacy-policy.en.md) (EN). Submission notes: [`docs/release.md`](docs/release.md).
 
 ---
 

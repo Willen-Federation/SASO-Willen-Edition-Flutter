@@ -75,10 +75,7 @@ void main() {
       // unpredictably with Material's own semantic nodes).
       final node = tester.widget<Semantics>(
         find
-            .ancestor(
-              of: find.text('利用中'),
-              matching: find.byType(Semantics),
-            )
+            .ancestor(of: find.text('利用中'), matching: find.byType(Semantics))
             .first,
       );
       expect(node.properties.label, '利用中');

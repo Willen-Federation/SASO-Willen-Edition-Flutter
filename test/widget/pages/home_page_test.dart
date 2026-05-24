@@ -198,21 +198,22 @@ void main() {
       expect(settingsButton.tooltip, '設定');
     });
 
-    testWidgets('SASO logo image carries a semantic label', (tester) async {
+    testWidgets('SASO logo image is excluded from AppBar semantics', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildApp(ApiMode.mock));
       await tester.pumpAndSettle();
 
-      // Image.asset's `semanticLabel` is surfaced via the Image widget's
-      // own semantics node, making the branding readable for screen
-      // readers (otherwise the logo would be silent).
-      final image = tester.widget<Image>(
-        find.image(
-          const AssetImage(
-            'assets/images/branding/saso-compact-rounded-256.png',
-          ),
-        ),
+      // The adjacent Text('SASO Willen') already conveys the brand name
+      // to screen readers, so the logo Image is intentionally wrapped in
+      // ExcludeSemantics to avoid VoiceOver reading the brand twice.
+      final logoFinder = find.image(
+        const AssetImage('assets/images/branding/saso-compact-rounded-256.png'),
       );
-      expect(image.semanticLabel, 'SASO ロゴ');
+      expect(
+        find.ancestor(of: logoFinder, matching: find.byType(ExcludeSemantics)),
+        findsOneWidget,
+      );
     });
   });
 }

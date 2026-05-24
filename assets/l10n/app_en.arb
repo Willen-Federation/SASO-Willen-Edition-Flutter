@@ -113,8 +113,6 @@
   },
 
   "settingsSaved": "Settings saved",
-  "privacyPolicy": "Privacy Policy",
-  "privacyPolicySubtitle": "How we handle your personal data (opens in browser)",
   "offlineBadge": "Offline",
   "offlineMode": "Offline mode",
   "offlineModeDescription": "When ON, writes are queued locally instead of being sent to the server.",
@@ -164,5 +162,12 @@
   "flagAuthFirebase": "Firebase Authentication",
   "flagOfflineMode": "Offline Mode",
   "flagBarcodeScanner": "Barcode Scanner",
-  "flagLabelPrint": "Label Printing"
+  "flagLabelPrint": "Label Printing",
+
+  "privacyPolicy": "Privacy Policy",
+  "privacyPolicySubtitle": "How we handle personal information (opens in your browser)",
+  "privacyPolicyOpenFailed": "Could not open the privacy policy: {detail}",
+  "@privacyPolicyOpenFailed": {
+    "placeholders": { "detail": { "type": "String" } }
+  }
 }

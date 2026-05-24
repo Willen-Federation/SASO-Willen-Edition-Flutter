@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/network/connection_tester.dart';
 import '../../../core/network/url_validator.dart';
 import '../../providers/server_config_provider.dart';
@@ -74,6 +76,33 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
     // Plain URL?
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
     return null;
+  }
+
+  /// Open the locale-appropriate Privacy Policy URL in an external browser.
+  ///
+  /// Issue #142 / #122 require a privacy-policy link in the onboarding
+  /// flow because users may submit credentials on the next screen without
+  /// ever reaching Settings. The link is shown unconditionally; SnackBar
+  /// errors are surfaced rather than failing silently.
+  Future<void> _openPrivacyPolicy() async {
+    final locale = Localizations.localeOf(context);
+    final url = locale.languageCode == 'ja'
+        ? AppConstants.privacyPolicyUrlJa
+        : AppConstants.privacyPolicyUrlEn;
+    final uri = Uri.parse(url);
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('プライバシーポリシーを開けませんでした: $url')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('プライバシーポリシーを開けませんでした: $e')));
+    }
   }
 
   Future<void> _connect() async {
@@ -297,6 +326,23 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // ── Privacy Policy link ───────────────────────────────────
+                //
+                // Required by Google Play (Issue #142) and App Store
+                // (Issue #122). Surfaced here because the next screen
+                // collects credentials — users must be able to review the
+                // policy before signing in.
+                Center(
+                  child: TextButton.icon(
+                    key: const Key('privacy_policy_link'),
+                    onPressed: _openPrivacyPolicy,
+                    icon: const Icon(Icons.privacy_tip_outlined, size: 18),
+                    label: const Text('プライバシーポリシー'),
                   ),
                 ),
               ],

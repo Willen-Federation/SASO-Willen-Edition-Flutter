@@ -171,8 +171,6 @@
   },
 
   "settingsSaved": "設定を保存しました",
-  "privacyPolicy": "プライバシーポリシー",
-  "privacyPolicySubtitle": "個人データの取り扱いについて (ブラウザで開きます)",
   "offlineBadge": "オフライン",
   "offlineMode": "オフラインモード",
   "offlineModeDescription": "ONにすると書き込みをキューに蓄積し、サーバーへ送らない",
@@ -222,5 +220,19 @@
   "flagAuthFirebase": "Firebase認証",
   "flagOfflineMode": "オフラインモード",
   "flagBarcodeScanner": "バーコードスキャン",
-  "flagLabelPrint": "ラベル印刷"
+  "flagLabelPrint": "ラベル印刷",
+
+  "privacyPolicy": "プライバシーポリシー",
+  "@privacyPolicy": {
+    "description": "Label for the privacy policy link shown in settings and onboarding. Required by Google Play and App Store for any app that handles personal data."
+  },
+  "privacyPolicySubtitle": "個人情報の取り扱いについて（外部ブラウザで開きます）",
+  "@privacyPolicySubtitle": {
+    "description": "Subtitle/description shown next to the privacy policy link in settings. Hints that the link opens an external browser."
+  },
+  "privacyPolicyOpenFailed": "プライバシーポリシーを開けませんでした: {detail}",
+  "@privacyPolicyOpenFailed": {
+    "description": "SnackBar shown when url_launcher fails to open the privacy policy URL. Placeholder is the underlying error message.",
+    "placeholders": { "detail": { "type": "String" } }
+  }
 }
