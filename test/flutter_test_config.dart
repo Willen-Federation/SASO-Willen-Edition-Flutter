@@ -32,16 +32,13 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     originalOnError?.call(details);
   };
 
-  await runZonedGuarded(
-    () async => testMain(),
-    (error, stack) {
-      final msg = error.toString();
-      if (msg.contains('GoogleFonts') ||
-          msg.contains('NotoSansJP') ||
-          (msg.contains('font') && msg.contains('was not found'))) {
-        return;
-      }
-      Zone.current.handleUncaughtError(error, stack);
-    },
-  );
+  await runZonedGuarded(() async => testMain(), (error, stack) {
+    final msg = error.toString();
+    if (msg.contains('GoogleFonts') ||
+        msg.contains('NotoSansJP') ||
+        (msg.contains('font') && msg.contains('was not found'))) {
+      return;
+    }
+    Zone.current.handleUncaughtError(error, stack);
+  });
 }
