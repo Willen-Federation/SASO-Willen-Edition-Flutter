@@ -57,11 +57,10 @@ class ItemDetailPage extends ConsumerWidget {
         top: false,
         child: itemAsync.when(
           loading: () => const LoadingWidget(),
-          error:
-              (e, _) => ErrorDisplayWidget(
-                error: e,
-                onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
-              ),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+          ),
           data: (item) => _ItemDetail(item: item),
         ),
       ),
@@ -229,10 +228,9 @@ class _ItemDetail extends ConsumerWidget {
                           s == item.status
                               ? Icons.radio_button_checked
                               : Icons.radio_button_unchecked,
-                          color:
-                              s == item.status
-                                  ? Theme.of(sheetCtx).colorScheme.primary
-                                  : Theme.of(sheetCtx).colorScheme.outline,
+                          color: s == item.status
+                              ? Theme.of(sheetCtx).colorScheme.primary
+                              : Theme.of(sheetCtx).colorScheme.outline,
                         ),
                         title: Row(
                           children: [

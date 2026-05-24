@@ -156,24 +156,23 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
   Future<void> _showPhotoSourceSheet() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      builder:
-          (ctx) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt_outlined),
-                  title: const Text('カメラで撮影'),
-                  onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: const Text('ライブラリから選択'),
-                  onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
-                ),
-              ],
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('カメラで撮影'),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
             ),
-          ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('ライブラリから選択'),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
     );
     if (source == null) return;
     await _pickPhotoAndSearch(source);
@@ -224,40 +223,38 @@ class _ItemSearchPageState extends ConsumerState<ItemSearchPage> {
             _PhotoSearchBanner(
               photo: _searchPhoto!,
               analysing: _analyzingPhoto,
-              onClear:
-                  () => setState(() {
-                    _searchPhoto = null;
-                    _query = '';
-                    _barcode = null;
-                    _isbn = null;
-                    _labelCode = null;
-                    _controller.clear();
-                  }),
+              onClear: () => setState(() {
+                _searchPhoto = null;
+                _query = '';
+                _barcode = null;
+                _isbn = null;
+                _labelCode = null;
+                _controller.clear();
+              }),
             ),
 
           // ── Results ──────────────────────────────────────────────────────
           Expanded(
-            child:
-                _analyzingPhoto
-                    ? const Center(child: LoadingWidget())
-                    : _query.isEmpty
-                    ? const Center(
-                      child: Text(
-                        'キーワードを入力・バーコードをスキャン\nまたは写真で検索',
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                    : _SearchResults(
-                      query:
-                          (_barcode == null &&
-                                  _isbn == null &&
-                                  _labelCode == null)
-                              ? _query
-                              : null,
-                      barcode: _barcode,
-                      isbn: _isbn,
-                      labelCode: _labelCode,
+            child: _analyzingPhoto
+                ? const Center(child: LoadingWidget())
+                : _query.isEmpty
+                ? const Center(
+                    child: Text(
+                      'キーワードを入力・バーコードをスキャン\nまたは写真で検索',
+                      textAlign: TextAlign.center,
                     ),
+                  )
+                : _SearchResults(
+                    query:
+                        (_barcode == null &&
+                            _isbn == null &&
+                            _labelCode == null)
+                        ? _query
+                        : null,
+                    barcode: _barcode,
+                    isbn: _isbn,
+                    labelCode: _labelCode,
+                  ),
           ),
         ],
       ),
@@ -379,11 +376,10 @@ class _SearchResults extends ConsumerWidget {
             crossAxisSpacing: 4,
           ),
           itemCount: items.length,
-          itemBuilder:
-              (_, i) => ItemListTile(
-                item: items[i],
-                onTap: () => context.push('/items/${items[i].id.value}'),
-              ),
+          itemBuilder: (_, i) => ItemListTile(
+            item: items[i],
+            onTap: () => context.push('/items/${items[i].id.value}'),
+          ),
         );
       },
     );

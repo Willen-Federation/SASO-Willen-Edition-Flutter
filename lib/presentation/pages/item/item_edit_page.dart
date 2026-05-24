@@ -27,11 +27,10 @@ class ItemEditPage extends ConsumerWidget {
         top: false,
         child: itemAsync.when(
           loading: () => const LoadingWidget(),
-          error:
-              (e, _) => ErrorDisplayWidget(
-                error: e,
-                onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
-              ),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(itemByIdProvider(itemId)),
+          ),
           data: (item) => _ItemEditForm(item: item),
         ),
       ),
@@ -206,8 +205,8 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
               labelText: 'アイテム名 *',
               border: OutlineInputBorder(),
             ),
-            validator:
-                (v) => (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? '名前を入力してください' : null,
           ),
           const SizedBox(height: AppSpacing.sm),
           TextFormField(
@@ -254,14 +253,13 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
           FilledButton.icon(
             key: const Key('edit_save_button'),
             onPressed: saving ? null : _save,
-            icon:
-                saving
-                    ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                    : const Icon(Icons.save_outlined),
+            icon: saving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.save_outlined),
             label: Text(saving ? '保存中…' : '保存'),
           ),
         ],

@@ -29,16 +29,14 @@ class CategoryBrowserPage extends ConsumerWidget {
         top: false,
         child: categoriesAsync.when(
           loading: () => const LoadingWidget(),
-          error:
-              (e, _) => ErrorDisplayWidget(
-                error: e,
-                onRetry: () => ref.invalidate(categoriesProvider),
-              ),
-          data:
-              (cats) => ListView.builder(
-                itemCount: cats.length,
-                itemBuilder: (_, i) => _CategoryTile(category: cats[i]),
-              ),
+          error: (e, _) => ErrorDisplayWidget(
+            error: e,
+            onRetry: () => ref.invalidate(categoriesProvider),
+          ),
+          data: (cats) => ListView.builder(
+            itemCount: cats.length,
+            itemBuilder: (_, i) => _CategoryTile(category: cats[i]),
+          ),
         ),
       ),
     );

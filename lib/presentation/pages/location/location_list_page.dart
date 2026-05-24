@@ -25,12 +25,10 @@ class LocationListPage extends ConsumerWidget {
         top: false,
         child: locationsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error:
-              (e, _) => _ErrorView(
-                error: e,
-                onRetry:
-                    () => ref.invalidate(storageLocationsProvider(parentId)),
-              ),
+          error: (e, _) => _ErrorView(
+            error: e,
+            onRetry: () => ref.invalidate(storageLocationsProvider(parentId)),
+          ),
           data: (locations) {
             if (locations.isEmpty) {
               return const _EmptyView();
@@ -96,11 +94,10 @@ class _LocationTile extends StatelessWidget {
           const Icon(Icons.chevron_right),
         ],
       ),
-      onTap:
-          () => context.push(
-            '/locations',
-            extra: {'parentId': location.id, 'parentName': location.name},
-          ),
+      onTap: () => context.push(
+        '/locations',
+        extra: {'parentId': location.id, 'parentName': location.name},
+      ),
     );
   }
 }
