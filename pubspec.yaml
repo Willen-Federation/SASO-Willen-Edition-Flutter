@@ -2,7 +2,12 @@ name: saso_willen_edition
 description: >
   SASO Willen Edition — Mobile terminal app for SASO inventory management.
   Handheld scanner/viewer for warehouse workers.
-version: 0.1.0+1
+# Bumped to 1.0.0+1 for the initial App Store submission (Issue #138).
+# `1.0.0` is CFBundleShortVersionString (marketing) and `+1` is
+# CFBundleVersion (build). Both flow into Xcode via FLUTTER_BUILD_NAME /
+# FLUTTER_BUILD_NUMBER — do not duplicate the values in project.pbxproj.
+# See docs/release/versioning.md for the bump policy.
+version: 1.0.0+1
 publish_to: none
 
 environment:
