@@ -55,38 +55,31 @@ Android 13（API 33）以上では、アプリが初回起動時に通知許可�
 
 ## リリースビルド
 
-### 署名キーを生成（初回のみ）
+Google Play への配布や社内テスト配布など、本番署名鍵で `.aab` / `.apk` を
+生成する手順は専用ガイドにまとめています。
+
+[Android リリース署名手順 (docs/release/android-signing.md)](../release/android-signing.md)
+を参照してください。以下のトピックを網羅しています:
+
+- `keytool` でのキーストア生成 (`-validity 10000` 要件含む)
+- `assetlinks.json` 用 SHA-256 fingerprint の取得
+- キーストアの 1Password / KMS での安全な保管ポリシー
+- Play App Signing への移行検討
+- `flutter build appbundle --release` 実行とトラブルシューティング
+
+クイックリファレンスとしては:
 
 ```bash
-keytool -genkey -v \
-  -keystore android/app/saso-release.jks \
-  -alias saso \
-  -keyalg RSA -keysize 2048 -validity 10000
-```
+# 1. android/key.properties.template をコピーして実値を埋める
+cp android/key.properties.template android/key.properties
 
-!!! warning "注意"
-    `.jks` ファイルは **絶対に Git にコミットしないでください。**  
-    `.gitignore` に `android/app/*.jks` を追加してください。
-
-### key.properties を作成
-
-```properties
-# android/key.properties（Git 管理外）
-storePassword=YOUR_STORE_PASSWORD
-keyPassword=YOUR_KEY_PASSWORD
-keyAlias=saso
-storeFile=saso-release.jks
-```
-
-### APK / AAB をビルド
-
-```bash
-# APK（テスト配布用）
-flutter build apk --release
-
-# AAB（Google Play 用）
+# 2. リリースビルド (Play Console 用 .aab)
 flutter build appbundle --release
 ```
+
+`key.properties` が無い状態で `flutter build appbundle --release` を実行
+すると Gradle がエラーで停止します (debug keystore へのフォールバックは
+意図せぬ本番出荷を防ぐため `Release` タスクでは無効です)。
 
 ---
 
