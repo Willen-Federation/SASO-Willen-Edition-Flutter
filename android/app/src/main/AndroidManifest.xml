@@ -139,10 +139,14 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="saso_default_channel"/>
-        <!-- FCM: notification icon (white silhouette on transparent background) -->
+        <!-- FCM: notification icon (white silhouette on transparent background).
+             Issue #153 — Android 5+ only uses the alpha channel of this drawable;
+             a full-colour @mipmap/ic_launcher renders as an opaque white square.
+             ic_stat_saso is a pure-white SASO silhouette on transparent bg,
+             provided at all density buckets under drawable-{m,h,x,xx,xxx}hdpi. -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher"/>
+            android:resource="@drawable/ic_stat_saso"/>
         <!-- FCM: notification accent colour -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
