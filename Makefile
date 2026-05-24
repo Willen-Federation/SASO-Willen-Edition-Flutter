@@ -3,7 +3,8 @@ DART        := dart
 IOS26_DEVICE := E95411CE-1DAF-4FDD-98CB-ED4F0BE0111F
 
 .PHONY: setup gen fmt analyze test test-unit test-widget test-integration \
-        test-all build-ios-sim run-ios clean help verify
+        test-all build-ios-sim run-ios build-aab build-apk run-android \
+        test-android-integration clean help verify
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -48,6 +49,18 @@ build-ios-sim: ## Build debug app for iOS simulator
 
 run-ios: ## Run app on iPhone 17 (iOS 26.4) simulator
 	$(FLUTTER) run -d $(IOS26_DEVICE)
+
+build-aab: gen ## Build release Android App Bundle (.aab) for Google Play
+	$(FLUTTER) build appbundle --release
+
+build-apk: gen ## Build release APK split per ABI (for direct install testing)
+	$(FLUTTER) build apk --release --split-per-abi
+
+run-android: ## Run app on a connected Android device/emulator
+	$(FLUTTER) run
+
+test-android-integration: ## Run integration tests on a connected Android emulator
+	$(FLUTTER) test integration_test/ --timeout 300s
 
 clean: ## Clean build artifacts
 	$(FLUTTER) clean

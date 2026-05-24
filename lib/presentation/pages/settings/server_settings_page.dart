@@ -561,9 +561,9 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                               color: Colors.amber,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'DEBUG',
-                              style: TextStyle(fontSize: 10),
+                              style: Theme.of(context).textTheme.labelSmall,
                             ),
                           ),
                       ],

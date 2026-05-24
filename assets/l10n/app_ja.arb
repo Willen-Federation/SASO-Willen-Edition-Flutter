@@ -64,6 +64,52 @@
   "scanBarcode": "バーコードをスキャン",
   "scanResult": "スキャン結果",
 
+  "barcodeScannerTitleSearch": "バーコードスキャン",
+  "@barcodeScannerTitleSearch": {
+    "description": "AppBar title for the barcode scanner in search mode (navigates to matching item/shelf/feature). Issue #135."
+  },
+  "barcodeScannerTitleRegister": "バーコード読み取り",
+  "@barcodeScannerTitleRegister": {
+    "description": "AppBar title for the barcode scanner in register mode (returns scanned code to caller). Issue #135."
+  },
+  "barcodeScannerTitleInventory": "入出庫スキャン",
+  "@barcodeScannerTitleInventory": {
+    "description": "AppBar title for the barcode scanner in inventory mode (navigates to inventory adjustment). Issue #135."
+  },
+  "barcodeScannerHintSearch": "バーコードをフレーム内に合わせてください",
+  "@barcodeScannerHintSearch": {
+    "description": "Hint text shown over camera preview in search mode. Issue #135."
+  },
+  "barcodeScannerHintRegister": "読み取るバーコードをフレーム内に合わせてください",
+  "@barcodeScannerHintRegister": {
+    "description": "Hint text shown over camera preview in register mode. Issue #135."
+  },
+  "barcodeScannerHintInventory": "棚または商品のバーコードをスキャンしてください",
+  "@barcodeScannerHintInventory": {
+    "description": "Hint text shown over camera preview in inventory mode. Issue #135."
+  },
+  "barcodeScannerTorchTooltip": "フラッシュ",
+  "@barcodeScannerTorchTooltip": {
+    "description": "Tooltip for the torch toggle button in the scanner AppBar. Issue #135."
+  },
+  "barcodeScannerSwitchCameraTooltip": "カメラ切替",
+  "@barcodeScannerSwitchCameraTooltip": {
+    "description": "Tooltip for the camera switch button in the scanner AppBar. Issue #135."
+  },
+  "barcodeScannerUnrecognizedTitle": "コードを認識できません",
+  "@barcodeScannerUnrecognizedTitle": {
+    "description": "Dialog title when scanned code does not match any item/shelf/feature/ISBN format. Issue #135."
+  },
+  "barcodeScannerUnrecognizedMessage": "{code}\n\nこのコードで新しいアイテムを登録しますか？",
+  "@barcodeScannerUnrecognizedMessage": {
+    "description": "Dialog body offering to register a new item from an unrecognized scan. Placeholder is the raw scanned code. Issue #135.",
+    "placeholders": { "code": { "type": "String" } }
+  },
+  "barcodeScannerRegisterItem": "アイテム登録",
+  "@barcodeScannerRegisterItem": {
+    "description": "Confirmation button label that navigates to item registration with the scanned code. Issue #135."
+  },
+
   "loading": "読み込み中...",
   "noData": "データがありません",
   "error": "エラー",

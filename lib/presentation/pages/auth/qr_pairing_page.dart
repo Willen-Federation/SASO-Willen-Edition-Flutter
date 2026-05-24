@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -188,87 +189,97 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.qrPairingTitle),
-        actions: [
-          IconButton(
-            icon: ValueListenableBuilder(
-              valueListenable: _controller,
-              builder: (_, state, __) => Icon(
-                state.torchState == TorchState.on
-                    ? Icons.flash_off
-                    : Icons.flash_on,
+    // Camera preview fills the screen — force light status-bar icons so
+    // they stay readable against the (typically dark) live feed.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.qrPairingTitle),
+          actions: [
+            IconButton(
+              icon: ValueListenableBuilder(
+                valueListenable: _controller,
+                builder: (_, state, __) => Icon(
+                  state.torchState == TorchState.on
+                      ? Icons.flash_off
+                      : Icons.flash_on,
+                ),
+              ),
+              onPressed: _controller.toggleTorch,
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            MobileScanner(controller: _controller, onDetect: _onDetect),
+
+            // Scanning overlay (centered — naturally inside safe bounds).
+            Center(
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-            onPressed: _controller.toggleTorch,
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          MobileScanner(controller: _controller, onDetect: _onDetect),
 
-          // Scanning overlay
-          Center(
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
-                borderRadius: BorderRadius.circular(12),
+            // Status overlay at the bottom — wrap in SafeArea so the
+            // translucent panel does not collide with the iPhone home
+            // indicator.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: Container(
+                  color: Colors.black54,
+                  padding: const EdgeInsets.all(16),
+                  child: _processing
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.qrPairingInProgress,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_errorMessage != null) ...[
+                              Text(
+                                _errorMessage!,
+                                style: const TextStyle(color: Colors.red),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            Text(
+                              l10n.qrPairingInstruction,
+                              style: const TextStyle(color: Colors.white70),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                ),
               ),
             ),
-          ),
-
-          // Status overlay at the bottom
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              color: Colors.black54,
-              padding: const EdgeInsets.all(16),
-              child: _processing
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          l10n.qrPairingInProgress,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_errorMessage != null) ...[
-                          Text(
-                            _errorMessage!,
-                            style: const TextStyle(color: Colors.red),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                        Text(
-                          l10n.qrPairingInstruction,
-                          style: const TextStyle(color: Colors.white70),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -91,11 +91,26 @@ class _ItemDetail extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
+                    // Wrapped in ConstrainedBox to guarantee an HIG-compliant
+                    // 44x44 minimum touch target (issue #134). The badge
+                    // itself stays visually compact; the InkWell expands to
+                    // fill the constrained area so taps near the edges are
+                    // still registered.
                     InkWell(
                       key: const Key('item_status_badge_button'),
                       borderRadius: BorderRadius.circular(12),
                       onTap: () => _pickStatus(context, ref),
-                      child: ItemStatusBadge(status: item.status),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 44,
+                          minHeight: 44,
+                        ),
+                        child: Center(
+                          widthFactor: 1,
+                          heightFactor: 1,
+                          child: ItemStatusBadge(status: item.status),
+                        ),
+                      ),
                     ),
                   ],
                 ),
