@@ -214,6 +214,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       'assets/images/branding/saso-full-512.png',
                       height: 80,
                       fit: BoxFit.contain,
+                      semanticLabel: 'SASO Willen ロゴ',
                     ),
                   ),
                 ),
@@ -436,6 +437,7 @@ class _CredentialForm extends StatelessWidget {
               icon: Icon(
                 obscurePassword ? Icons.visibility_off : Icons.visibility,
               ),
+              tooltip: obscurePassword ? 'パスワードを表示' : 'パスワードを隠す',
               onPressed: onTogglePassword,
             ),
           ),

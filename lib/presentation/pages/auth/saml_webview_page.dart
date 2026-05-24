@@ -136,6 +136,7 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
         title: const Text('SSOログイン'),
         leading: IconButton(
           icon: const Icon(Icons.close),
+          tooltip: '閉じる',
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

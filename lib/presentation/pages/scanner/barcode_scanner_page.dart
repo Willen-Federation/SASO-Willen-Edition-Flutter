@@ -167,21 +167,26 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       body: Stack(
         children: [
           MobileScanner(controller: _controller, onDetect: _onDetect),
-          // Scan overlay — the camera preview underneath is always dark, so we
-          // use a fixed near-white token (see _kScannerOverlayForeground) in
-          // both light and dark themes. This keeps the frame and hint visible
-          // on top of any camera image without depending on the surrounding
-          // ColorScheme.
+          // Scan overlay — group the visual frame with its purpose so
+          // VoiceOver announces it as a single scanning region instead of
+          // an unlabeled rectangle. The camera preview underneath is always
+          // dark, so we use a fixed near-white token in both light and dark
+          // themes; a ColorScheme token would disappear against the camera.
           Center(
-            child: Container(
-              width: 240,
-              height: 240,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: _kScannerOverlayForeground,
-                  width: 2,
+            child: Semantics(
+              container: true,
+              label: 'バーコードスキャン領域',
+              hint: 'バーコードをこの枠に合わせてください',
+              child: Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _kScannerOverlayForeground,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),

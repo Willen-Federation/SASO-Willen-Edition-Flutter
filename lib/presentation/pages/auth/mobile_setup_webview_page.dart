@@ -198,6 +198,7 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
         title: Text(title),
         leading: IconButton(
           icon: const Icon(Icons.close),
+          tooltip: '閉じる',
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
