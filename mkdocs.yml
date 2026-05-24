@@ -65,6 +65,8 @@ plugins:
             AWS Amplify Pinpoint: AWS Amplify Pinpoint
             iOS デプロイ: iOS deployment
             Android デプロイ: Android deployment
+            リリース: Release
+            Android リリース署名: Android release signing
             機能ガイド: Feature guides
             バーコードスキャン: Barcode scanning
             アイテム検索: Item search
@@ -122,6 +124,8 @@ nav:
     - AWS Amplify Pinpoint: setup/amplify.md
     - iOS デプロイ: setup/ios.md
     - Android デプロイ: setup/android.md
+  - リリース:
+    - Android リリース署名: release/android-signing.md
   - 機能ガイド:
     - バーコードスキャン: features/barcode.md
     - アイテム検索: features/search.md

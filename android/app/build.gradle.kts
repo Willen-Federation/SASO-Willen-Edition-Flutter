@@ -9,11 +9,33 @@ plugins {
 
 // Release-signing properties loaded from android/key.properties (gitignored).
 // Expected keys: storeFile, storePassword, keyAlias, keyPassword.
+// See docs/release/android-signing.md for the keystore generation +
+// secure-storage walkthrough. A starter is checked in as
+// android/key.properties.template.
 val keystoreProperties = Properties().apply {
     val propertiesFile = rootProject.file("key.properties")
     if (propertiesFile.exists()) {
         load(propertiesFile.inputStream())
     }
+}
+
+// Issue #156 — fail fast when a real release build is requested without
+// signing credentials. `flutter run --release` and other local dev tasks
+// still fall back to the debug keystore (see buildTypes.release below);
+// the guard here only fires for tasks that produce shippable artefacts
+// such as `bundleRelease` / `assembleRelease`. Without this, missing
+// credentials would silently sign the AAB with the debug keystore and
+// be rejected by Play Console only at upload time.
+val isReleaseArtifactTask = gradle.startParameter.taskNames.any { taskName ->
+    val lower = taskName.lowercase()
+    lower.contains("bundlerelease") || lower.contains("assemblerelease")
+}
+if (isReleaseArtifactTask && keystoreProperties["storeFile"] == null) {
+    throw GradleException(
+        "android/key.properties is missing — release builds require a real " +
+            "signing keystore. See docs/release/android-signing.md for the " +
+            "setup walkthrough. Template: android/key.properties.template.",
+    )
 }
 
 android {
