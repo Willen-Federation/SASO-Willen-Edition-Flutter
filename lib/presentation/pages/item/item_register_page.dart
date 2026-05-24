@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../data/datasources/local/pending_registration_dao.dart';
 import '../../../data/datasources/local/price_history_dao.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
@@ -597,7 +598,11 @@ class _ProductInfoCard extends StatelessWidget {
           ].join(' · '),
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        trailing: const Icon(Icons.auto_awesome, size: 16, color: Colors.amber),
+        trailing: Icon(
+          Icons.auto_awesome,
+          size: 16,
+          color: context.semanticColors.warning,
+        ),
       ),
     );
   }
@@ -945,10 +950,10 @@ class _SuccessView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.check_circle_outline,
                 size: 72,
-                color: Colors.green,
+                color: context.semanticColors.success,
               ),
               const SizedBox(height: 16),
               Text(

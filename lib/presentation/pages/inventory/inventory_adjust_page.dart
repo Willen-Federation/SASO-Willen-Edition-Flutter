@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
@@ -634,10 +635,10 @@ class _SuccessView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle_outline,
               size: 72, // hero check-mark, larger than display token
-              color: Colors.green,
+              color: context.semanticColors.success,
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:saso_willen_edition/l10n/app_localizations.dart';
 
 import '../../../core/errors/problem_details.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
 /// MaterialBanner that surfaces a `SASO-MOBILE-2008` scope-insufficient
@@ -23,11 +24,12 @@ class ScopeDeniedBanner extends StatelessWidget {
   static void show(BuildContext context, ProblemDetails problem) {
     if (!problem.isScopeInsufficient) return;
     final messenger = ScaffoldMessenger.of(context);
+    final warning = context.semanticColors;
     messenger.clearMaterialBanners();
     messenger.showMaterialBanner(
       MaterialBanner(
-        leading: const Icon(Icons.lock_outline, color: Colors.amber),
-        backgroundColor: Colors.amber.shade50,
+        leading: Icon(Icons.lock_outline, color: warning.warning),
+        backgroundColor: warning.warningContainer,
         content: ScopeDeniedBanner(problem: problem),
         actions: [
           TextButton(
