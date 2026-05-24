@@ -401,6 +401,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                   key: const Key('delta_decrement'),
                   onPressed: _delta > 1 ? () => setState(() => _delta--) : null,
                   icon: const Icon(Icons.remove),
+                  tooltip: '数量を減らす',
                 ),
                 const SizedBox(width: 24),
                 Text(
@@ -413,6 +414,7 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
                   key: const Key('delta_increment'),
                   onPressed: () => setState(() => _delta++),
                   icon: const Icon(Icons.add),
+                  tooltip: '数量を増やす',
                 ),
               ],
             ),

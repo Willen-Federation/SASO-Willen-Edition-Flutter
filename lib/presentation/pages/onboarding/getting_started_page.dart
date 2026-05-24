@@ -158,47 +158,57 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                 const SizedBox(height: 40),
 
                 // ── QR scan card ───────────────────────────────────────────
-                Card(
-                  child: InkWell(
-                    onTap: _connecting ? null : _scanQrCode,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.qr_code_scanner,
-                              color: colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'QRコードをスキャン',
-                                  style: theme.textTheme.titleSmall,
+                MergeSemantics(
+                  child: Semantics(
+                    button: true,
+                    enabled: !_connecting,
+                    label:
+                        'QRコードをスキャン。'
+                        'サーバー管理画面に表示されるQRコードを読み取ります',
+                    child: Card(
+                      child: InkWell(
+                        onTap: _connecting ? null : _scanQrCode,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primaryContainer,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'サーバー管理画面に表示されるQRコードを読み取ります',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
+                                child: Icon(
+                                  Icons.qr_code_scanner,
+                                  color: colorScheme.onPrimaryContainer,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'QRコードをスキャン',
+                                      style: theme.textTheme.titleSmall,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'サーバー管理画面に表示されるQRコードを読み取ります',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right),
+                            ],
                           ),
-                          const Icon(Icons.chevron_right),
-                        ],
+                        ),
                       ),
                     ),
                   ),

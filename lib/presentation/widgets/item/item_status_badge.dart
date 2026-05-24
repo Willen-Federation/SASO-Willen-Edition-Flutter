@@ -27,20 +27,25 @@ class ItemStatusBadge extends StatelessWidget {
     final baseStyle = compact
         ? theme.textTheme.labelSmall
         : theme.textTheme.labelMedium;
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 12,
-        vertical: compact ? 2 : 4,
-      ),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        labelFor(status, context),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: baseStyle?.copyWith(color: fg, fontWeight: FontWeight.w600),
+    final label = labelFor(status, context);
+    return Semantics(
+      label: label,
+      container: true,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 8 : 12,
+          vertical: compact ? 2 : 4,
+        ),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: baseStyle?.copyWith(color: fg, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

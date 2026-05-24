@@ -157,26 +157,43 @@ class _MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Card(
-      clipBehavior: Clip.hardEdge,
-      color: colorScheme.primaryContainer,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: colorScheme.onPrimaryContainer),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                ),
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        label: label,
+        child: Card(
+          clipBehavior: Clip.hardEdge,
+          color: colorScheme.primaryContainer,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Icon is decorative — the parent Semantics already exposes
+                  // the label to TalkBack/VoiceOver, so we exclude it to avoid
+                  // duplicate readouts.
+                  ExcludeSemantics(
+                    child: Icon(
+                      icon,
+                      size: 40,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ExcludeSemantics(
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
