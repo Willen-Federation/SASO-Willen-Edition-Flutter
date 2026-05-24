@@ -13,6 +13,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(serverConfigNotifierProvider);
     final isMock = config.apiMode == ApiMode.mock;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final pendingCountAsync = ref.watch(pendingCountProvider);
     final pendingCount = pendingCountAsync.when(
