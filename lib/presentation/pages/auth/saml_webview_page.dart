@@ -24,7 +24,7 @@ import '../../../core/network/url_validator.dart';
 /// Usage:
 ///   final token = await Navigator.push&lt;String&gt;(
 ///     context,
-///     MaterialPageRoute(builder: (_) => SamlWebViewPage(loginUrl: url)),
+///     adaptivePageRoute(builder: (_) => SamlWebViewPage(loginUrl: url)),
 ///   );
 class SamlWebViewPage extends StatefulWidget {
   const SamlWebViewPage({super.key, required this.loginUrl});
