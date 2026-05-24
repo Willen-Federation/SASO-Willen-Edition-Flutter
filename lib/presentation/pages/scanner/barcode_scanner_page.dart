@@ -174,22 +174,19 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               ),
             ),
           ),
-          if (_processing)
-            const Center(child: CircularProgressIndicator(color: Colors.white)),
-          // Bottom hint — keep clear of the home indicator.
-          SafeArea(
-            top: false,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 32, left: 16, right: 16),
-                child: Text(
-                  _hint,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ),
+        ),
+        if (_processing)
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+        Positioned(
+          bottom: 48,
+          left: 0,
+          right: 0,
+          child: Text(
+            _hint,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
         ],
       ),
