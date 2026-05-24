@@ -174,7 +174,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
           child: Text(
             _hint,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
         ),
       ],

@@ -1,4 +1,48 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Issue #141 — explicit permission declarations for Google Play review.
+      Previously only POST_NOTIFICATIONS and RECEIVE_BOOT_COMPLETED were
+      declared explicitly; INTERNET / CAMERA were merged transitively from
+      the `http` and `mobile_scanner` plugin manifests. Google Play review
+      flags these implicit declarations as unclear, so we mirror them here.
+
+      Also: `image_picker` v1+ transitively requests READ_MEDIA_IMAGES /
+      READ_MEDIA_VIDEO / READ_EXTERNAL_STORAGE. Under the Google Play
+      Photo & Video Permissions policy (effective 2025-01-22) these are
+      reserved for apps with a *broad* photo-access use case (gallery,
+      photo manager). SASO Willen Edition only needs the Android Photo
+      Picker (system picker, available on Android 13+ and back-ported via
+      image_picker), so the broad-storage permissions must be removed
+      from the merged manifest via `tools:node="remove"`.
+
+      Verification: after a release App Bundle build, the merged
+      manifest report at
+      app/build/outputs/logs/manifest-merger-release-report.txt
+      must show the three READ_* permissions as removed and no Play
+      Console warnings should appear on upload.
+    -->
+
+    <!-- HTTP network access. Flutter's tooling adds this transitively in
+         debug builds, but explicit declaration is the recommended
+         release-build practice (and required for some lint checks). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Camera for barcode scanning (mobile_scanner). The matching
+         <uses-feature> is declared with required="false" so devices
+         without a camera can still install the app (Play filter). -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+
+    <!-- Strip image_picker's transitive broad-storage permissions.
+         image_picker >=1.0 uses the Android Photo Picker on API 33+ and
+         falls back to ACTION_OPEN_DOCUMENT on older versions, so none of
+         these are actually required at runtime. Leaving them declared
+         risks Play rejection under the Photo & Video Permissions policy. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
+
     <!-- Android 13+ runtime notification permission (POST_NOTIFICATIONS) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Required for FCM background delivery on some devices -->
