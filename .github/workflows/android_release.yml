@@ -1,0 +1,101 @@
+name: Android Release Build
+
+# Trigger on version tag pushes (e.g. `v1.0.0`) and on-demand manual
+# dispatch from the Actions UI. Pull requests intentionally do NOT
+# trigger this workflow — release builds are a maintainer concern and
+# would balloon CI minutes on every PR.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# Workflow-level default: read-only (issue #26-MED-005). The build
+# job only needs `contents: read` to checkout source and upload its
+# artifact through GitHub's API. No write surface required.
+permissions:
+  contents: read
+
+env:
+  # Keep this in sync with .github/workflows/flutter_ci.yml so analyze
+  # and release builds resolve identical SDK semantics.
+  FLUTTER_VERSION: '3.44.0'
+
+jobs:
+  build-aab:
+    name: Build Android App Bundle (.aab)
+    runs-on: ubuntu-latest
+    steps:
+      # Issue #26-MED-004 — third-party actions SHA-pinned, refreshed
+      # weekly by Dependabot (see .github/dependabot.yml).
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # JDK 17 matches docs/setup/android.md and is the minimum AGP
+      # 8.9.x supports. `temurin` is the Eclipse Adoptium build used
+      # by `subosito/flutter-action` itself, keeping the JVMs aligned.
+      - name: Set up JDK 17
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generation
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # Release build. Signing falls back to the debug keystore when
+      # `android/key.properties` is absent (see android/app/build.gradle.kts).
+      # Real Play Store releases must run with the production keystore
+      # — handled by issue #E17 (keystore management) once it lands.
+      - name: Build Android App Bundle
+        run: flutter build appbundle --release
+
+      # Record the AAB byte size so we can track R8 minify regressions
+      # over time. Output ends up in the run summary and the artifact.
+      - name: Record build size
+        run: |
+          mkdir -p build-meta
+          ls -lh build/app/outputs/bundle/release/*.aab \
+            | tee build-meta/aab-size.txt
+          echo "## AAB size" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat build-meta/aab-size.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: app-release-aab
+          path: |
+            build/app/outputs/bundle/release/*.aab
+            build-meta/aab-size.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      # Optional: upload to Play Console Internal Testing track.
+      # Disabled by default — requires the following repository secrets
+      # to be provisioned before the maintainer flips this on:
+      #   * PLAY_SERVICE_ACCOUNT_JSON  — service-account JSON key with
+      #     Play Console "Release manager" role on this app.
+      #   * PLAY_PACKAGE_NAME          — e.g. jp.willen.saso.saso_willen_edition.
+      # See https://github.com/r0adkll/upload-google-play for setup.
+      #
+      # - name: Upload to Play Console (Internal Testing)
+      #   uses: r0adkll/upload-google-play@<SHA>  # pin once enabled
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      #     packageName: ${{ secrets.PLAY_PACKAGE_NAME }}
+      #     releaseFiles: build/app/outputs/bundle/release/app-release.aab
+      #     track: internal
+      #     status: draft
