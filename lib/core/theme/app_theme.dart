@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'text_theme.dart';
 
 abstract final class AppTheme {
   /// Material 3 minimum touch target size (48 dp).
@@ -17,48 +18,61 @@ abstract final class AppTheme {
     style: IconButton.styleFrom(minimumSize: _minTouchTarget),
   );
 
-  static ThemeData get light => ThemeData(
-    useMaterial3: true,
-    // Adapt control density to the host platform's accessibility settings
-    // (e.g. Android "Display size = Larger") so touch targets scale up rather
-    // than shrinking below the Material 48 dp baseline.
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    iconButtonTheme: _iconButtonTheme,
-    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
-    appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
-    cardTheme: const CardThemeData(
-      elevation: 1,
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
-      filled: true,
-    ),
-    // Issue #131 — register semantic colour tokens (success / warning /
-    // error / info) as a ThemeExtension so callers can read them via
-    // `context.semanticColors` without scattering hardcoded Colors.green
-    // etc. across the codebase.
-    extensions: <ThemeExtension<dynamic>>[AppSemanticColors.light()],
-  );
+  static ThemeData get light {
+    // Build the base first so we can layer Noto Sans JP on top of the
+    // Material 3 typescale that ThemeData would otherwise hand us.
+    // ColorScheme.fromSeed gives the M3 typography its colour roles.
+    final base = ThemeData(
+      useMaterial3: true,
+      // Adapt control density to the host platform's accessibility settings
+      // (e.g. Android "Display size = Larger") so touch targets scale up
+      // rather than shrinking below the Material 48 dp baseline.
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      iconButtonTheme: _iconButtonTheme,
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+    );
+    return base.copyWith(
+      textTheme: AppTextTheme.resolve(base.textTheme),
+      appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
+      cardTheme: const CardThemeData(
+        elevation: 1,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+        filled: true,
+      ),
+      // Issue #131 — register semantic colour tokens (success / warning /
+      // error / info) as a ThemeExtension so callers can read them via
+      // `context.semanticColors` without scattering hardcoded Colors.green
+      // etc. across the codebase.
+      extensions: <ThemeExtension<dynamic>>[AppSemanticColors.light()],
+    );
+  }
 
-  static ThemeData get dark => ThemeData(
-    useMaterial3: true,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    iconButtonTheme: _iconButtonTheme,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1565C0),
-      brightness: Brightness.dark,
-    ),
-    appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
-    cardTheme: const CardThemeData(
-      elevation: 1,
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
-      filled: true,
-    ),
-    // Issue #131 — dark-mode variant of the semantic colour tokens.
-    extensions: <ThemeExtension<dynamic>>[AppSemanticColors.dark()],
-  );
+  static ThemeData get dark {
+    final base = ThemeData(
+      useMaterial3: true,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      iconButtonTheme: _iconButtonTheme,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF1565C0),
+        brightness: Brightness.dark,
+      ),
+    );
+    return base.copyWith(
+      textTheme: AppTextTheme.resolve(base.textTheme),
+      appBarTheme: const AppBarTheme(centerTitle: false, elevation: 0),
+      cardTheme: const CardThemeData(
+        elevation: 1,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+        filled: true,
+      ),
+      // Issue #131 — dark-mode variant of the semantic colour tokens.
+      extensions: <ThemeExtension<dynamic>>[AppSemanticColors.dark()],
+    );
+  }
 }
