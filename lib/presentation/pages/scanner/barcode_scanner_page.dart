@@ -189,24 +189,19 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
               ),
             ),
           ),
-          if (_processing)
-            const Center(
-              child: CircularProgressIndicator(
-                color: _kScannerOverlayForeground,
-              ),
-            ),
-          Positioned(
-            bottom: 48,
-            left: 0,
-            right: 0,
-            child: Text(
-              _hint(l10n),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: _kScannerOverlayForeground,
-                fontSize: 14,
-              ),
-            ),
+        ),
+        if (_processing)
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+        Positioned(
+          bottom: 48,
+          left: 0,
+          right: 0,
+          child: Text(
+            _hint,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
         ],
       ),
