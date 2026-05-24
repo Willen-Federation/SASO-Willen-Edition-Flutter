@@ -131,9 +131,10 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
       if (!mounted) return;
       if (result['found'] == true && result['item'] != null) {
         setState(
-          () => _item = McpItemModel.fromJson(
-            result['item'] as Map<String, dynamic>,
-          ),
+          () =>
+              _item = McpItemModel.fromJson(
+                result['item'] as Map<String, dynamic>,
+              ),
         );
       } else {
         setState(() => _errorMessage = 'アイテムが見つかりません');
@@ -173,12 +174,13 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text('オフラインモード: キューに保存しました')));
       setState(
-        () => _result = StockAdjustmentResult(
-          itemId: _item!.id,
-          previousStock: _item!.stock,
-          newStock: _item!.stock + signedDelta,
-          delta: signedDelta,
-        ),
+        () =>
+            _result = StockAdjustmentResult(
+              itemId: _item!.id,
+              previousStock: _item!.stock,
+              newStock: _item!.stock + signedDelta,
+              delta: signedDelta,
+            ),
       );
       return;
     }
@@ -233,42 +235,43 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
     final controller = TextEditingController();
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('棚番号を入力'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.characters,
-          decoration: const InputDecoration(
-            hintText: '例: A-01',
-            labelText: '棚番号',
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('棚番号を入力'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              textCapitalization: TextCapitalization.characters,
+              decoration: const InputDecoration(
+                hintText: '例: A-01',
+                labelText: '棚番号',
+              ),
+              onSubmitted: (v) {
+                ctx.pop();
+                if (v.isNotEmpty) {
+                  setState(() {
+                    _scannedShelfId = v;
+                    _phase = _Phase.item;
+                  });
+                }
+              },
+            ),
+            actions: [
+              TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
+              FilledButton(
+                onPressed: () {
+                  ctx.pop();
+                  if (controller.text.isNotEmpty) {
+                    setState(() {
+                      _scannedShelfId = controller.text;
+                      _phase = _Phase.item;
+                    });
+                  }
+                },
+                child: const Text('確定'),
+              ),
+            ],
           ),
-          onSubmitted: (v) {
-            ctx.pop();
-            if (v.isNotEmpty) {
-              setState(() {
-                _scannedShelfId = v;
-                _phase = _Phase.item;
-              });
-            }
-          },
-        ),
-        actions: [
-          TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
-          FilledButton(
-            onPressed: () {
-              ctx.pop();
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _scannedShelfId = controller.text;
-                  _phase = _Phase.item;
-                });
-              }
-            },
-            child: const Text('確定'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -276,44 +279,45 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
     final controller = TextEditingController();
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('商品コードを入力'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            hintText: '例: 00001234',
-            labelText: '商品コード / JANコード',
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('商品コードを入力'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
+                hintText: '例: 00001234',
+                labelText: '商品コード / JANコード',
+              ),
+              onSubmitted: (v) {
+                ctx.pop();
+                if (v.isNotEmpty) {
+                  setState(() {
+                    _scannedItemCode = v;
+                    _phase = _Phase.adjust;
+                  });
+                  _resolveItem(v);
+                }
+              },
+            ),
+            actions: [
+              TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
+              FilledButton(
+                onPressed: () {
+                  ctx.pop();
+                  if (controller.text.isNotEmpty) {
+                    setState(() {
+                      _scannedItemCode = controller.text;
+                      _phase = _Phase.adjust;
+                    });
+                    _resolveItem(controller.text);
+                  }
+                },
+                child: const Text('確定'),
+              ),
+            ],
           ),
-          onSubmitted: (v) {
-            ctx.pop();
-            if (v.isNotEmpty) {
-              setState(() {
-                _scannedItemCode = v;
-                _phase = _Phase.adjust;
-              });
-              _resolveItem(v);
-            }
-          },
-        ),
-        actions: [
-          TextButton(onPressed: ctx.pop, child: const Text('キャンセル')),
-          FilledButton(
-            onPressed: () {
-              ctx.pop();
-              if (controller.text.isNotEmpty) {
-                setState(() {
-                  _scannedItemCode = controller.text;
-                  _phase = _Phase.adjust;
-                });
-                _resolveItem(controller.text);
-              }
-            },
-            child: const Text('確定'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -421,14 +425,15 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
             const SizedBox(height: 8),
             SegmentedButton<AdjustmentReason>(
               key: const Key('reason_selector'),
-              segments: AdjustmentReason.values
-                  .map(
-                    (r) => ButtonSegment<AdjustmentReason>(
-                      value: r,
-                      label: Text(r.label),
-                    ),
-                  )
-                  .toList(),
+              segments:
+                  AdjustmentReason.values
+                      .map(
+                        (r) => ButtonSegment<AdjustmentReason>(
+                          value: r,
+                          label: Text(r.label),
+                        ),
+                      )
+                      .toList(),
               selected: {_reason},
               onSelectionChanged: (s) => setState(() => _reason = s.first),
             ),
@@ -443,13 +448,14 @@ class _InventoryAdjustPageState extends ConsumerState<InventoryAdjustPage> {
             FilledButton.icon(
               key: const Key('submit_button'),
               onPressed: (_submitting || _item == null) ? null : _submit,
-              icon: _submitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.check_circle_outline),
+              icon:
+                  _submitting
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.check_circle_outline),
               label: Text(_submitting ? '処理中…' : '確定'),
             ),
           ],
@@ -617,8 +623,8 @@ class _SuccessView extends StatelessWidget {
               children: [
                 OutlinedButton.icon(
                   key: const Key('continue_scan'),
-                  onPressed: () =>
-                      context.pushReplacement('/scanner?mode=inventory'),
+                  onPressed:
+                      () => context.pushReplacement('/scanner?mode=inventory'),
                   icon: const Icon(Icons.qr_code_scanner),
                   label: const Text('続けてスキャン'),
                 ),

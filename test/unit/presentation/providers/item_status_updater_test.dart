@@ -49,9 +49,8 @@ void main() {
       final state = container.read(itemStatusUpdaterProvider);
       expect(state, const AsyncData<void>(null));
 
-      final captured = verify(
-        () => repo.updateStatus(captureAny(), captureAny()),
-      ).captured;
+      final captured =
+          verify(() => repo.updateStatus(captureAny(), captureAny())).captured;
       expect((captured[0] as ItemId).value, '24010001');
       expect(captured[1], ItemStatus.forSale);
     });

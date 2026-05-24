@@ -62,34 +62,40 @@ class ShelfViewPage extends ConsumerWidget {
       appBar: AppBar(title: Text('棚: $shelfId')),
       body: dataAsync.when(
         loading: () => const LoadingWidget(),
-        error: (e, _) => ErrorDisplayWidget(
-          error: e,
-          onRetry: () => ref.invalidate(shelfDataProvider(shelfId)),
-        ),
-        data: (data) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                data.label,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+        error:
+            (e, _) => ErrorDisplayWidget(
+              error: e,
+              onRetry: () => ref.invalidate(shelfDataProvider(shelfId)),
             ),
-            Expanded(
-              child: data.items.isEmpty
-                  ? const Center(child: Text('棚にアイテムがありません'))
-                  : ListView.builder(
-                      itemCount: data.items.length,
-                      itemBuilder: (_, i) => ItemListTile(
-                        item: data.items[i],
-                        onTap: () =>
-                            context.push('/items/${data.items[i].id.value}'),
-                      ),
-                    ),
+        data:
+            (data) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    data.label,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                Expanded(
+                  child:
+                      data.items.isEmpty
+                          ? const Center(child: Text('棚にアイテムがありません'))
+                          : ListView.builder(
+                            itemCount: data.items.length,
+                            itemBuilder:
+                                (_, i) => ItemListTile(
+                                  item: data.items[i],
+                                  onTap:
+                                      () => context.push(
+                                        '/items/${data.items[i].id.value}',
+                                      ),
+                                ),
+                          ),
+                ),
+              ],
             ),
-          ],
-        ),
       ),
     );
   }

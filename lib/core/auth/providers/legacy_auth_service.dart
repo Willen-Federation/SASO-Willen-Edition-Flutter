@@ -67,10 +67,11 @@ class LegacyAuthService implements AuthService {
       // both of which then 404. If the http client silently follows the
       // redirect we lose the actual auth signal and surface a misleading
       // "HTTP 404" with a homepage HTML body.
-      final request = http.Request('POST', uri)
-        ..headers['Content-Type'] = 'application/x-www-form-urlencoded'
-        ..bodyFields = {'id': username, 'password': password}
-        ..followRedirects = false;
+      final request =
+          http.Request('POST', uri)
+            ..headers['Content-Type'] = 'application/x-www-form-urlencoded'
+            ..bodyFields = {'id': username, 'password': password}
+            ..followRedirects = false;
       final streamed = await _http
           .send(request)
           .timeout(AppConstants.httpTimeout);

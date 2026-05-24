@@ -13,9 +13,8 @@ String _$categoriesHash() => r'c03af718dde78ce01d5eabeaeb7aad0b8399bbba';
 final categoriesProvider = AutoDisposeFutureProvider<List<Category>>.internal(
   categories,
   name: r'categoriesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$categoriesHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$categoriesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

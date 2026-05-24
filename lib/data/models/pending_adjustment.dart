@@ -28,9 +28,10 @@ class PendingAdjustment {
         shelfId: map['shelf_id'] as String?,
         locationId: map['location_id'] as int?,
         errorMessage: map['error_message'] as String?,
-        syncedAt: map['synced_at'] != null
-            ? DateTime.tryParse(map['synced_at'] as String)
-            : null,
+        syncedAt:
+            map['synced_at'] != null
+                ? DateTime.tryParse(map['synced_at'] as String)
+                : null,
       );
 
   final int? id;

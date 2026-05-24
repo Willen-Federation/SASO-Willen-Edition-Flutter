@@ -37,13 +37,14 @@ class RetryClient extends http.BaseClient {
   }
 
   http.Request _cloneRequest(http.Request source) {
-    final clone = http.Request(source.method, source.url)
-      ..headers.addAll(source.headers)
-      ..bodyBytes = source.bodyBytes
-      ..encoding = source.encoding
-      ..followRedirects = source.followRedirects
-      ..maxRedirects = source.maxRedirects
-      ..persistentConnection = source.persistentConnection;
+    final clone =
+        http.Request(source.method, source.url)
+          ..headers.addAll(source.headers)
+          ..bodyBytes = source.bodyBytes
+          ..encoding = source.encoding
+          ..followRedirects = source.followRedirects
+          ..maxRedirects = source.maxRedirects
+          ..persistentConnection = source.persistentConnection;
     return clone;
   }
 

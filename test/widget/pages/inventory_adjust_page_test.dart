@@ -13,10 +13,11 @@ GoRouter _buildRouter({String? prefillJanCode, int? prefillItemId}) => GoRouter(
   routes: [
     GoRoute(
       path: '/inventory/adjust',
-      builder: (_, __) => InventoryAdjustPage(
-        prefillJanCode: prefillJanCode,
-        prefillItemId: prefillItemId,
-      ),
+      builder:
+          (_, __) => InventoryAdjustPage(
+            prefillJanCode: prefillJanCode,
+            prefillItemId: prefillItemId,
+          ),
     ),
     GoRoute(
       path: '/scanner/jan',

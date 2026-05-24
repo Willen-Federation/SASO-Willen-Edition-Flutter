@@ -184,44 +184,25 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     return AppSemanticColors(
       success: Color.lerp(success, other.success, t)!,
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
-      successContainer: Color.lerp(
-        successContainer,
-        other.successContainer,
-        t,
-      )!,
-      onSuccessContainer: Color.lerp(
-        onSuccessContainer,
-        other.onSuccessContainer,
-        t,
-      )!,
+      successContainer:
+          Color.lerp(successContainer, other.successContainer, t)!,
+      onSuccessContainer:
+          Color.lerp(onSuccessContainer, other.onSuccessContainer, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       onWarning: Color.lerp(onWarning, other.onWarning, t)!,
-      warningContainer: Color.lerp(
-        warningContainer,
-        other.warningContainer,
-        t,
-      )!,
-      onWarningContainer: Color.lerp(
-        onWarningContainer,
-        other.onWarningContainer,
-        t,
-      )!,
+      warningContainer:
+          Color.lerp(warningContainer, other.warningContainer, t)!,
+      onWarningContainer:
+          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
       error: Color.lerp(error, other.error, t)!,
       onError: Color.lerp(onError, other.onError, t)!,
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
-      onErrorContainer: Color.lerp(
-        onErrorContainer,
-        other.onErrorContainer,
-        t,
-      )!,
+      onErrorContainer:
+          Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
       info: Color.lerp(info, other.info, t)!,
       onInfo: Color.lerp(onInfo, other.onInfo, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
-      onInfoContainer: Color.lerp(
-        onInfoContainer,
-        other.onInfoContainer,
-        t,
-      )!,
+      onInfoContainer: Color.lerp(onInfoContainer, other.onInfoContainer, t)!,
     );
   }
 }

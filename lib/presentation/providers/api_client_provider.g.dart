@@ -13,9 +13,10 @@ String _$sasoApiClientHash() => r'c7e61c74c3ac87b53ced25142c2b7a04d9792c0f';
 final sasoApiClientProvider = AutoDisposeProvider<SasoApiClient>.internal(
   sasoApiClient,
   name: r'sasoApiClientProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$sasoApiClientHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$sasoApiClientHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -31,9 +32,10 @@ final itemRepositoryProvider =
     AutoDisposeFutureProvider<ItemRepository>.internal(
       itemRepository,
       name: r'itemRepositoryProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$itemRepositoryHash,
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$itemRepositoryHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

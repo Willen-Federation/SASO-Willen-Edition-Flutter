@@ -15,9 +15,8 @@ String _$pendingCountHash() => r'3beea5d01ae66c874457f6c774f580d55ac5dd4f';
 final pendingCountProvider = AutoDisposeFutureProvider<int>.internal(
   pendingCount,
   name: r'pendingCountProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$pendingCountHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$pendingCountHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

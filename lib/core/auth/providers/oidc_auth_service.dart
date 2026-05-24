@@ -147,9 +147,8 @@ class OidcAuthService implements AuthService {
       final expiresAtRaw = await _secureStorage.read(
         AppConstants.oidcExpiresAtKey,
       );
-      _expiresAt = expiresAtRaw == null
-          ? null
-          : DateTime.tryParse(expiresAtRaw);
+      _expiresAt =
+          expiresAtRaw == null ? null : DateTime.tryParse(expiresAtRaw);
     } catch (_) {
       await _clearPersistedSession();
       _accessToken = null;

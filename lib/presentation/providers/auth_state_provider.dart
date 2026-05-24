@@ -267,9 +267,10 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         final accessToken = json['access_token'] as String;
         final refreshToken = json['refresh_token'] as String;
         final deviceIdRaw = json['device_id'];
-        final deviceId = deviceIdRaw is int
-            ? deviceIdRaw
-            : int.parse(deviceIdRaw.toString());
+        final deviceId =
+            deviceIdRaw is int
+                ? deviceIdRaw
+                : int.parse(deviceIdRaw.toString());
 
         await ref
             .read(serverConfigNotifierProvider.notifier)
@@ -298,10 +299,11 @@ class AuthStateNotifier extends _$AuthStateNotifier {
     // A 404 on /api/v1/mobile/connect almost always means the server is a
     // legacy SASO deployment that doesn't expose the v1 REST surface —
     // QR pairing is REST-only, so surface that hint instead of a bare code.
-    final hint = status == 404
-        ? ' — /api/v1/mobile/connect not found; the server may be a '
-              'legacy SASO deployment without the v1 REST API'
-        : '';
+    final hint =
+        status == 404
+            ? ' — /api/v1/mobile/connect not found; the server may be a '
+                'legacy SASO deployment without the v1 REST API'
+            : '';
     final msg =
         'Pairing failed (HTTP $status$hint): ${_snippet(response.body)} '
         '(POST $uri)';

@@ -8,10 +8,7 @@ import 'package:saso_willen_edition/presentation/providers/auth_state_provider.d
 import 'package:saso_willen_edition/presentation/providers/server_config_provider.dart';
 
 Widget _wrap(Widget child, List<Override> overrides) {
-  return ProviderScope(
-    overrides: overrides,
-    child: MaterialApp(home: child),
-  );
+  return ProviderScope(overrides: overrides, child: MaterialApp(home: child));
 }
 
 ServerAuthDiscovery _discovery({
@@ -410,10 +407,8 @@ class _FakeServerConfigNotifier extends ServerConfigNotifier {
   final ApiMode apiMode;
 
   @override
-  ServerConfig build() => ServerConfig(
-    baseUrl: 'https://saso.example.com',
-    apiMode: apiMode,
-  );
+  ServerConfig build() =>
+      ServerConfig(baseUrl: 'https://saso.example.com', apiMode: apiMode);
 }
 
 class _FakeAuthStateNotifier extends AuthStateNotifier {

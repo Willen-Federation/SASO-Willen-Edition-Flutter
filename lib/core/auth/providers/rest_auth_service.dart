@@ -121,9 +121,10 @@ class RestAuthService implements AuthService {
         final accessToken = json['access_token'] as String;
         final refreshToken = json['refresh_token'] as String;
         final deviceIdRaw = json['device_id'];
-        final deviceId = deviceIdRaw is int
-            ? deviceIdRaw
-            : int.parse(deviceIdRaw.toString());
+        final deviceId =
+            deviceIdRaw is int
+                ? deviceIdRaw
+                : int.parse(deviceIdRaw.toString());
         final expiresAt = _parseExpiresAt(json);
 
         _accessToken = accessToken;
@@ -173,7 +174,7 @@ class RestAuthService implements AuthService {
         'SASO-AUTH-1010' =>
           problem.retryAfterSeconds != null
               ? 'Too many failed attempts. Try again in '
-                    '${problem.retryAfterSeconds} seconds.'
+                  '${problem.retryAfterSeconds} seconds.'
               : 'Too many failed attempts. Try again later.',
         'SASO-AUTH-1011' => 'Login request was malformed. Please retry.',
         _ =>
@@ -340,7 +341,7 @@ class RestAuthService implements AuthService {
         'SASO-AUTH-1010' =>
           problem.retryAfterSeconds != null
               ? 'Too many attempts. Try again in '
-                    '${problem.retryAfterSeconds} seconds.'
+                  '${problem.retryAfterSeconds} seconds.'
               : 'Too many attempts. Try again later.',
         'SASO-AUTH-1011' =>
           'Password change request was malformed. Please retry.',

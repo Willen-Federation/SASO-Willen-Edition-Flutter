@@ -110,9 +110,8 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
   Future<void> _openPrivacyPolicy() async {
     final l10n = AppLocalizations.of(context)!;
     final localeCode = Localizations.localeOf(context).languageCode;
-    final urlString = localeCode == 'ja'
-        ? _privacyPolicyUrlJa
-        : _privacyPolicyUrlEn;
+    final urlString =
+        localeCode == 'ja' ? _privacyPolicyUrlJa : _privacyPolicyUrlEn;
     Uri uri;
     try {
       uri = Uri.parse(urlString);
@@ -142,20 +141,21 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.logout),
-        content: Text(l10n.logoutConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(l10n.logout),
+            content: Text(l10n.logoutConfirmMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(l10n.logout),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.logout),
-          ),
-        ],
-      ),
     );
     if (confirm != true) return;
     if (!mounted) return;
@@ -268,9 +268,8 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                   icon: const Icon(Icons.link_off),
                   label: const Text('再設定'),
                   style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(
-                      context,
-                    ).colorScheme.onPrimaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                   onPressed: () => context.go('/onboarding'),
                 ),
@@ -399,15 +398,16 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
                         OutlinedButton.icon(
                           key: const Key('test_connection_button'),
                           onPressed: _testing ? null : _testConnection,
-                          icon: _testing
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.network_check),
+                          icon:
+                              _testing
+                                  ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Icon(Icons.network_check),
                           label: Text(l10n.testConnection),
                         ),
                         const SizedBox(width: 12),

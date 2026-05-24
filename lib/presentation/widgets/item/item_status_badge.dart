@@ -24,9 +24,8 @@ class ItemStatusBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final (fg, bg) = _palette(scheme);
-    final baseStyle = compact
-        ? theme.textTheme.labelSmall
-        : theme.textTheme.labelMedium;
+    final baseStyle =
+        compact ? theme.textTheme.labelSmall : theme.textTheme.labelMedium;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 8 : 12,

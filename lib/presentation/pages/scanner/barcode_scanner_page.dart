@@ -114,26 +114,24 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
     final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.barcodeScannerUnrecognizedTitle),
-        content: Text(l10n.barcodeScannerUnrecognizedMessage(janCode)),
-        actions: [
-          TextButton(
-            onPressed: () => ctx.pop(),
-            child: Text(l10n.cancel),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(l10n.barcodeScannerUnrecognizedTitle),
+            content: Text(l10n.barcodeScannerUnrecognizedMessage(janCode)),
+            actions: [
+              TextButton(onPressed: () => ctx.pop(), child: Text(l10n.cancel)),
+              FilledButton.icon(
+                onPressed: () {
+                  ctx.pop();
+                  context.pushReplacement(
+                    '/items/register?janCode=${Uri.encodeComponent(janCode)}',
+                  );
+                },
+                icon: const Icon(Icons.add_box_outlined),
+                label: Text(l10n.barcodeScannerRegisterItem),
+              ),
+            ],
           ),
-          FilledButton.icon(
-            onPressed: () {
-              ctx.pop();
-              context.pushReplacement(
-                '/items/register?janCode=${Uri.encodeComponent(janCode)}',
-              );
-            },
-            icon: const Icon(Icons.add_box_outlined),
-            label: Text(l10n.barcodeScannerRegisterItem),
-          ),
-        ],
-      ),
     );
   }
 
@@ -195,9 +193,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             ),
           ),
           if (_processing)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
           Positioned(
             bottom: 48,
             left: 0,

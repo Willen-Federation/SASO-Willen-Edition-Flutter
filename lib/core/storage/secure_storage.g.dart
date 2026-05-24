@@ -14,9 +14,10 @@ final secureStorageProvider =
     AutoDisposeProvider<SecureStorageService>.internal(
       secureStorage,
       name: r'secureStorageProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$secureStorageHash,
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$secureStorageHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );

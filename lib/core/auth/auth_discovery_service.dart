@@ -47,11 +47,12 @@ enum AuthDiscoveryFailureReason {
 /// [failureDetail] carries a short admin-readable note (HTTP status, error
 /// code, exception message, etc.) suitable for surfacing in a diagnostic
 /// banner or settings page.
-typedef AuthDiscoveryOutcome = ({
-  ServerAuthDiscovery discovery,
-  AuthDiscoveryFailureReason failureReason,
-  String? failureDetail,
-});
+typedef AuthDiscoveryOutcome =
+    ({
+      ServerAuthDiscovery discovery,
+      AuthDiscoveryFailureReason failureReason,
+      String? failureDetail,
+    });
 
 /// Discovers the auth providers the server has enabled.
 ///

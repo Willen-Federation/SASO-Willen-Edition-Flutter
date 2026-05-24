@@ -155,85 +155,88 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
             ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : total == 0
-          ? const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      body:
+          _loading
+              ? const Center(child: CircularProgressIndicator())
+              : total == 0
+              ? const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      size: 64,
+                      color: Colors.green,
+                    ),
+                    SizedBox(height: 16),
+                    Text('保留中のデータはありません'),
+                  ],
+                ),
+              )
+              : Column(
                 children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    size: 64,
-                    color: Colors.green,
-                  ),
-                  SizedBox(height: 16),
-                  Text('保留中のデータはありません'),
-                ],
-              ),
-            )
-          : Column(
-              children: [
-                if (_syncing)
-                  LinearProgressIndicator(
-                    value: _syncTotal > 0 ? _syncDone / _syncTotal : null,
-                  ),
-                if (_syncError != null)
-                  Container(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      _syncError!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
+                  if (_syncing)
+                    LinearProgressIndicator(
+                      value: _syncTotal > 0 ? _syncDone / _syncTotal : null,
+                    ),
+                  if (_syncError != null)
+                    Container(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        _syncError!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
                       ),
                     ),
-                  ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      if (_regs.isNotEmpty) ...[
-                        const _SectionHeader(
-                          icon: Icons.add_box_outlined,
-                          title: '登録保留',
-                        ),
-                        ..._regs.map(
-                          (r) => _RegistrationTile(
-                            reg: r,
-                            onRetry: () => _retryRegistration(r),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        if (_regs.isNotEmpty) ...[
+                          const _SectionHeader(
+                            icon: Icons.add_box_outlined,
+                            title: '登録保留',
                           ),
-                        ),
-                      ],
-                      if (_adjs.isNotEmpty) ...[
-                        const _SectionHeader(
-                          icon: Icons.inventory_2_outlined,
-                          title: '入出庫保留',
-                        ),
-                        ..._adjs.map(
-                          (a) => _AdjustmentTile(
-                            adj: a,
-                            onRetry: () => _retryAdjustment(a),
+                          ..._regs.map(
+                            (r) => _RegistrationTile(
+                              reg: r,
+                              onRetry: () => _retryRegistration(r),
+                            ),
                           ),
-                        ),
+                        ],
+                        if (_adjs.isNotEmpty) ...[
+                          const _SectionHeader(
+                            icon: Icons.inventory_2_outlined,
+                            title: '入出庫保留',
+                          ),
+                          ..._adjs.map(
+                            (a) => _AdjustmentTile(
+                              adj: a,
+                              onRetry: () => _retryAdjustment(a),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-      floatingActionButton: total > 0
-          ? FloatingActionButton.extended(
-              onPressed: _syncing ? null : _syncAll,
-              icon: _syncing
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.sync),
-              label: Text(_syncing ? '送信中 $_syncDone/$_syncTotal' : '全件送信'),
-            )
-          : null,
+                ],
+              ),
+      floatingActionButton:
+          total > 0
+              ? FloatingActionButton.extended(
+                onPressed: _syncing ? null : _syncAll,
+                icon:
+                    _syncing
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.sync),
+                label: Text(_syncing ? '送信中 $_syncDone/$_syncTotal' : '全件送信'),
+              )
+              : null,
     );
   }
 
@@ -333,9 +336,10 @@ class _RegistrationTile extends StatelessWidget {
     subtitle: Text(
       '¥${reg.price}  在庫: ${reg.stock}  ${reg.createdAt.toLocal().toString().substring(0, 16)}',
     ),
-    trailing: (reg.status == 'pending' || reg.status == 'failed')
-        ? TextButton(onPressed: onRetry, child: const Text('再送'))
-        : null,
+    trailing:
+        (reg.status == 'pending' || reg.status == 'failed')
+            ? TextButton(onPressed: onRetry, child: const Text('再送'))
+            : null,
   );
 }
 
@@ -353,9 +357,10 @@ class _AdjustmentTile extends StatelessWidget {
       subtitle: Text(
         '$sign  ${adj.reason}  ${adj.shelfId ?? ''}  ${adj.createdAt.toLocal().toString().substring(0, 16)}',
       ),
-      trailing: (adj.status == 'pending' || adj.status == 'failed')
-          ? TextButton(onPressed: onRetry, child: const Text('再送'))
-          : null,
+      trailing:
+          (adj.status == 'pending' || adj.status == 'failed')
+              ? TextButton(onPressed: onRetry, child: const Text('再送'))
+              : null,
     );
   }
 }

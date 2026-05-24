@@ -67,9 +67,10 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     // the light (Scaffold background) splash; without this, devices that
     // launched the app in dark UI mode keep light icons and become
     // invisible against the white background.
-    final overlayStyle = Theme.of(context).brightness == Brightness.dark
-        ? SystemUiOverlayStyle.light
-        : SystemUiOverlayStyle.dark;
+    final overlayStyle =
+        Theme.of(context).brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
       child: Scaffold(

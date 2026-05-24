@@ -35,9 +35,7 @@ Widget _buildApp(List<Category> categories) {
     ],
   );
   return ProviderScope(
-    overrides: [
-      categoriesProvider.overrideWith((ref) async => categories),
-    ],
+    overrides: [categoriesProvider.overrideWith((ref) async => categories)],
     child: MaterialApp.router(routerConfig: router),
   );
 }
@@ -87,40 +85,34 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets(
-      'left content padding is capped at depth=5 so deep labels keep '
-      'usable horizontal space',
-      (tester) async {
-        await tester.pumpWidget(_buildApp([_buildDeepChain(20)]));
-        await tester.pumpAndSettle();
+    testWidgets('left content padding is capped at depth=5 so deep labels keep '
+        'usable horizontal space', (tester) async {
+      await tester.pumpWidget(_buildApp([_buildDeepChain(20)]));
+      await tester.pumpAndSettle();
 
-        const expectedCap = 16.0 + 5 * 16; // _kBaseIndent + _kMaxIndentDepth*step
+      const expectedCap = 16.0 + 5 * 16; // _kBaseIndent + _kMaxIndentDepth*step
 
-        // Inspect a few deep tiles (depth 6, 10, 20) — all share the cap.
-        for (final depth in [6, 10, 20]) {
-          final tileFinder = find.ancestor(
-            of: find.text('カテゴリ$depth'),
-            matching: find.byType(ListTile),
-          );
-          expect(tileFinder, findsOneWidget, reason: 'tile depth=$depth');
-          final tile = tester.widget<ListTile>(tileFinder);
-          final padding = tile.contentPadding as EdgeInsets;
-          expect(
-            padding.left,
-            expectedCap,
-            reason: 'left padding capped at depth=$depth',
-          );
-        }
-      },
-    );
+      // Inspect a few deep tiles (depth 6, 10, 20) — all share the cap.
+      for (final depth in [6, 10, 20]) {
+        final tileFinder = find.ancestor(
+          of: find.text('カテゴリ$depth'),
+          matching: find.byType(ListTile),
+        );
+        expect(tileFinder, findsOneWidget, reason: 'tile depth=$depth');
+        final tile = tester.widget<ListTile>(tileFinder);
+        final padding = tile.contentPadding as EdgeInsets;
+        expect(
+          padding.left,
+          expectedCap,
+          reason: 'left padding capped at depth=$depth',
+        );
+      }
+    });
 
     testWidgets('long labels use ellipsis + maxLines=1', (tester) async {
-      const longName =
-          'とても長いカテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名';
+      const longName = 'とても長いカテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名カテゴリ名';
       await tester.pumpWidget(
-        _buildApp([
-          const Category(id: 'c0', name: longName),
-        ]),
+        _buildApp([const Category(id: 'c0', name: longName)]),
       );
       await tester.pumpAndSettle();
 

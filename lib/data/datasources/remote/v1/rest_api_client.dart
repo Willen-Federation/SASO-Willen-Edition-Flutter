@@ -413,9 +413,10 @@ class RestV1ApiClient implements SasoApiClient {
   }) async {
     final uri = Uri.parse('$serverUrl/api/v1/items/drafts');
     final response = await _authenticatedRequest(() async {
-      final request = http.MultipartRequest('POST', uri)
-        ..headers['Authorization'] = 'Bearer $_accessToken'
-        ..headers['Accept'] = 'application/json';
+      final request =
+          http.MultipartRequest('POST', uri)
+            ..headers['Authorization'] = 'Bearer $_accessToken'
+            ..headers['Accept'] = 'application/json';
 
       if (itemName != null && itemName.isNotEmpty) {
         request.fields['item_name'] = itemName;
@@ -471,8 +472,8 @@ class RestV1ApiClient implements SasoApiClient {
     );
     _handleErrors(response);
     final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = (body['data'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>();
+    final data =
+        (body['data'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
     // Per OpenAPI ItemList.nextCursor (camelCase). Accept snake_case
     // `next_cursor` too in case an older server is still in front.
     final nextCursor = (body['nextCursor'] ?? body['next_cursor']) as int?;

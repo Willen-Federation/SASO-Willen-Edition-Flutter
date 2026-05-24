@@ -82,13 +82,14 @@ void main() {
       expect(result, isA<AuthSuccess>());
 
       // Verify the request shape.
-      final captured = verify(
-        () => httpClient.post(
-          captureAny(),
-          headers: captureAny(named: 'headers'),
-          body: captureAny(named: 'body'),
-        ),
-      ).captured;
+      final captured =
+          verify(
+            () => httpClient.post(
+              captureAny(),
+              headers: captureAny(named: 'headers'),
+              body: captureAny(named: 'body'),
+            ),
+          ).captured;
       expect(
         (captured[0] as Uri).toString(),
         'https://saso.example.com/api/v1/auth/login',
@@ -371,13 +372,14 @@ void main() {
 
       await service.logoutFromServer('https://saso.example.com');
 
-      final captured = verify(
-        () => httpClient.post(
-          captureAny(),
-          headers: captureAny(named: 'headers'),
-          body: captureAny(named: 'body'),
-        ),
-      ).captured;
+      final captured =
+          verify(
+            () => httpClient.post(
+              captureAny(),
+              headers: captureAny(named: 'headers'),
+              body: captureAny(named: 'body'),
+            ),
+          ).captured;
 
       // verify captures every call — the last one is the logout POST.
       final logoutUri = captured[captured.length - 3] as Uri;

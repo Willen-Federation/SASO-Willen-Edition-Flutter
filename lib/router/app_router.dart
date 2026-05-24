@@ -73,52 +73,58 @@ GoRouter appRouter(Ref ref) {
     routes: [
       GoRoute(
         path: '/splash',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const SplashPage()),
+        pageBuilder:
+            (_, state) => adaptivePage(state: state, child: const SplashPage()),
       ),
       GoRoute(
         path: '/onboarding',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const GettingStartedPage()),
+        pageBuilder:
+            (_, state) =>
+                adaptivePage(state: state, child: const GettingStartedPage()),
       ),
       GoRoute(
         path: '/auth/login',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const LoginPage()),
+        pageBuilder:
+            (_, state) => adaptivePage(state: state, child: const LoginPage()),
       ),
       GoRoute(
         path: '/auth/qr',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const QrPairingPage()),
+        pageBuilder:
+            (_, state) =>
+                adaptivePage(state: state, child: const QrPairingPage()),
       ),
       GoRoute(
         path: '/settings',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const ServerSettingsPage()),
+        pageBuilder:
+            (_, state) =>
+                adaptivePage(state: state, child: const ServerSettingsPage()),
       ),
       GoRoute(
         path: '/home',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const HomePage()),
+        pageBuilder:
+            (_, state) => adaptivePage(state: state, child: const HomePage()),
       ),
       GoRoute(
         path: '/items/search',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const ItemSearchPage()),
+        pageBuilder:
+            (_, state) =>
+                adaptivePage(state: state, child: const ItemSearchPage()),
       ),
       GoRoute(
         path: '/items/:id/edit',
-        pageBuilder: (_, state) => adaptivePage(
-          state: state,
-          child: ItemEditPage(itemId: state.pathParameters['id']!),
-        ),
+        pageBuilder:
+            (_, state) => adaptivePage(
+              state: state,
+              child: ItemEditPage(itemId: state.pathParameters['id']!),
+            ),
       ),
       GoRoute(
         path: '/items/:id',
-        pageBuilder: (_, state) => adaptivePage(
-          state: state,
-          child: ItemDetailPage(itemId: state.pathParameters['id']!),
-        ),
+        pageBuilder:
+            (_, state) => adaptivePage(
+              state: state,
+              child: ItemDetailPage(itemId: state.pathParameters['id']!),
+            ),
       ),
       GoRoute(
         path: '/scanner',
@@ -137,22 +143,25 @@ GoRouter appRouter(Ref ref) {
       // Legacy route kept for backward compatibility.
       GoRoute(
         path: '/scanner/jan',
-        pageBuilder: (_, state) => adaptivePage(
-          state: state,
-          child: const BarcodeScannerPage(mode: ScannerMode.register),
-        ),
+        pageBuilder:
+            (_, state) => adaptivePage(
+              state: state,
+              child: const BarcodeScannerPage(mode: ScannerMode.register),
+            ),
       ),
       GoRoute(
         path: '/categories',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const CategoryBrowserPage()),
+        pageBuilder:
+            (_, state) =>
+                adaptivePage(state: state, child: const CategoryBrowserPage()),
       ),
       GoRoute(
         path: '/shelves/:id',
-        pageBuilder: (_, state) => adaptivePage(
-          state: state,
-          child: ShelfViewPage(shelfId: state.pathParameters['id']!),
-        ),
+        pageBuilder:
+            (_, state) => adaptivePage(
+              state: state,
+              child: ShelfViewPage(shelfId: state.pathParameters['id']!),
+            ),
       ),
       GoRoute(
         path: '/items/register',
@@ -166,15 +175,16 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/inventory/adjust',
-        pageBuilder: (_, state) => adaptivePage(
-          state: state,
-          child: InventoryAdjustPage(
-            prefillJanCode: state.uri.queryParameters['janCode'],
-            prefillItemId: int.tryParse(
-              state.uri.queryParameters['itemId'] ?? '',
+        pageBuilder:
+            (_, state) => adaptivePage(
+              state: state,
+              child: InventoryAdjustPage(
+                prefillJanCode: state.uri.queryParameters['janCode'],
+                prefillItemId: int.tryParse(
+                  state.uri.queryParameters['itemId'] ?? '',
+                ),
+              ),
             ),
-          ),
-        ),
       ),
       GoRoute(
         path: '/locations',
@@ -191,8 +201,8 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/outbox',
-        pageBuilder: (_, state) =>
-            adaptivePage(state: state, child: const OutboxPage()),
+        pageBuilder:
+            (_, state) => adaptivePage(state: state, child: const OutboxPage()),
       ),
     ],
   );

@@ -266,13 +266,14 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                 // ── Connect button ─────────────────────────────────────────
                 FilledButton.icon(
                   onPressed: _connecting ? null : _connect,
-                  icon: _connecting
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.link),
+                  icon:
+                      _connecting
+                          ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.link),
                   label: Text(_connecting ? '接続中…' : '接続して始める'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
