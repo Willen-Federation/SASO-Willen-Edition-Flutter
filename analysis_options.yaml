@@ -52,3 +52,26 @@ linter:
     - test_types_in_equals
     - throw_in_finally
     - use_build_context_synchronously
+    # ── Design-token discipline (issue #129) ────────────────────────────
+    # A formal `avoid_magic_numbers` lint is not part of the built-in Dart
+    # linter (it ships in third-party packages like `dart_code_metrics` /
+    # `pedantic_mono` that we don't currently consume). For now the policy
+    # is enforced by code review using these tokens:
+    #
+    #   • lib/core/theme/app_spacing.dart     — padding / SizedBox literals
+    #   • lib/core/theme/app_radii.dart       — BorderRadius literals
+    #   • lib/core/theme/app_icon_size.dart   — Icon size literals
+    #
+    # New `EdgeInsets.all(<literal>)`, `SizedBox(height: <literal>)`,
+    # `BorderRadius.circular(<literal>)`, or `Icon(..., size: <literal>)`
+    # call sites should reach for the matching token instead. Reviewers
+    # can spot regressions with:
+    #
+    #   rg "EdgeInsets\.all\([0-9]" lib/
+    #   rg "BorderRadius\.circular\(" lib/
+    #   rg "SizedBox\((height|width): [0-9]" lib/
+    #   rg "size: [0-9]+(?:\.0)?" lib/
+    #
+    # Promoting this to a hard lint via dart_code_metrics or a custom
+    # analyzer plugin is tracked separately — see the App Store v1.0
+    # Release umbrella issue #120.

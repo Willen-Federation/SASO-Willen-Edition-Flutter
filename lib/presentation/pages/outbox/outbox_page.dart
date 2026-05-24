@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/storage/database_helper.dart';
+import '../../../core/theme/app_icon_size.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/local/pending_adjustment_dao.dart';
 import '../../../data/datasources/local/pending_registration_dao.dart';
 import '../../../data/models/pending_adjustment.dart';
@@ -164,10 +166,10 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
                 children: [
                   Icon(
                     Icons.check_circle_outline,
-                    size: 64,
+                    size: AppIconSize.display,
                     color: Colors.green,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: AppSpacing.md),
                   Text('保留中のデータはありません'),
                 ],
               ),
@@ -181,7 +183,7 @@ class _OutboxPageState extends ConsumerState<OutboxPage> {
                 if (_syncError != null)
                   Container(
                     color: Theme.of(context).colorScheme.errorContainer,
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     child: Text(
                       _syncError!,
                       style: TextStyle(
@@ -310,11 +312,16 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+    padding: const EdgeInsets.fromLTRB(
+      AppSpacing.md,
+      AppSpacing.sm,
+      AppSpacing.md,
+      AppSpacing.xs,
+    ),
     child: Row(
       children: [
         Icon(icon, size: 18),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Text(title, style: Theme.of(context).textTheme.titleSmall),
       ],
     ),

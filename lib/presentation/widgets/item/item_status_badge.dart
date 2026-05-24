@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_radii.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/item_status.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -33,13 +35,10 @@ class ItemStatusBadge extends StatelessWidget {
       container: true,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: compact ? 8 : 12,
-          vertical: compact ? 2 : 4,
+          horizontal: compact ? AppSpacing.sm : 12,
+          vertical: compact ? 2 : AppSpacing.xs,
         ),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: BoxDecoration(color: bg, borderRadius: AppRadii.lgAll),
         child: Text(
           label,
           maxLines: 1,

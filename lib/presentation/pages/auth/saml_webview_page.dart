@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/logging/app_logger.dart';
 import '../../../core/network/url_validator.dart';
+import '../../../core/theme/app_spacing.dart';
 
 /// In-app WebView for SAML SSO login flows.
 ///
@@ -143,7 +144,7 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
       body: _initError != null
           ? Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Text(
                   'SSOログインURLが無効です: $_initError',
                   textAlign: TextAlign.center,

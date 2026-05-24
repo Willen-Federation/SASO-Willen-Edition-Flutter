@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../core/theme/app_radii.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/remote/isbn/isbn_lookup_service.dart';
 import '../../../domain/value_objects/item_id.dart';
 import '../../../presentation/providers/item_provider.dart';
@@ -272,11 +274,14 @@ class _PhotoSearchBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: AppRadii.smAll,
             child: Image.file(
               File(photo.path),
               width: 48,
@@ -285,7 +290,7 @@ class _PhotoSearchBanner extends StatelessWidget {
               semanticLabel: '検索に使用する写真',
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               analysing ? 'バーコードを解析中…' : '写真から検索',

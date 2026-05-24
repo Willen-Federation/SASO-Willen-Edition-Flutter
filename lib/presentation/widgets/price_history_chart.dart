@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
+import '../../core/theme/app_spacing.dart';
 import '../../data/models/price_history_entry.dart';
 
 /// Displays a list of price history entries with a sparkline chart when there
@@ -14,7 +15,10 @@ class PriceHistoryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
       return const Center(
-        child: Padding(padding: EdgeInsets.all(32), child: Text('価格データがありません')),
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.xl),
+          child: Text('価格データがありません'),
+        ),
       );
     }
 
@@ -23,20 +27,26 @@ class PriceHistoryChart extends StatelessWidget {
       children: [
         if (entries.length >= 2) ...[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
             child: Text('価格推移', style: Theme.of(context).textTheme.titleSmall),
           ),
           SizedBox(
             height: 120,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: _PriceSparkline(entries: entries),
             ),
           ),
           const Divider(),
         ],
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
+          ),
           child: Text('取得履歴', style: Theme.of(context).textTheme.titleSmall),
         ),
         ...entries.reversed.map(

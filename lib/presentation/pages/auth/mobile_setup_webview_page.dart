@@ -5,6 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/logging/app_logger.dart';
 import '../../../core/network/url_validator.dart';
+import '../../../core/theme/app_spacing.dart';
 
 /// In-app WebView wrapping the server's `/m/setup` flow used to log in via
 /// any server-configured provider (OIDC / SAML / Auth0 / Cognito / Firebase
@@ -205,7 +206,7 @@ class _MobileSetupWebViewPageState extends State<MobileSetupWebViewPage> {
       body: _initError != null
           ? Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Text(
                   'サーバーURLが無効です: $_initError',
                   textAlign: TextAlign.center,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/mock/mock_api_client.dart';
 import '../../../data/datasources/remote/legacy/legacy_api_client.dart';
 import '../../../data/datasources/remote/v1/rest_api_client.dart';
@@ -70,7 +71,7 @@ class ShelfViewPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Text(
                 data.label,
                 style: Theme.of(context).textTheme.titleLarge,
