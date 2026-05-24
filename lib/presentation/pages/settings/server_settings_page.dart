@@ -147,10 +147,7 @@ class _ServerSettingsPageState extends ConsumerState<ServerSettingsPage> {
       message: l10n.logoutConfirmMessage,
       actions: [
         AdaptiveDialogAction<bool>(label: l10n.cancel, value: false),
-        AdaptiveDialogAction<bool>.destructive(
-          label: l10n.logout,
-          value: true,
-        ),
+        AdaptiveDialogAction<bool>.destructive(label: l10n.logout, value: true),
       ],
     );
     if (confirm != true) return;

@@ -146,9 +146,7 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
       ),
       title: l10n.qrPairingSuccessTitle,
       message: l10n.qrPairingSuccessBody(serverHost),
-      actions: [
-        AdaptiveDialogAction.primary(label: l10n.qrPairingContinue),
-      ],
+      actions: [AdaptiveDialogAction.primary(label: l10n.qrPairingContinue)],
     );
     if (!mounted) return;
     navigator.go('/home');

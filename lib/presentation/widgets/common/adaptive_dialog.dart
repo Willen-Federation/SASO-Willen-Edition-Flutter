@@ -27,12 +27,9 @@ bool _isCupertinoHost() => !kIsWeb && Platform.isIOS;
 @immutable
 class AdaptiveDialogAction<T> {
   /// Generic action — non-default, non-destructive (e.g. "Cancel").
-  const AdaptiveDialogAction({
-    required this.label,
-    this.value,
-    this.icon,
-  }) : isDefault = false,
-       isDestructive = false;
+  const AdaptiveDialogAction({required this.label, this.value, this.icon})
+    : isDefault = false,
+      isDestructive = false;
 
   /// Affirmative / default action. Bolded on iOS, rendered as a
   /// [FilledButton] on Material.
@@ -127,9 +124,7 @@ Future<T?> showSasoAdaptiveDialog<T>({
       icon: icon,
       title: Text(title),
       content: content ?? (message != null ? Text(message) : null),
-      actions: actions
-          .map((a) => _materialActionFor<T>(dialogCtx, a))
-          .toList(),
+      actions: actions.map((a) => _materialActionFor<T>(dialogCtx, a)).toList(),
     ),
   );
 }
@@ -208,9 +203,9 @@ Future<T?> showSasoAdaptiveDialogBuilder<T>({
       icon: icon,
       title: Text(title),
       content: contentBuilder?.call(dialogCtx),
-      actions: actionsBuilder(dialogCtx)
-          .map((a) => _materialBuilderActionFor<T>(dialogCtx, a))
-          .toList(),
+      actions: actionsBuilder(
+        dialogCtx,
+      ).map((a) => _materialBuilderActionFor<T>(dialogCtx, a)).toList(),
     ),
   );
 }
@@ -223,11 +218,7 @@ Widget _cupertinoTitle({required String title, Widget? icon}) {
   if (icon == null) return Text(title);
   return Column(
     mainAxisSize: MainAxisSize.min,
-    children: [
-      icon,
-      const SizedBox(height: 8),
-      Text(title),
-    ],
+    children: [icon, const SizedBox(height: 8), Text(title)],
   );
 }
 

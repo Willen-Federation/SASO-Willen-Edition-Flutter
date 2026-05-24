@@ -191,9 +191,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
             ),
           ),
           if (_processing)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
           Positioned(
             bottom: 48,
             left: 0,
