@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import '../../constants/app_constants.dart';
+import '../../logging/app_logger.dart';
 import '../../network/url_validator.dart';
 import '../../storage/secure_storage.dart';
 import '../auth_service.dart';
@@ -233,20 +233,24 @@ class RestAuthService implements AuthService {
             )
             .timeout(AppConstants.httpTimeout);
         if (response.statusCode != 204 && response.statusCode != 200) {
-          debugPrint(
-            '[RestAuth] logout returned HTTP ${response.statusCode}; '
-            'clearing local state regardless.',
+          AppLogger.warn(
+            'RestAuth',
+            'logout returned HTTP ${response.statusCode}; '
+                'clearing local state regardless.',
           );
         }
       } on TimeoutException {
-        debugPrint('[RestAuth] logout timed out; clearing local state.');
+        AppLogger.warn('RestAuth', 'logout timed out; clearing local state.');
       } on ArgumentError catch (e) {
-        debugPrint(
-          '[RestAuth] logout skipped — invalid serverUrl: ${e.message}',
+        AppLogger.warn(
+          'RestAuth',
+          'logout skipped — invalid serverUrl: ${e.message}',
         );
       } catch (e) {
-        debugPrint(
-          '[RestAuth] logout network error: $e; clearing local state.',
+        AppLogger.warn(
+          'RestAuth',
+          'logout network error; clearing local state.',
+          e,
         );
       }
     }

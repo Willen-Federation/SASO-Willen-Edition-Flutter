@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../router/navigator_key.dart';
+import '../logging/app_logger.dart';
 import 'push_notification_router.dart';
 import 'push_notification_service.dart';
 
@@ -51,7 +52,7 @@ class _PushNotificationStartupState
 
       _openedSub = service.onMessageOpenedApp.listen(_routeFromMessage);
     } catch (e, stack) {
-      debugPrint('Push notifications unavailable: $e\n$stack');
+      AppLogger.error('Push', 'Push notifications unavailable', e, stack);
     }
   }
 

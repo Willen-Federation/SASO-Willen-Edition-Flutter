@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/logging/app_logger.dart';
 import '../../../core/network/url_validator.dart';
 
 /// In-app WebView for SAML SSO login flows.
@@ -89,8 +90,9 @@ class _SamlWebViewPageState extends State<SamlWebViewPage> {
             // the IdP from sending the cookie-bearing request to
             // an arbitrary host.
             if (!_isSameOrigin(uri)) {
-              debugPrint(
-                'SamlWebViewPage: blocked cross-origin navigation to ${uri.origin}',
+              AppLogger.warn(
+                'SamlWebView',
+                'blocked cross-origin navigation to ${uri.origin}',
               );
               return NavigationDecision.prevent;
             }

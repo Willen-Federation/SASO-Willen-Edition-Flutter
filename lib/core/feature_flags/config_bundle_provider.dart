@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../presentation/providers/server_config_provider.dart';
+import '../logging/app_logger.dart';
 import 'feature_flag_service.dart';
 
 /// Fetches the server's offline config bundle (GET /api/v1/mobile/config)
@@ -27,6 +27,6 @@ final configBundleSyncProvider = FutureProvider<void>((ref) async {
     final bundle = await client.fetchConfigBundle();
     FeatureFlagService.instance.applyServerConfigBundle(bundle);
   } catch (e) {
-    debugPrint('[ConfigBundle] Fetch failed, keeping existing flags: $e');
+    AppLogger.warn('ConfigBundle', 'Fetch failed, keeping existing flags', e);
   }
 });

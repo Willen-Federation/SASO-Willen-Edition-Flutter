@@ -18,6 +18,15 @@ analyzer:
     # also light up in analyzer output as a guidance signal.
     # See docs/v3-migration.md for the deletion roadmap.
     deprecated_member_use_from_same_package: info
+    # Issue #157 — `print()` leaks to Logcat / OSLog in release builds.
+    # R8 minify strips `debugPrint` but cannot remove `print`, so a stray
+    # call can leak JWTs / FCM tokens / SAML assertions through any app
+    # holding READ_LOGS (or via `adb logcat` for the user themselves).
+    # Promote to error so any new `print()` fails `flutter analyze` in CI.
+    # The intended fix is to route every log through
+    # `lib/core/logging/app_logger.dart` (AppLogger), whose call sites
+    # collapse to no-ops in release mode via `if (kDebugMode)` guards.
+    avoid_print: error
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"

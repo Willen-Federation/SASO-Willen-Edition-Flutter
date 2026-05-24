@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
+import '../logging/app_logger.dart';
+
 /// HTTPS certificate-pinned [http.Client] factory.
 ///
 /// Pins are supplied via `--dart-define` at build time so the pin set
@@ -70,9 +72,10 @@ class PinnedHttpClient {
           'Pass --dart-define=PINNED_SPKI_SHA256_AUTH=<base64>.',
         );
       }
-      debugPrint(
-        '[PinnedHttpClient] WARNING: running unpinned (no pins '
-        'configured). This is acceptable only in debug.',
+      AppLogger.warn(
+        'PinnedHttpClient',
+        'running unpinned (no pins configured). '
+            'This is acceptable only in debug.',
       );
       return http.Client();
     }
