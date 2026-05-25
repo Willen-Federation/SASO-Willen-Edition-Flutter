@@ -74,7 +74,7 @@
       See: https://docs.flutter.dev/release/breaking-changes/android-predictive-back
     -->
     <application
-        android:label="saso_willen_edition"
+        android:label="SASO-WILLEN"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"

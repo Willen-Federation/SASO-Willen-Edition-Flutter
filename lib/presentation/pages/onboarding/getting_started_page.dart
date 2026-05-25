@@ -301,7 +301,7 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                     'assets/images/branding/saso-full-512.png',
                     height: 96,
                     fit: BoxFit.contain,
-                    semanticLabel: 'SASO Willen ロゴ',
+                    semanticLabel: 'SASO-WILLEN ロゴ',
                   ),
                 ),
                 const SizedBox(height: 8),

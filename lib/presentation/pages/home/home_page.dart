@@ -40,7 +40,7 @@ class HomePage extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Text('SASO Willen'),
+            const Text('SASO-WILLEN'),
           ],
         ),
         actions: [

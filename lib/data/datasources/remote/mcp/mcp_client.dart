@@ -81,7 +81,7 @@ class McpClient {
         'protocolVersion': '2024-11-05',
         'capabilities': <String, dynamic>{},
         'clientInfo': {
-          'name': 'SASO Willen Flutter',
+          'name': 'SASO-WILLEN Flutter',
           'version': AppConstants.version,
         },
       });

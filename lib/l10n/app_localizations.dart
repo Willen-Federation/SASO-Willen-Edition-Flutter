@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// Application title
   ///
   /// In ja, this message translates to:
-  /// **'SASO Willen'**
+  /// **'SASO-WILLEN'**
   String get appTitle;
 
   /// No description provided for @home.
