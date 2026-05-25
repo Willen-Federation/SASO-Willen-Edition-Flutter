@@ -217,6 +217,15 @@
   "flagBarcodeScanner": "バーコードスキャン",
   "flagLabelPrint": "ラベル印刷",
 
+  "menuProductPhoto": "商品撮影",
+  "@menuProductPhoto": {
+    "description": "Home-screen card label that opens the product photo capture page."
+  },
+  "menuBarcodeInput": "バーコード入力",
+  "@menuBarcodeInput": {
+    "description": "Home-screen card label for the barcode scan / JAN-ISBN input mode."
+  },
+
   "privacyPolicy": "プライバシーポリシー",
   "@privacyPolicy": {
     "description": "Label for the privacy policy link shown in settings and onboarding. Required by Google Play and App Store for any app that handles personal data."

@@ -28,7 +28,7 @@ class FcmPushService implements PushNotificationService {
 
     // Keep token fresh — backend should be notified on each refresh
     _messaging.onTokenRefresh.listen((token) {
-      AppLogger.info('Push', 'FCM Token Refreshed: $token');
+      AppLogger.info('Push', 'FCM token refreshed (${_tokenShape(token)})');
     });
   }
 
@@ -70,6 +70,11 @@ class FcmPushService implements PushNotificationService {
           data: msg.data.cast<String, String>(),
         ),
       );
+}
+
+String _tokenShape(String token) {
+  final prefix = token.substring(0, token.length < 6 ? token.length : 6);
+  return 'len=${token.length}, prefix=$prefix…';
 }
 
 @pragma('vm:entry-point')

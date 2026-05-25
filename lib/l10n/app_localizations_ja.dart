@@ -390,6 +390,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get flagLabelPrint => 'ラベル印刷';
 
   @override
+  String get menuProductPhoto => '商品撮影';
+
+  @override
+  String get menuBarcodeInput => 'バーコード入力';
+
+  @override
   String get privacyPolicy => 'プライバシーポリシー';
 
   @override

@@ -16,6 +16,7 @@ import '../presentation/pages/location/location_list_page.dart';
 import '../presentation/pages/onboarding/getting_started_page.dart';
 import '../presentation/pages/outbox/outbox_page.dart';
 import '../presentation/pages/scanner/barcode_scanner_page.dart';
+import '../presentation/pages/scanner/product_photo_capture_page.dart';
 import '../presentation/pages/settings/server_settings_page.dart';
 import '../presentation/pages/shelf/shelf_view_page.dart';
 import '../presentation/pages/splash/splash_page.dart';
@@ -141,6 +142,16 @@ GoRouter appRouter(Ref ref) {
           state: state,
           child: const BarcodeScannerPage(mode: ScannerMode.register),
         ),
+      ),
+      GoRoute(
+        path: '/capture/photo',
+        pageBuilder: (_, state) {
+          final janCode = state.uri.queryParameters['janCode'];
+          return adaptivePage(
+            state: state,
+            child: ProductPhotoCapturePage(prefillJanCode: janCode),
+          );
+        },
       ),
       GoRoute(
         path: '/categories',

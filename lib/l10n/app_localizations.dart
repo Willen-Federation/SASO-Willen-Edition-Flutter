@@ -806,6 +806,18 @@ abstract class AppLocalizations {
   /// **'ラベル印刷'**
   String get flagLabelPrint;
 
+  /// Home-screen card label that opens the product photo capture page.
+  ///
+  /// In ja, this message translates to:
+  /// **'商品撮影'**
+  String get menuProductPhoto;
+
+  /// Home-screen card label for the barcode scan / JAN-ISBN input mode.
+  ///
+  /// In ja, this message translates to:
+  /// **'バーコード入力'**
+  String get menuBarcodeInput;
+
   /// Label for the privacy policy link shown in settings and onboarding. Required by Google Play and App Store for any app that handles personal data.
   ///
   /// In ja, this message translates to:

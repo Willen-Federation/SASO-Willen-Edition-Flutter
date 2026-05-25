@@ -69,7 +69,6 @@ class _PushNotificationStartupState
 
   Future<void> _setupPushService(PushNotificationService service) async {
     if (_serviceInitialized) return;
-    _serviceInitialized = true;
 
     // Push initialisation is best-effort: APNs may be unavailable in
     // simulators, FirebaseApp may not be configured for non-prod builds,
@@ -77,6 +76,9 @@ class _PushNotificationStartupState
     // these conditions should block the rest of the app.
     try {
       await service.initialize();
+      if (service is SnsPushService && !Amplify.isConfigured) {
+        return;
+      }
 
       final initial = await service.getInitialMessage();
       if (initial != null) _routeFromMessage(initial);
@@ -89,9 +91,11 @@ class _PushNotificationStartupState
 
       final token = await service.getDeviceToken();
       if (token != null) {
-        AppLogger.info('Push', 'Push Device Token: $token');
+        AppLogger.info('Push', 'Push device token available (${_tokenShape(token)})');
       }
+      _serviceInitialized = true;
     } catch (e, stack) {
+      _serviceInitialized = false;
       AppLogger.error('Push', 'Push notifications unavailable', e, stack);
     }
   }
@@ -167,26 +171,36 @@ class _PushNotificationStartupState
     super.dispose();
   }
 
+  String _tokenShape(String token) {
+    final prefix = token.substring(0, token.length < 6 ? token.length : 6);
+    return 'len=${token.length}, prefix=$prefix…';
+  }
+
   @override
   Widget build(BuildContext context) {
     // Listen for server discovery updates to configure Amplify on-the-fly
     ref.listen<ServerAuthDiscovery>(
       serverAuthDiscoveryNotifierProvider,
-      (previous, next) async {
+      (previous, next) {
         if (next.providers.isNotEmpty) {
-          final service = ref.read(pushNotificationServiceProvider);
-          if (service is SnsPushService && !Amplify.isConfigured) {
-            try {
-              await AmplifyConfigurator.configure(next);
-              await _setupPushService(service);
-            } catch (e, stack) {
-              AppLogger.error('Push', 'Amplify configure failed on discovery update', e, stack);
-            }
-          }
+          unawaited(_handleDiscoveryUpdate(next));
         }
       },
     );
 
     return widget.child;
+  }
+
+  Future<void> _handleDiscoveryUpdate(ServerAuthDiscovery discovery) async {
+    final service = ref.read(pushNotificationServiceProvider);
+    if (service is! SnsPushService || Amplify.isConfigured) {
+      return;
+    }
+    try {
+      await AmplifyConfigurator.configure(discovery);
+      await _setupPushService(service);
+    } catch (e, stack) {
+      AppLogger.error('Push', 'Amplify configure failed on discovery update', e, stack);
+    }
   }
 }

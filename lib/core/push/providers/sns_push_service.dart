@@ -24,7 +24,10 @@ class SnsPushService implements PushNotificationService {
 
     Amplify.Notifications.Push.onTokenReceived.listen((token) {
       _token = token;
-      AppLogger.info('Push', 'SNS Pinpoint Token Received: $token');
+      AppLogger.info(
+        'Push',
+        'SNS Pinpoint token received (${_tokenShape(token)})',
+      );
     });
   }
 
@@ -65,5 +68,10 @@ class SnsPushService implements PushNotificationService {
         data: Map<String, String>.from(event.data),
       ),
     );
+  }
+
+  String _tokenShape(String token) {
+    final prefix = token.substring(0, token.length < 6 ? token.length : 6);
+    return 'len=${token.length}, prefix=$prefix…';
   }
 }

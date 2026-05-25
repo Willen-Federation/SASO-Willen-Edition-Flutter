@@ -59,7 +59,7 @@ class CognitoAuthService implements AuthService {
         hostedUiDomain: _hostedUiDomain,
       );
     }
-    _amplifyConfigured = true;
+    _amplifyConfigured = Amplify.isConfigured;
   }
 
   @override
