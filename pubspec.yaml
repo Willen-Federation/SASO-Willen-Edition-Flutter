@@ -131,7 +131,7 @@ dev_dependencies:
   riverpod_generator: ^2.6.5
 
   # Linting
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   # custom_lint 0.8.x depends on analyzer ^8.0.0, which conflicts with
   # the analyzer ^7.0.0 that riverpod_lint 2.6.x needs. Hold custom_lint
   # at the 0.7.x line until the Riverpod 3 migration unsticks the lint
