@@ -219,7 +219,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         'assets/images/branding/saso-full-512.png',
                         height: 80,
                         fit: BoxFit.contain,
-                        semanticLabel: 'SASO Willen ロゴ',
+                        semanticLabel: 'SASO-WILLEN ロゴ',
                       ),
                     ),
                   ),

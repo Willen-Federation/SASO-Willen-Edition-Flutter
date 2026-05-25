@@ -2,4 +2,4 @@
 
 "NSCameraUsageDescription" = "Used to scan barcodes during inventory work.";
 "NSPhotoLibraryUsageDescription" = "Used to attach product photos to inventory items.";
-"CFBundleDisplayName" = "SASO Willen";
+"CFBundleDisplayName" = "SASO-WILLEN";

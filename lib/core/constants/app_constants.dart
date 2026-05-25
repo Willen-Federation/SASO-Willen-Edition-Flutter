@@ -1,5 +1,5 @@
 abstract final class AppConstants {
-  static const String appName = 'SASO Willen';
+  static const String appName = 'SASO-WILLEN';
   static const String version = '0.1.0';
 
   static const String serverUrlKey = 'server_url';

@@ -15,7 +15,7 @@ class SasoApp extends ConsumerWidget {
 
     return PushNotificationStartup(
       child: MaterialApp.router(
-        title: 'SASO Willen',
+        title: 'SASO-WILLEN',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         // Follow the OS appearance setting (Light / Dark / Automatic on
