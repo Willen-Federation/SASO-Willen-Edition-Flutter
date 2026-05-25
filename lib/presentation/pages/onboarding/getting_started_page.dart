@@ -9,6 +9,7 @@ import '../../../core/auth/auth_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/network/connection_tester.dart';
 import '../../../core/network/url_validator.dart';
+import '../../layout/responsive.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import '../../widgets/common/adaptive_dialog.dart';
@@ -288,10 +289,11 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-          child: Form(
-            key: _formKey,
-            child: Column(
+          child: AdaptiveContainer(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+            child: Form(
+              key: _formKey,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // ── Hero ───────────────────────────────────────────────────
@@ -474,6 +476,7 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ),

@@ -6,6 +6,7 @@ import 'package:amplify_push_notifications_pinpoint/amplify_push_notifications_p
 
 import '../../../amplifyconfiguration.dart';
 import '../../auth/auth_provider_config.dart';
+import '../../constants/app_constants.dart';
 import '../../feature_flags/feature_flag_service.dart';
 import '../../logging/app_logger.dart';
 

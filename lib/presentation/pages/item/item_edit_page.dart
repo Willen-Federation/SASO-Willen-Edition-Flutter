@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/item.dart';
+import '../../layout/responsive.dart';
 import '../../providers/item_provider.dart';
 import '../../widgets/common/error_display_widget.dart';
 import '../../widgets/common/loading_widget.dart';
@@ -193,11 +194,13 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
   }
 
   Widget _buildForm({required bool saving}) {
-    return Form(
-      key: _formKey,
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
+    return AdaptiveContainer(
+      padding: EdgeInsets.zero,
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
           TextFormField(
             key: const Key('edit_name'),
             controller: _nameController,
@@ -264,6 +267,7 @@ class _ItemEditFormState extends ConsumerState<_ItemEditForm> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

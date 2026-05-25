@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:saso_willen_edition/presentation/pages/home/home_page.dart';
 import 'package:saso_willen_edition/presentation/providers/server_config_provider.dart';
 
+import 'package:saso_willen_edition/l10n/app_localizations.dart';
+
 class _TestServerConfig extends ServerConfigNotifier {
   _TestServerConfig(this._apiMode);
   final ApiMode _apiMode;
@@ -33,7 +35,12 @@ Widget _buildApp(ApiMode apiMode) => ProviderScope(
   overrides: [
     serverConfigNotifierProvider.overrideWith(() => _TestServerConfig(apiMode)),
   ],
-  child: MaterialApp.router(routerConfig: _buildRouter()),
+  child: MaterialApp.router(
+    routerConfig: _buildRouter(),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('ja'),
+  ),
 );
 
 void main() {
@@ -44,8 +51,8 @@ void main() {
       expect(find.textContaining('モックモード'), findsOneWidget);
     });
 
-    testWidgets('does not show mock banner in legacy mode', (tester) async {
-      await tester.pumpWidget(_buildApp(ApiMode.legacy));
+    testWidgets('does not show mock banner in rest mode', (tester) async {
+      await tester.pumpWidget(_buildApp(ApiMode.rest));
       await tester.pumpAndSettle();
       expect(find.textContaining('モックモード'), findsNothing);
     });

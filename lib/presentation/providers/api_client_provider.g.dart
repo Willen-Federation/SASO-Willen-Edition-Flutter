@@ -6,7 +6,7 @@ part of 'api_client_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sasoApiClientHash() => r'c7e61c74c3ac87b53ced25142c2b7a04d9792c0f';
+String _$sasoApiClientHash() => r'be756bf78b1e6f726c03dce2cc5ff261b93dccad';
 
 /// See also [sasoApiClient].
 @ProviderFor(sasoApiClient)

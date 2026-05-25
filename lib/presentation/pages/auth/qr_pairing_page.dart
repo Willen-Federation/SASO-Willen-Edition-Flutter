@@ -167,6 +167,10 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final size = MediaQuery.sizeOf(context);
+    final scanSize = (size.width < size.height ? size.width : size.height) * 0.45;
+    final boxSize = scanSize.clamp(200.0, 320.0);
+
     // Camera preview fills the screen — force light status-bar icons so
     // they stay readable against the (typically dark) live feed.
     //
@@ -206,8 +210,8 @@ class _QrPairingPageState extends ConsumerState<QrPairingPage> {
                 label: 'QRコードスキャン領域',
                 hint: 'QRコードをこの枠に合わせてください',
                 child: Container(
-                  width: 260,
-                  height: 260,
+                  width: boxSize,
+                  height: boxSize,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _kPairingOverlayForeground,

@@ -10,11 +10,6 @@
   debug-overrides: lets developer machines use a user-installed CA
   (Charles / mitmproxy / locally trusted dev cert) without weakening
   release-mode behaviour.
-
-  TODO(team): once auth.willen.jp's primary + backup SPKI hashes are
-  decided, add a <domain-config> block with <pin-set> entries here so
-  the OS enforces the pin at the platform level in addition to the
-  Dart-level PinnedHttpClient.
 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false">
