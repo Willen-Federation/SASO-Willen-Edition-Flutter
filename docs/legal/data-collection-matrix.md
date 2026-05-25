@@ -12,7 +12,7 @@ Data Safety declaration and the App Store App Privacy label remain
 identical and accurate. Mis-declaration is a hard rejection / takedown
 risk on both stores.
 
-If you add or remove a data-collecting SDK in [pubspec.yaml](../../pubspec.yaml),
+If you add or remove a data-collecting SDK in [pubspec.yaml](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/blob/main/pubspec.yaml),
 update this table **in the same PR**.
 
 ---
@@ -28,7 +28,7 @@ update this table **in the same PR**.
   require declaring `App info and performance → Crash logs` and
   `Diagnostics`.
 - **Analytics**: **no analytics SDK is bundled.** `firebase_analytics`,
-  `mixpanel`, `amplitude`, etc. are NOT in [pubspec.yaml](../../pubspec.yaml).
+  `mixpanel`, `amplitude`, etc. are NOT in [pubspec.yaml](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/blob/main/pubspec.yaml).
   If added later, `App activity → App interactions / Page views` must
   be declared.
 - **Feature flags**: SDKs gated by feature flags (`ff_push_fcm`,
@@ -41,7 +41,7 @@ update this table **in the same PR**.
 
 ## 2. Data-collecting SDK inventory
 
-Source: [pubspec.yaml](../../pubspec.yaml). Last reconciled 2026-05.
+Source: [pubspec.yaml](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/blob/main/pubspec.yaml). Last reconciled 2026-05.
 
 | # | SDK | Pub package | Flag | Collects on device | Sent to third party? |
 |---|-----|-------------|------|---------------------|----------------------|
@@ -184,7 +184,7 @@ chosen item.
 ### 3.11 Location
 
 **Not collected.** No `geolocator` / `location` / `flutter_native_place_picker`
-SDKs in [pubspec.yaml](../../pubspec.yaml). The IP-derived coarse
+SDKs in [pubspec.yaml](https://github.com/Willen-Federation/SASO-Willen-Edition-Flutter/blob/main/pubspec.yaml). The IP-derived coarse
 location that Pinpoint / FCM compute server-side is part of their own
 data-handling and is not collected by the app per Google's definition.
 

@@ -51,11 +51,13 @@ void main() {
       );
     });
 
-    test('declares NSCameraUsageDescription and NSPhotoLibraryUsageDescription',
-        () {
-      expect(plist, contains('<key>NSCameraUsageDescription</key>'));
-      expect(plist, contains('<key>NSPhotoLibraryUsageDescription</key>'));
-    });
+    test(
+      'declares NSCameraUsageDescription and NSPhotoLibraryUsageDescription',
+      () {
+        expect(plist, contains('<key>NSCameraUsageDescription</key>'));
+        expect(plist, contains('<key>NSPhotoLibraryUsageDescription</key>'));
+      },
+    );
 
     test('declares ITSAppUsesNonExemptEncryption = false', () {
       expect(
@@ -72,35 +74,41 @@ void main() {
     late String manifest;
 
     setUpAll(() async {
-      manifest = await File(
-        'ios/Runner/PrivacyInfo.xcprivacy',
-      ).readAsString();
+      manifest = await File('ios/Runner/PrivacyInfo.xcprivacy').readAsString();
     });
 
     test('NSPrivacyTracking is false', () {
       expect(
         manifest.contains('<key>NSPrivacyTracking</key>\n    <false/>'),
         isTrue,
-        reason: 'App must not use data for ATT tracking (see '
+        reason:
+            'App must not use data for ATT tracking (see '
             'docs/release/app-privacy-mapping.md)',
       );
     });
 
-    test('declares the four Required Reason API categories used by Flutter',
-        () {
-      expect(manifest, contains('NSPrivacyAccessedAPICategoryUserDefaults'));
-      expect(manifest, contains('NSPrivacyAccessedAPICategoryFileTimestamp'));
-      expect(manifest, contains('NSPrivacyAccessedAPICategoryDiskSpace'));
-      expect(manifest, contains('NSPrivacyAccessedAPICategorySystemBootTime'));
-    });
+    test(
+      'declares the four Required Reason API categories used by Flutter',
+      () {
+        expect(manifest, contains('NSPrivacyAccessedAPICategoryUserDefaults'));
+        expect(manifest, contains('NSPrivacyAccessedAPICategoryFileTimestamp'));
+        expect(manifest, contains('NSPrivacyAccessedAPICategoryDiskSpace'));
+        expect(
+          manifest,
+          contains('NSPrivacyAccessedAPICategorySystemBootTime'),
+        );
+      },
+    );
 
-    test('declares the collected data types matching app-privacy-mapping.md',
-        () {
-      expect(manifest, contains('NSPrivacyCollectedDataTypeEmailAddress'));
-      expect(manifest, contains('NSPrivacyCollectedDataTypeUserID'));
-      expect(manifest, contains('NSPrivacyCollectedDataTypeDeviceID'));
-      expect(manifest, contains('NSPrivacyCollectedDataTypePhotosorVideos'));
-    });
+    test(
+      'declares the collected data types matching app-privacy-mapping.md',
+      () {
+        expect(manifest, contains('NSPrivacyCollectedDataTypeEmailAddress'));
+        expect(manifest, contains('NSPrivacyCollectedDataTypeUserID'));
+        expect(manifest, contains('NSPrivacyCollectedDataTypeDeviceID'));
+        expect(manifest, contains('NSPrivacyCollectedDataTypePhotosorVideos'));
+      },
+    );
   });
 
   group('android/app/src/main/AndroidManifest.xml — issue #126', () {
@@ -116,7 +124,8 @@ void main() {
       expect(
         manifest,
         contains('android:screenOrientation="portrait"'),
-        reason: 'MainActivity must declare portrait so cold-launch in '
+        reason:
+            'MainActivity must declare portrait so cold-launch in '
             'landscape orientation is impossible',
       );
     });

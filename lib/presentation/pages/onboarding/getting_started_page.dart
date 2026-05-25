@@ -5,10 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/auth/auth_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/network/connection_tester.dart';
 import '../../../core/network/url_validator.dart';
+import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
+import '../../widgets/common/adaptive_dialog.dart';
 
 /// First-launch configuration screen.
 ///
@@ -39,16 +42,141 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
   }
 
   /// Open the barcode scanner in register mode; the scanned raw string is
-  /// expected to be either a plain URL or JSON `{"url":"…"}`.
+  /// expected to be either:
+  ///   • `SASO1:{base64url_token}|{server_url}` — full pairing QR (token + URL)
+  ///   • a plain URL or JSON `{"url":"…"}` — server-URL-only QR
   Future<void> _scanQrCode() async {
     final raw = await context.push<String?>('/scanner/jan');
     if (raw == null || raw.trim().isEmpty) return;
-    final url = _extractUrl(raw.trim());
+    final trimmed = raw.trim();
+
+    // Full pairing QR: contains both the token and the server URL.
+    // Parse it and establish the session directly without requiring a
+    // separate manual URL step.
+    final pairing = _parseSaso1Qr(trimmed);
+    if (pairing != null) {
+      await _connectWithPairingQr(pairing.$1, pairing.$2);
+      return;
+    }
+
+    // URL-only QR: populate the text field so the user can confirm.
+    final url = _extractUrl(trimmed);
     if (url != null) {
       _urlController.text = url;
       setState(() => _errorMessage = null);
     } else {
-      setState(() => _errorMessage = 'QRコードからURLを読み取れませんでした: $raw');
+      setState(() => _errorMessage = 'QRコードからURLを読み取れませんでした: $trimmed');
+    }
+  }
+
+  /// Parses a `SASO1:{token}|{serverUrl}` payload.
+  /// Returns `(token, serverUrl)` or null if the raw string is not in that format.
+  (String, String)? _parseSaso1Qr(String raw) {
+    const prefix = 'SASO1:';
+    if (!raw.startsWith(prefix)) return null;
+    final payload = raw.substring(prefix.length);
+    final pipe = payload.indexOf('|');
+    if (pipe < 0) return null;
+    final token = payload.substring(0, pipe);
+    final url = payload.substring(pipe + 1);
+    if (token.isEmpty || url.isEmpty) return null;
+    return (token, url);
+  }
+
+  /// Handles a full SASO1 pairing QR: saves the server URL, then exchanges
+  /// the pairing token for a JWT in one step.
+  ///
+  /// Security (#24): the QR-provided host is shown in a confirmation dialog
+  /// before any network request involving the pairing token. The user must
+  /// explicitly approve the destination URL; cancelling aborts silently.
+  ///
+  /// REST guard: QR pairing requires POST /api/v1/mobile/connect, which only
+  /// exists on REST-capable servers. If autoDetect resolves to legacy mode the
+  /// token exchange would 404, so we fail fast with a clear message.
+  Future<void> _connectWithPairingQr(
+    String pairingToken,
+    String serverUrl,
+  ) async {
+    // --- Security: show the destination host and require explicit confirmation
+    // before POSTing the pairing token anywhere. An attacker-printed QR that
+    // embeds evil.example.com would otherwise silently exfiltrate the token.
+    final Uri normalized;
+    try {
+      normalized = UrlValidator.ensureHttpsOrLoopback(serverUrl);
+    } on ArgumentError catch (e) {
+      setState(() => _errorMessage = 'サーバーURL不正: ${e.message}');
+      return;
+    }
+
+    final confirmed = await showSasoAdaptiveDialog<bool>(
+      context: context,
+      icon: const Icon(Icons.link, size: 40),
+      title: 'このサーバーに接続しますか？',
+      message: normalized.host,
+      actions: [
+        const AdaptiveDialogAction(label: 'キャンセル', value: false),
+        const AdaptiveDialogAction.primary(label: '接続する', value: true),
+      ],
+    );
+    if (!mounted || confirmed != true) return;
+
+    setState(() {
+      _connecting = true;
+      _errorMessage = null;
+    });
+    try {
+      final normalizedStr = normalized.toString();
+      final detected = await ConnectionTester().autoDetect(normalizedStr);
+
+      if (!mounted) return;
+
+      final result = detected.result;
+      if (result is ConnectionTestFailure || result is ConnectionTestTimeout) {
+        final msg = switch (result) {
+          ConnectionTestFailure(message: final m) => m,
+          ConnectionTestTimeout(timeout: final t) => 'タイムアウト (${t.inSeconds}秒)',
+          _ => '接続失敗',
+        };
+        setState(() => _errorMessage = '接続できませんでした: $msg');
+        return;
+      }
+
+      // --- REST guard: POST /api/v1/mobile/connect does not exist on legacy
+      // servers. Persisting legacy mode and attempting the exchange would
+      // silently 404; surface a clear error instead.
+      if (detected.mode != ApiMode.rest) {
+        setState(() {
+          _errorMessage =
+              'このサーバーはREST API v1に対応していないため、QRペアリングを使用できません。'
+              'ログイン画面から通常のログインをお試しください。';
+        });
+        return;
+      }
+
+      await ref
+          .read(serverConfigNotifierProvider.notifier)
+          .save(url: normalizedStr, mode: detected.mode);
+
+      if (!mounted) return;
+
+      final authResult = await ref
+          .read(authStateNotifierProvider.notifier)
+          .loginWithQrToken(
+            pairingToken: pairingToken,
+            serverUrl: normalizedStr,
+          );
+
+      if (!mounted) return;
+
+      authResult.when(
+        success: (_, __, ___, ____) => context.go('/home'),
+        failure: (msg, _) => setState(() => _errorMessage = 'ペアリング失敗: $msg'),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'エラー: $e');
+    } finally {
+      if (mounted) setState(() => _connecting = false);
     }
   }
 
