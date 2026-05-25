@@ -1,6 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_push_notifications_pinpoint/amplify_push_notifications_pinpoint.dart';
-import '../../../amplifyconfiguration.dart';
+
+import '../../logging/app_logger.dart';
 import '../push_notification_service.dart';
 
 /// Amazon SNS / Pinpoint push service via AWS Amplify.
@@ -12,25 +12,22 @@ class SnsPushService implements PushNotificationService {
   bool _ready = false;
 
   @override
-  bool get isSupported => Amplify.isConfigured;
+  bool get isSupported => true;
 
   @override
   Future<void> initialize() async {
     if (!Amplify.isConfigured) {
-      try {
-        await Amplify.addPlugin(AmplifyPushNotificationsPinpoint());
-        await Amplify.configure(amplifyconfig);
-      } catch (e) {
-        // Amplify not configured (stub credentials) — SNS notifications unavailable.
-        // Replace lib/amplifyconfiguration.dart with real config to enable.
-        return;
-      }
+      return;
     }
     _ready = true;
     await requestPermission();
 
     Amplify.Notifications.Push.onTokenReceived.listen((token) {
       _token = token;
+      AppLogger.info(
+        'Push',
+        'SNS Pinpoint token received (${_tokenShape(token)})',
+      );
     });
   }
 
@@ -71,5 +68,10 @@ class SnsPushService implements PushNotificationService {
         data: Map<String, String>.from(event.data),
       ),
     );
+  }
+
+  String _tokenShape(String token) {
+    final prefix = token.substring(0, token.length < 6 ? token.length : 6);
+    return 'len=${token.length}, prefix=$prefix…';
   }
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../logging/app_logger.dart';
 import '../push_notification_service.dart';
 
 /// Firebase Cloud Messaging push service.
@@ -27,7 +28,7 @@ class FcmPushService implements PushNotificationService {
 
     // Keep token fresh — backend should be notified on each refresh
     _messaging.onTokenRefresh.listen((token) {
-      // Token updates are forwarded to backend by the calling layer
+      AppLogger.info('Push', 'FCM token refreshed (${_tokenShape(token)})');
     });
   }
 
@@ -69,6 +70,11 @@ class FcmPushService implements PushNotificationService {
           data: msg.data.cast<String, String>(),
         ),
       );
+}
+
+String _tokenShape(String token) {
+  final prefix = token.substring(0, token.length < 6 ? token.length : 6);
+  return 'len=${token.length}, prefix=$prefix…';
 }
 
 @pragma('vm:entry-point')

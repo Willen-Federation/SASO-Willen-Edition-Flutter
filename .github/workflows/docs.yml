@@ -65,8 +65,8 @@ jobs:
           python-version: '3.x'
           cache: pip
 
-      - name: Install MkDocs Material
-        run: pip install mkdocs-material
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
       - name: Deploy to GitHub Pages
         # Note: `--verbose` was removed (issue #37) — the flag leaks
