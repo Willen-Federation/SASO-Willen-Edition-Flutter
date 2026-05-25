@@ -12,10 +12,6 @@
   release-mode behaviour.
 -->
 <network-security-config>
-    <domain-config>
-        <domain includeSubdomains="true">auth.willen.jp</domain>
-    </domain-config>
-
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
