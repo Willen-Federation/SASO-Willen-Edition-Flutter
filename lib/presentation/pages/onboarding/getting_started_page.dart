@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/auth/auth_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/network/connection_tester.dart';
 import '../../../core/network/url_validator.dart';
+import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 
 /// First-launch configuration screen.
@@ -39,16 +41,103 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
   }
 
   /// Open the barcode scanner in register mode; the scanned raw string is
-  /// expected to be either a plain URL or JSON `{"url":"…"}`.
+  /// expected to be either:
+  ///   • `SASO1:{base64url_token}|{server_url}` — full pairing QR (token + URL)
+  ///   • a plain URL or JSON `{"url":"…"}` — server-URL-only QR
   Future<void> _scanQrCode() async {
     final raw = await context.push<String?>('/scanner/jan');
     if (raw == null || raw.trim().isEmpty) return;
-    final url = _extractUrl(raw.trim());
+    final trimmed = raw.trim();
+
+    // Full pairing QR: contains both the token and the server URL.
+    // Parse it and establish the session directly without requiring a
+    // separate manual URL step.
+    final pairing = _parseSaso1Qr(trimmed);
+    if (pairing != null) {
+      await _connectWithPairingQr(pairing.$1, pairing.$2);
+      return;
+    }
+
+    // URL-only QR: populate the text field so the user can confirm.
+    final url = _extractUrl(trimmed);
     if (url != null) {
       _urlController.text = url;
       setState(() => _errorMessage = null);
     } else {
-      setState(() => _errorMessage = 'QRコードからURLを読み取れませんでした: $raw');
+      setState(() => _errorMessage = 'QRコードからURLを読み取れませんでした: $trimmed');
+    }
+  }
+
+  /// Parses a `SASO1:{token}|{serverUrl}` payload.
+  /// Returns `(token, serverUrl)` or null if the raw string is not in that format.
+  (String, String)? _parseSaso1Qr(String raw) {
+    const prefix = 'SASO1:';
+    if (!raw.startsWith(prefix)) return null;
+    final payload = raw.substring(prefix.length);
+    final pipe = payload.indexOf('|');
+    if (pipe < 0) return null;
+    final token = payload.substring(0, pipe);
+    final url = payload.substring(pipe + 1);
+    if (token.isEmpty || url.isEmpty) return null;
+    return (token, url);
+  }
+
+  /// Handles a full SASO1 pairing QR: saves the server URL, then exchanges
+  /// the pairing token for a JWT in one step.
+  Future<void> _connectWithPairingQr(
+    String pairingToken,
+    String serverUrl,
+  ) async {
+    setState(() {
+      _connecting = true;
+      _errorMessage = null;
+    });
+    try {
+      final normalized =
+          UrlValidator.ensureHttpsOrLoopback(serverUrl).toString();
+      final detected = await ConnectionTester().autoDetect(normalized);
+
+      if (!mounted) return;
+
+      final result = detected.result;
+      if (result is ConnectionTestFailure || result is ConnectionTestTimeout) {
+        final msg = switch (result) {
+          ConnectionTestFailure(message: final m) => m,
+          ConnectionTestTimeout(timeout: final t) => 'タイムアウト (${t.inSeconds}秒)',
+          _ => '接続失敗',
+        };
+        setState(() => _errorMessage = '接続できませんでした: $msg');
+        return;
+      }
+
+      await ref
+          .read(serverConfigNotifierProvider.notifier)
+          .save(url: normalized, mode: detected.mode);
+
+      if (!mounted) return;
+
+      final authResult = await ref
+          .read(authStateNotifierProvider.notifier)
+          .loginWithQrToken(
+            pairingToken: pairingToken,
+            serverUrl: normalized,
+          );
+
+      if (!mounted) return;
+
+      authResult.when(
+        success: (_, __, ___, ____) => context.go('/home'),
+        failure: (msg, _) =>
+            setState(() => _errorMessage = 'ペアリング失敗: $msg'),
+      );
+    } on ArgumentError catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'サーバーURL不正: ${e.message}');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'エラー: $e');
+    } finally {
+      if (mounted) setState(() => _connecting = false);
     }
   }
 
