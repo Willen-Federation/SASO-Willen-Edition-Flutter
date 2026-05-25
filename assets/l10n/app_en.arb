@@ -164,6 +164,9 @@
   "flagBarcodeScanner": "Barcode Scanner",
   "flagLabelPrint": "Label Printing",
 
+  "menuProductPhoto": "Product Photo",
+  "menuBarcodeInput": "Barcode Input",
+
   "privacyPolicy": "Privacy Policy",
   "privacyPolicySubtitle": "How we handle personal information (opens in your browser)",
   "privacyPolicyOpenFailed": "Could not open the privacy policy: {detail}",
