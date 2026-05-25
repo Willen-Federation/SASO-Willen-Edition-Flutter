@@ -40,14 +40,8 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 
 /// Returns the local credential-based auth service.
 ///
-/// Selection rule:
-///   - [ApiMode.rest] → [RestAuthService] (`POST /api/v1/auth/login`,
-///     introduced in PR-A3 server-side). New deployments should land here.
-///   - [ApiMode.legacy] → [LegacyAuthService] (`POST /auth/start/` form
-///     redirect dance). Deprecated in v2.5; removed in v3.0.
-///   - [ApiMode.mock] → also returns [LegacyAuthService] but the mock
-///     code path skips the network call entirely so the choice doesn't
-///     matter — kept simple to avoid an extra branch.
+/// This provider always returns [RestAuthService], using
+/// `POST /api/v1/auth/login` for local credential auth.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
@@ -109,9 +103,7 @@ class AuthStateNotifier extends _$AuthStateNotifier {
   }
 
   /// Credential-based login. Dispatches to the [authServiceProvider]
-  /// configured for the active [ApiMode] — [RestAuthService] for REST
-  /// deployments (`POST /api/v1/auth/login`), [LegacyAuthService] for
-  /// legacy ones (`POST /auth/start/`). On success, the REST path also
+  /// ([RestAuthService] via `POST /api/v1/auth/login`). On success, it also
   /// pumps the freshly issued token pair through
   /// [ServerConfigNotifier.updateTokenPair] so the in-memory config —
   /// and therefore [RestV1ApiClient] — picks up the new Bearer

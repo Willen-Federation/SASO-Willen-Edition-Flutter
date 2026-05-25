@@ -10,14 +10,8 @@ String _$authServiceHash() => r'af778b96e475aabbae48ba05bd8d1c4d1c10799d';
 
 /// Returns the local credential-based auth service.
 ///
-/// Selection rule:
-///   - [ApiMode.rest] → [RestAuthService] (`POST /api/v1/auth/login`,
-///     introduced in PR-A3 server-side). New deployments should land here.
-///   - [ApiMode.legacy] → [LegacyAuthService] (`POST /auth/start/` form
-///     redirect dance). Deprecated in v2.5; removed in v3.0.
-///   - [ApiMode.mock] → also returns [LegacyAuthService] but the mock
-///     code path skips the network call entirely so the choice doesn't
-///     matter — kept simple to avoid an extra branch.
+/// This provider always returns [RestAuthService], using
+/// `POST /api/v1/auth/login` for local credential auth.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider

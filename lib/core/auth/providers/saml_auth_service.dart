@@ -22,8 +22,17 @@ class JwtDecoder {
   static bool isExpired(String token) {
     try {
       final payload = decodePayload(token);
-      final exp = payload['exp'] as int?;
-      if (exp == null) return false;
+      return isExpiredPayload(payload);
+    } catch (_) {
+      return true;
+    }
+  }
+
+  static bool isExpiredPayload(Map<String, dynamic> payload) {
+    try {
+      final rawExp = payload['exp'];
+      final exp = rawExp is int ? rawExp : int.tryParse(rawExp.toString());
+      if (exp == null) return true;
       final expiryTime = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       return DateTime.now().isAfter(expiryTime);
     } catch (_) {
@@ -79,7 +88,7 @@ class SamlAuthService implements AuthService {
       );
     }
 
-    if (JwtDecoder.isExpired(token)) {
+    if (JwtDecoder.isExpiredPayload(payload)) {
       return const AuthResult.failure(
         message: 'Token has expired',
         code: 'saml_token_expired',

@@ -12,19 +12,8 @@
   release-mode behaviour.
 -->
 <network-security-config>
-    <!--
-      SPKI pinning for the Auth server.
-      TODO(team): Once auth.willen.jp's production certificate is issued,
-      update these placeholder hashes with the actual primary & backup hashes.
-    -->
     <domain-config>
         <domain includeSubdomains="true">auth.willen.jp</domain>
-        <pin-set expiration="2027-05-26">
-            <!-- Placeholder primary hash (Base64 SPKI SHA-256) -->
-            <pin digest="SHA-256">9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</pin>
-            <!-- Placeholder backup hash -->
-            <pin digest="SHA-256">qwertyuiopasdfghjklzxcvbnm1234567890abcdefg=</pin>
-        </pin-set>
     </domain-config>
 
     <base-config cleartextTrafficPermitted="false">
