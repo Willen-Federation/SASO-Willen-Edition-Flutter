@@ -93,8 +93,9 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
       _errorMessage = null;
     });
     try {
-      final normalized =
-          UrlValidator.ensureHttpsOrLoopback(serverUrl).toString();
+      final normalized = UrlValidator.ensureHttpsOrLoopback(
+        serverUrl,
+      ).toString();
       final detected = await ConnectionTester().autoDetect(normalized);
 
       if (!mounted) return;
@@ -118,17 +119,13 @@ class _GettingStartedPageState extends ConsumerState<GettingStartedPage> {
 
       final authResult = await ref
           .read(authStateNotifierProvider.notifier)
-          .loginWithQrToken(
-            pairingToken: pairingToken,
-            serverUrl: normalized,
-          );
+          .loginWithQrToken(pairingToken: pairingToken, serverUrl: normalized);
 
       if (!mounted) return;
 
       authResult.when(
         success: (_, __, ___, ____) => context.go('/home'),
-        failure: (msg, _) =>
-            setState(() => _errorMessage = 'ペアリング失敗: $msg'),
+        failure: (msg, _) => setState(() => _errorMessage = 'ペアリング失敗: $msg'),
       );
     } on ArgumentError catch (e) {
       if (!mounted) return;

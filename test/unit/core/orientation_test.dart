@@ -26,9 +26,7 @@ void main() {
 
     setUp(() {
       calls.clear();
-      TestDefaultBinaryMessengerBinding
-          .instance
-          .defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, (call) async {
             if (call.method == 'SystemChrome.setPreferredOrientations') {
               calls.add(call);
@@ -38,37 +36,32 @@ void main() {
     });
 
     tearDown(() {
-      TestDefaultBinaryMessengerBinding
-          .instance
-          .defaultBinaryMessenger
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);
     });
 
-    test(
-      'portraitUp + portraitDown matches the policy in main.dart',
-      () async {
-        // Mirror the exact call shape from main.dart. This is the
-        // canonical "if you change this, change main.dart too" pin.
-        await SystemChrome.setPreferredOrientations(const [
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-        ]);
+    test('portraitUp + portraitDown matches the policy in main.dart', () async {
+      // Mirror the exact call shape from main.dart. This is the
+      // canonical "if you change this, change main.dart too" pin.
+      await SystemChrome.setPreferredOrientations(const [
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
 
-        expect(calls, hasLength(1));
-        final args = calls.single.arguments as List;
-        expect(args, contains('DeviceOrientation.portraitUp'));
-        expect(args, contains('DeviceOrientation.portraitDown'));
-        expect(
-          args,
-          isNot(contains('DeviceOrientation.landscapeLeft')),
-          reason: 'landscape must remain locked off — see #126',
-        );
-        expect(
-          args,
-          isNot(contains('DeviceOrientation.landscapeRight')),
-          reason: 'landscape must remain locked off — see #126',
-        );
-      },
-    );
+      expect(calls, hasLength(1));
+      final args = calls.single.arguments as List;
+      expect(args, contains('DeviceOrientation.portraitUp'));
+      expect(args, contains('DeviceOrientation.portraitDown'));
+      expect(
+        args,
+        isNot(contains('DeviceOrientation.landscapeLeft')),
+        reason: 'landscape must remain locked off — see #126',
+      );
+      expect(
+        args,
+        isNot(contains('DeviceOrientation.landscapeRight')),
+        reason: 'landscape must remain locked off — see #126',
+      );
+    });
   });
 }
