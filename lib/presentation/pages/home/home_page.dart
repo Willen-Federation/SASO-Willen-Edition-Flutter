@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../presentation/providers/outbox_provider.dart';
 import '../../../presentation/providers/server_config_provider.dart';
 import '../../layout/responsive.dart';
@@ -14,6 +15,7 @@ class HomePage extends ConsumerWidget {
     final config = ref.watch(serverConfigNotifierProvider);
     final isMock = config.apiMode == ApiMode.mock;
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final pendingCountAsync = ref.watch(pendingCountProvider);
     final pendingCount = pendingCountAsync.when(
@@ -110,6 +112,18 @@ class HomePage extends ConsumerWidget {
                   icon: Icons.qr_code_scanner,
                   label: 'バーコードスキャン',
                   onTap: () => context.push('/scanner'),
+                ),
+                _MenuCard(
+                  key: const Key('menu_barcode_input'),
+                  icon: Icons.barcode_reader,
+                  label: l10n.menuBarcodeInput,
+                  onTap: () => context.push('/scanner?mode=register'),
+                ),
+                _MenuCard(
+                  key: const Key('menu_product_photo'),
+                  icon: Icons.add_a_photo_outlined,
+                  label: l10n.menuProductPhoto,
+                  onTap: () => context.push('/capture/photo'),
                 ),
                 _MenuCard(
                   icon: Icons.add_box_outlined,

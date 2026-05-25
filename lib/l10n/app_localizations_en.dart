@@ -418,6 +418,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flagLabelPrint => 'Label Printing';
 
   @override
+  String get menuProductPhoto => 'Product Photo';
+
+  @override
+  String get menuBarcodeInput => 'Barcode Input';
+
+  @override
   String get privacyPolicy => 'Privacy Policy';
 
   @override
