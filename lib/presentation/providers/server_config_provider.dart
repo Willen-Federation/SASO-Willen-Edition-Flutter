@@ -19,11 +19,6 @@ part 'server_config_provider.g.dart';
 /// 14-call-site removal tracker on PR-B4+.
 enum ApiMode {
   mock,
-  @Deprecated(
-    'Legacy session-cookie auth will be removed in v3.0. Use ApiMode.rest '
-    'with POST /api/v1/auth/login. See docs/auth-migration.md.',
-  )
-  legacy,
   rest,
 }
 
@@ -32,12 +27,6 @@ abstract class ServerConfig with _$ServerConfig {
   const factory ServerConfig({
     @Default('') String baseUrl,
     @Default(ApiMode.rest) ApiMode apiMode,
-    // TODO(v3.0): drop `sessionCookie` together with ApiMode.legacy.
-    // Cookie persistence + AppConstants.sessionCookieKey + the
-    // updateSessionCookie() helper below all go away. The legacy
-    // session-cookie restore branch in AuthStateNotifier.loadStoredCredentials
-    // is the matching deletion point. See docs/v3-migration.md.
-    String? sessionCookie,
     String? jwtToken,
     String? refreshToken,
     int? deviceId,
@@ -68,16 +57,20 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final modeIndex =
         prefs.getInt(AppConstants.apiModeKey) ?? ApiMode.rest.index;
     final refreshToken = await secureStorage.read(AppConstants.refreshTokenKey);
-    final sessionCookie = await secureStorage.read(
-      AppConstants.sessionCookieKey,
-    );
     final deviceId = prefs.getInt(AppConstants.deviceIdKey);
     final offlineMode = prefs.getBool(AppConstants.offlineModeKey) ?? false;
     final aiAutofill = prefs.getBool(AppConstants.aiAutofillKey) ?? false;
+
+    final ApiMode mode;
+    if (modeIndex >= ApiMode.values.length) {
+      mode = ApiMode.rest;
+    } else {
+      mode = ApiMode.values[modeIndex];
+    }
+
     state = ServerConfig(
       baseUrl: url,
-      apiMode: ApiMode.values[modeIndex],
-      sessionCookie: sessionCookie,
+      apiMode: mode,
       refreshToken: refreshToken,
       deviceId: deviceId,
       offlineMode: offlineMode,
@@ -95,10 +88,6 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
 
   void updateToken(String token) {
     state = state.copyWith(jwtToken: token);
-  }
-
-  void updateSessionCookie(String cookie) {
-    state = state.copyWith(sessionCookie: cookie);
   }
 
   Future<void> updateTokenPair({
@@ -133,14 +122,12 @@ class ServerConfigNotifier extends _$ServerConfigNotifier {
     final prefs = await SharedPreferences.getInstance();
     final secureStorage = ref.read(secureStorageProvider);
     await secureStorage.delete(AppConstants.refreshTokenKey);
-    await secureStorage.delete(AppConstants.sessionCookieKey);
     await prefs.remove(AppConstants.refreshTokenKey);
     await prefs.remove(AppConstants.deviceIdKey);
     state = state.copyWith(
       jwtToken: null,
       refreshToken: null,
       deviceId: null,
-      sessionCookie: null,
     );
   }
 }

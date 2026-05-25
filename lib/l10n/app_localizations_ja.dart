@@ -119,27 +119,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get apiModeMockDescription => 'ローカル開発用のインメモリデータ。ネットワーク通信を行いません。';
 
   @override
-  String get apiModeLegacy => 'レガシー（非推奨）';
-
-  @override
-  String get apiModeLegacyDescription =>
-      '/auth/start/ への セッションCookie 認証。v3.0で削除されます。';
-
-  @override
-  String get apiModeLegacyDeprecationNotice =>
-      'レガシー（セッションCookie）認証はv3.0で削除されます。サーバーが対応次第、RESTモードへ移行してください。';
-
-  @override
   String get apiModeRest => 'REST v1';
 
   @override
   String get apiModeRestDescription => 'JWT ベースの REST API。本番環境ではこちらを推奨します。';
-
-  @override
-  String get compatibilityModeSection => '互換モード（非推奨）';
-
-  @override
-  String get compatibilityModeSubtitle => '旧サーバー向け。v3.0で削除予定です。';
 
   @override
   String get testConnection => '接続テスト';

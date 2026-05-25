@@ -8,7 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/auth/auth_provider_config.dart';
 import '../../core/auth/auth_service.dart';
 import '../../core/auth/providers/auth0_auth_service.dart';
-import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/auth/providers/rest_auth_service.dart';
 import '../../core/constants/app_constants.dart';
@@ -41,14 +40,8 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 
 /// Returns the local credential-based auth service.
 ///
-/// Selection rule:
-///   - [ApiMode.rest] → [RestAuthService] (`POST /api/v1/auth/login`,
-///     introduced in PR-A3 server-side). New deployments should land here.
-///   - [ApiMode.legacy] → [LegacyAuthService] (`POST /auth/start/` form
-///     redirect dance). Deprecated in v2.5; removed in v3.0.
-///   - [ApiMode.mock] → also returns [LegacyAuthService] but the mock
-///     code path skips the network call entirely so the choice doesn't
-///     matter — kept simple to avoid an extra branch.
+/// This provider always returns [RestAuthService], using
+/// `POST /api/v1/auth/login` for local credential auth.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
@@ -56,15 +49,7 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 @riverpod
 AuthService authService(Ref ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  final mode = ref.watch(
-    serverConfigNotifierProvider.select((config) => config.apiMode),
-  );
-  if (mode == ApiMode.rest) {
-    return RestAuthService(secureStorage);
-  }
-  // TODO(v3.0): collapse this provider to `return RestAuthService(secureStorage);`
-  // once ApiMode.legacy is removed. See docs/v3-migration.md.
-  return LegacyAuthService(secureStorage);
+  return RestAuthService(secureStorage);
 }
 
 // ---------------------------------------------------------------------------
@@ -113,26 +98,12 @@ class AuthStateNotifier extends _$AuthStateNotifier {
         state = AuthState.authenticated(userId: 'restored', token: token);
         return;
       }
-
-      // Legacy session-cookie path: cookie is already restored into
-      // ServerConfig by ServerConfigNotifier.load(); just reflect the
-      // authenticated state so the router skips the login screen.
-      // TODO(v3.0): drop this branch with the ApiMode.legacy removal.
-      // The sessionCookieKey read + AppConstants.sessionCookieKey itself
-      // also go away. See docs/v3-migration.md.
-      final cookie = await secureStorage.read(AppConstants.sessionCookieKey);
-      if (cookie != null && cookie.isNotEmpty) {
-        state = const AuthState.authenticated(userId: 'restored');
-        return;
-      }
     } catch (_) {}
     state = const AuthState.unauthenticated();
   }
 
   /// Credential-based login. Dispatches to the [authServiceProvider]
-  /// configured for the active [ApiMode] — [RestAuthService] for REST
-  /// deployments (`POST /api/v1/auth/login`), [LegacyAuthService] for
-  /// legacy ones (`POST /auth/start/`). On success, the REST path also
+  /// ([RestAuthService] via `POST /api/v1/auth/login`). On success, it also
   /// pumps the freshly issued token pair through
   /// [ServerConfigNotifier.updateTokenPair] so the in-memory config —
   /// and therefore [RestV1ApiClient] — picks up the new Bearer
@@ -209,7 +180,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       await secureStorage.delete(AppConstants.oidcRefreshTokenKey);
       await secureStorage.delete(AppConstants.oidcExpiresAtKey);
       await secureStorage.delete(AppConstants.oidcUserIdKey);
-      await secureStorage.delete(AppConstants.sessionCookieKey);
     }
 
     _applyResult(result, service);
@@ -344,11 +314,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
   void _applyResult(AuthResult result, AuthService service) {
     result.when(
       success: (userId, token, sessionCookie, expiresAt) {
-        if (sessionCookie != null) {
-          ref
-              .read(serverConfigNotifierProvider.notifier)
-              .updateSessionCookie(sessionCookie);
-        }
         state = AuthState.authenticated(
           userId: userId,
           token: token,

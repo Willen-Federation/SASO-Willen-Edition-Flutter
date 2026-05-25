@@ -68,49 +68,6 @@ void main() {
     });
 
     testWidgets(
-      'hides credential form when local is absent in legacy API mode',
-      (tester) async {
-        await tester.binding.setSurfaceSize(const Size(400, 1400));
-        addTearDown(() => tester.binding.setSurfaceSize(null));
-
-        await tester.pumpWidget(
-          _wrap(const LoginPage(), [
-            serverAuthDiscoveryNotifierProvider.overrideWith(
-              () => _FakeDiscoveryNotifier(
-                _discovery(
-                  strategy: AuthStrategy.defaultOnly,
-                  providers: const [
-                    AuthProviderSummary(
-                      id: 5,
-                      name: 'Corporate SSO',
-                      type: AuthProviderType.oidc,
-                      isDefault: true,
-                      enabled: true,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            serverConfigNotifierProvider.overrideWith(
-              // Legacy mode — discovery is the only signal that should
-              // surface the credential form. With no local in discovery
-              // we expect the form to be hidden.
-              () => _FakeServerConfigNotifier(apiMode: ApiMode.legacy),
-            ),
-            authStateNotifierProvider.overrideWith(
-              () => _FakeAuthStateNotifier(),
-            ),
-          ]),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.byKey(const Key('username_field')), findsNothing);
-        expect(find.byKey(const Key('provider_button_5')), findsOneWidget);
-        expect(find.text('Corporate SSO'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
       'shows credential form in REST mode even when discovery omits local',
       (tester) async {
         // Mirrors the current saso.sksl.jp production discovery payload:

@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/storage/database_helper.dart';
 import '../../data/datasources/local/item_local_cache.dart';
 import '../../data/datasources/mock/mock_api_client.dart';
-import '../../data/datasources/remote/legacy/legacy_api_client.dart';
 import '../../data/datasources/remote/saso_api_client.dart';
 import '../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../data/datasources/remote/v1/retry_client.dart';
@@ -19,13 +18,6 @@ SasoApiClient sasoApiClient(Ref ref) {
   final config = ref.watch(serverConfigNotifierProvider);
   return switch (config.apiMode) {
     ApiMode.mock => MockApiClient(),
-    // TODO(v3.0): drop this arm together with ApiMode.legacy removal.
-    // See docs/v3-migration.md for the full Phase C plan.
-    // ignore: deprecated_member_use_from_same_package
-    ApiMode.legacy => LegacyApiClient(
-      serverUrl: config.baseUrl,
-      sessionCookie: config.sessionCookie,
-    ),
     ApiMode.rest => RestV1ApiClient(
       serverUrl: config.baseUrl,
       jwtToken: config.jwtToken ?? '',

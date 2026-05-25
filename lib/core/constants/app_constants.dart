@@ -4,7 +4,6 @@ abstract final class AppConstants {
 
   static const String serverUrlKey = 'server_url';
   static const String apiModeKey = 'api_mode';
-  static const String sessionCookieKey = 'session_cookie';
   static const String jwtTokenKey = 'jwt_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String deviceIdKey = 'device_id';
