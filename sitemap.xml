@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/changelog/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/changelog/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/code-of-conduct/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/code-of-conduct/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/code-of-conduct/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/contributing/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/contributing/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/integration-coverage/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/integration-coverage/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/integration-coverage/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/release/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/tablet-foldable-audit/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/tablet-foldable-audit/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/tablet-foldable-audit/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/v3-migration/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/v3-migration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/v3-migration/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/api/flutter-requirements/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/flutter-requirements/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/flutter-requirements/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/api/legacy/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/legacy/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/legacy/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/api/mock/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/mock/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/mock/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/api/reference/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/reference/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/reference/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/features/barcode/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/barcode/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/barcode/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/features/offline/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/offline/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/offline/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/features/push/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/push/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/push/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/features/search/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/search/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/search/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/legal/data-collection-matrix/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/legal/data-collection-matrix/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/data-collection-matrix/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/legal/privacy-policy/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/legal/privacy-policy/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/privacy-policy/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/release/android-signing/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/android-signing/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/android-signing/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/release/app-privacy-mapping/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/app-privacy-mapping/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/app-privacy-mapping/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/release/applinks/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/applinks/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/applinks/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/release/versioning/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/versioning/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/versioning/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/security/medium-audit-2026-05-17/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/security/medium-audit-2026-05-17/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/security/medium-audit-2026-05-17/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/setup/amplify/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/amplify/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/amplify/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/setup/android/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/android/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/android/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/setup/firebase/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/firebase/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/firebase/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/setup/ios/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/ios/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/ios/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/android-16kb-page-size/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/android-16kb-page-size/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/android-16kb-page-size/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/login/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/login/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/login/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/changelog/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/changelog/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/changelog/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/code-of-conduct/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/code-of-conduct/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/code-of-conduct/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/contributing/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/contributing/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/contributing/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/integration-coverage/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/integration-coverage/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/integration-coverage/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/release/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/tablet-foldable-audit/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/tablet-foldable-audit/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/tablet-foldable-audit/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/v3-migration/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/v3-migration/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/v3-migration/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/api/flutter-requirements/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/flutter-requirements/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/flutter-requirements/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/api/legacy/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/legacy/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/legacy/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/api/mock/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/mock/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/mock/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/api/reference/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/api/reference/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/api/reference/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/features/barcode/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/barcode/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/barcode/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/features/offline/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/offline/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/offline/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/features/push/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/push/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/push/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/features/search/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/features/search/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/features/search/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/data-collection-matrix/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/data-collection-matrix/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/legal/data-collection-matrix/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/privacy-policy/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/legal/privacy-policy/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/legal/privacy-policy/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/release/android-signing/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/android-signing/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/android-signing/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/release/app-privacy-mapping/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/app-privacy-mapping/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/app-privacy-mapping/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/release/applinks/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/applinks/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/applinks/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/release/versioning/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/release/versioning/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/release/versioning/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/security/medium-audit-2026-05-17/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/security/medium-audit-2026-05-17/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/security/medium-audit-2026-05-17/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/amplify/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/amplify/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/amplify/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/android/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/android/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/android/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/firebase/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/firebase/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/firebase/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/ios/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/setup/ios/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/setup/ios/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/android-16kb-page-size/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/android-16kb-page-size/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/android-16kb-page-size/"/>
+    </url>
+    <url>
+        <loc>https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/login/</loc>
+        <lastmod>2026-05-25</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://willen-federation.github.io/saso-willen-edition-flutter/en/troubleshooting/login/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://willen-federation.github.io/saso-willen-edition-flutter/troubleshooting/login/"/>
+    </url>
+</urlset>
