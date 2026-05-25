@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_discovery_service.dart';
+import '../../../core/push/push_notification_startup.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 
@@ -51,7 +52,13 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
     final authState = ref.read(authStateNotifierProvider);
     if (authState.isAuthenticated) {
-      context.go('/home');
+      final pendingRoute = ref.read(pendingPushRouteProvider);
+      if (pendingRoute != null) {
+        ref.read(pendingPushRouteProvider.notifier).state = null;
+        context.go(pendingRoute);
+      } else {
+        context.go('/home');
+      }
     } else {
       context.go('/auth/login');
     }

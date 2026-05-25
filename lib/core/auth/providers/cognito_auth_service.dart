@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart' hide AuthResult;
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 import '../../constants/app_constants.dart';
+import '../../push/providers/amplify_configurator.dart';
 import '../../storage/secure_storage.dart';
 import '../auth_service.dart';
 
@@ -48,47 +47,17 @@ class CognitoAuthService implements AuthService {
   @override
   bool get isAuthenticated => _cachedToken != null;
 
-  /// Builds a minimal Amplify config JSON for this Cognito user pool.
-  String _buildAmplifyConfig() {
-    final cognitoPlugin = <String, dynamic>{
-      'UserAgent': 'aws-amplify-cli/2.0',
-      'Version': '0.1.0',
-      'CognitoUserPool': {
-        'Default': {
-          'PoolId': _userPoolId,
-          'AppClientId': _clientId,
-          'Region': _region,
-        },
-      },
-      'Auth': {
-        'Default': {
-          'authenticationFlowType': 'USER_SRP_AUTH',
-          if (_hostedUiDomain != null)
-            'OAuth': {
-              'WebDomain': _hostedUiDomain,
-              'AppClientId': _clientId,
-              'SignInRedirectURI': 'jp.willen.saso://callback',
-              'SignOutRedirectURI': 'jp.willen.saso://logout',
-              'Scopes': ['openid', 'profile', 'email'],
-            },
-        },
-      },
-    };
 
-    return jsonEncode({
-      'UserAgent': 'aws-amplify-cli/2.0',
-      'Version': '1.0',
-      'auth': {
-        'plugins': {'awsCognitoAuthPlugin': cognitoPlugin},
-      },
-    });
-  }
 
   Future<void> _ensureConfigured() async {
     if (_amplifyConfigured) return;
     if (!Amplify.isConfigured) {
-      await Amplify.addPlugin(AmplifyAuthCognito());
-      await Amplify.configure(_buildAmplifyConfig());
+      await AmplifyConfigurator.configureWithDetails(
+        userPoolId: _userPoolId,
+        clientId: _clientId,
+        region: _region,
+        hostedUiDomain: _hostedUiDomain,
+      );
     }
     _amplifyConfigured = true;
   }
