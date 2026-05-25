@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../data/datasources/mock/mock_api_client.dart';
-import '../../../data/datasources/remote/legacy/legacy_api_client.dart';
 import '../../../data/datasources/remote/v1/rest_api_client.dart';
 import '../../../domain/entities/item.dart';
 import '../../../domain/value_objects/shelf_id.dart';
@@ -24,12 +23,6 @@ Future<({String label, List<Item> items})> shelfData(
   final config = ref.watch(serverConfigNotifierProvider);
   final client = switch (config.apiMode) {
     ApiMode.mock => MockApiClient(),
-    // TODO(v3.0): drop with ApiMode.legacy removal — see docs/v3-migration.md.
-    // ignore: deprecated_member_use_from_same_package
-    ApiMode.legacy => LegacyApiClient(
-      serverUrl: config.baseUrl,
-      sessionCookie: config.sessionCookie,
-    ),
     ApiMode.rest => RestV1ApiClient(
       serverUrl: config.baseUrl,
       jwtToken: config.jwtToken ?? '',

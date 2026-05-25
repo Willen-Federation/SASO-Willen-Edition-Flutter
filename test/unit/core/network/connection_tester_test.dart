@@ -28,37 +28,17 @@ void main() {
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
   });
 
-  test('legacy mode hits /category/list.json with cookie header', () async {
-    when(
-      () => client.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => http.Response('[]', 200));
-
-    final result = await tester.test(
-      const ServerConfig(
-        apiMode: ApiMode.legacy,
-        baseUrl: 'https://saso.example.com',
-        sessionCookie: 'sid=abc',
-      ),
-    );
-
-    expect(result, isA<ConnectionTestSuccess>());
-    final captured = verify(
-      () => client.get(captureAny(), headers: captureAny(named: 'headers')),
-    ).captured;
-    expect(
-      (captured[0] as Uri).toString(),
-      'https://saso.example.com/category/list.json',
-    );
-    expect((captured[1] as Map<String, String>)['Cookie'], 'sid=abc');
-  });
-
   test('rest mode hits /api/v1/health without bearer header', () async {
     when(
       () => client.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => http.Response('{}', 200));
 
     final result = await tester.test(
-      const ServerConfig(baseUrl: 'https://api.example.com', jwtToken: 'tok-1'),
+      const ServerConfig(
+        apiMode: ApiMode.rest,
+        baseUrl: 'https://api.example.com',
+        jwtToken: 'tok-1',
+      ),
     );
 
     expect(result, isA<ConnectionTestSuccess>());
@@ -79,7 +59,7 @@ void main() {
 
   test('non-mock mode with empty url returns failure without HTTP', () async {
     final result = await tester.test(
-      const ServerConfig(apiMode: ApiMode.legacy),
+      const ServerConfig(apiMode: ApiMode.rest),
     );
     expect(result, isA<ConnectionTestFailure>());
     expect((result as ConnectionTestFailure).message, 'URL_MISSING');
@@ -88,7 +68,7 @@ void main() {
 
   test('malformed url returns failure without HTTP', () async {
     final result = await tester.test(
-      const ServerConfig(apiMode: ApiMode.legacy, baseUrl: 'not a url'),
+      const ServerConfig(apiMode: ApiMode.rest, baseUrl: 'not a url'),
     );
     expect(result, isA<ConnectionTestFailure>());
     verifyNever(() => client.get(any(), headers: any(named: 'headers')));
@@ -101,7 +81,7 @@ void main() {
 
     final result = await tester.test(
       const ServerConfig(
-        apiMode: ApiMode.legacy,
+        apiMode: ApiMode.rest,
         baseUrl: 'https://saso.example.com',
       ),
     );
@@ -120,7 +100,7 @@ void main() {
 
     final result = await tester.test(
       const ServerConfig(
-        apiMode: ApiMode.legacy,
+        apiMode: ApiMode.rest,
         baseUrl: 'https://saso.example.com',
       ),
     );
@@ -135,7 +115,7 @@ void main() {
 
     final result = await tester.test(
       const ServerConfig(
-        apiMode: ApiMode.legacy,
+        apiMode: ApiMode.rest,
         baseUrl: 'https://saso.example.com',
       ),
     );
@@ -160,30 +140,7 @@ void main() {
       expect(detected.result, isA<ConnectionTestSuccess>());
     });
 
-    test(
-      'falls back to legacy mode when REST fails but legacy succeeds',
-      () async {
-        int callCount = 0;
-        when(
-          () => client.get(any(), headers: any(named: 'headers')),
-        ).thenAnswer((_) async {
-          callCount++;
-          // First call: REST /api/v1/health → 404
-          // Second call: legacy /category/list.json → 200
-          return callCount == 1
-              ? http.Response('Not Found', 404)
-              : http.Response('[]', 200);
-        });
-
-        final detected = await tester.autoDetect('https://saso.example.com');
-
-        expect(detected.mode, ApiMode.legacy);
-        expect(detected.result, isA<ConnectionTestSuccess>());
-        expect(callCount, 2);
-      },
-    );
-
-    test('returns REST failure when both probes fail', () async {
+    test('returns REST failure when probe fails', () async {
       when(
         () => client.get(any(), headers: any(named: 'headers')),
       ).thenAnswer((_) async => http.Response('error', 503));
@@ -207,27 +164,6 @@ void main() {
       expect(
         (captured.first as Uri).toString(),
         'https://saso.example.com/api/v1/health',
-      );
-    });
-
-    test('legacy fallback probes /category/list.json', () async {
-      int callCount = 0;
-      final capturedUris = <Uri>[];
-      when(() => client.get(any(), headers: any(named: 'headers'))).thenAnswer((
-        invocation,
-      ) async {
-        callCount++;
-        capturedUris.add(invocation.positionalArguments.first as Uri);
-        return callCount == 1
-            ? http.Response('Not Found', 404)
-            : http.Response('[]', 200);
-      });
-
-      await tester.autoDetect('https://saso.example.com');
-
-      expect(
-        capturedUris[1].toString(),
-        'https://saso.example.com/category/list.json',
       );
     });
   });

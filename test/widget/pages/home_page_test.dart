@@ -44,8 +44,8 @@ void main() {
       expect(find.textContaining('モックモード'), findsOneWidget);
     });
 
-    testWidgets('does not show mock banner in legacy mode', (tester) async {
-      await tester.pumpWidget(_buildApp(ApiMode.legacy));
+    testWidgets('does not show mock banner in rest mode', (tester) async {
+      await tester.pumpWidget(_buildApp(ApiMode.rest));
       await tester.pumpAndSettle();
       expect(find.textContaining('モックモード'), findsNothing);
     });

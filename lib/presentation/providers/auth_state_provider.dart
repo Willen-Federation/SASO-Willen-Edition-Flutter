@@ -8,7 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/auth/auth_provider_config.dart';
 import '../../core/auth/auth_service.dart';
 import '../../core/auth/providers/auth0_auth_service.dart';
-import '../../core/auth/providers/legacy_auth_service.dart';
 import '../../core/auth/providers/oidc_auth_service.dart';
 import '../../core/auth/providers/rest_auth_service.dart';
 import '../../core/constants/app_constants.dart';
@@ -56,15 +55,7 @@ class ServerAuthDiscoveryNotifier extends _$ServerAuthDiscoveryNotifier {
 @riverpod
 AuthService authService(Ref ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  final mode = ref.watch(
-    serverConfigNotifierProvider.select((config) => config.apiMode),
-  );
-  if (mode == ApiMode.rest) {
-    return RestAuthService(secureStorage);
-  }
-  // TODO(v3.0): collapse this provider to `return RestAuthService(secureStorage);`
-  // once ApiMode.legacy is removed. See docs/v3-migration.md.
-  return LegacyAuthService(secureStorage);
+  return RestAuthService(secureStorage);
 }
 
 // ---------------------------------------------------------------------------
@@ -111,18 +102,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       final token = await secureStorage.read(AppConstants.jwtTokenKey);
       if (token != null && token.isNotEmpty) {
         state = AuthState.authenticated(userId: 'restored', token: token);
-        return;
-      }
-
-      // Legacy session-cookie path: cookie is already restored into
-      // ServerConfig by ServerConfigNotifier.load(); just reflect the
-      // authenticated state so the router skips the login screen.
-      // TODO(v3.0): drop this branch with the ApiMode.legacy removal.
-      // The sessionCookieKey read + AppConstants.sessionCookieKey itself
-      // also go away. See docs/v3-migration.md.
-      final cookie = await secureStorage.read(AppConstants.sessionCookieKey);
-      if (cookie != null && cookie.isNotEmpty) {
-        state = const AuthState.authenticated(userId: 'restored');
         return;
       }
     } catch (_) {}
@@ -209,7 +188,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
       await secureStorage.delete(AppConstants.oidcRefreshTokenKey);
       await secureStorage.delete(AppConstants.oidcExpiresAtKey);
       await secureStorage.delete(AppConstants.oidcUserIdKey);
-      await secureStorage.delete(AppConstants.sessionCookieKey);
     }
 
     _applyResult(result, service);
@@ -344,11 +322,6 @@ class AuthStateNotifier extends _$AuthStateNotifier {
   void _applyResult(AuthResult result, AuthService service) {
     result.when(
       success: (userId, token, sessionCookie, expiresAt) {
-        if (sessionCookie != null) {
-          ref
-              .read(serverConfigNotifierProvider.notifier)
-              .updateSessionCookie(sessionCookie);
-        }
         state = AuthState.authenticated(
           userId: userId,
           token: token,

@@ -148,6 +148,10 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final size = MediaQuery.sizeOf(context);
+    final scanSize = (size.width < size.height ? size.width : size.height) * 0.45;
+    final boxSize = scanSize.clamp(200.0, 320.0);
+
     return PopScope(
       // Issue #145: stop the mobile_scanner camera session as soon as the
       // Predictive Back gesture (Android 14+) commits to a pop. Without this
@@ -189,8 +193,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
                 label: 'バーコードスキャン領域',
                 hint: 'バーコードをこの枠に合わせてください',
                 child: Container(
-                  width: 240,
-                  height: 240,
+                  width: boxSize,
+                  height: boxSize,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _kScannerOverlayForeground,

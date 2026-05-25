@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/auth/auth_provider_config.dart';
 import '../../../core/auth/auth_service.dart';
 import '../../../router/adaptive_page.dart';
+import '../../layout/responsive.dart';
 import '../../providers/auth_state_provider.dart';
 import '../../providers/server_config_provider.dart';
 import 'mobile_setup_webview_page.dart';
@@ -209,9 +210,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         top: false,
         child: _loading
             ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
+            : AdaptiveContainer(
+                padding: EdgeInsets.zero,
+                child: ListView(
+                  padding: const EdgeInsets.all(24),
+                  children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Center(
@@ -365,6 +368,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                 ],
               ),
+            ),
       ),
     );
   }

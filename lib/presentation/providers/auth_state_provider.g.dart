@@ -6,10 +6,18 @@ part of 'auth_state_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'd17a736a9de9427b5d06ba5260920846a121ff33';
+String _$authServiceHash() => r'af778b96e475aabbae48ba05bd8d1c4d1c10799d';
 
-/// Returns the local credential-based auth service that talks to the
-/// server's `/auth/start/` endpoint with `{id, password}`.
+/// Returns the local credential-based auth service.
+///
+/// Selection rule:
+///   - [ApiMode.rest] → [RestAuthService] (`POST /api/v1/auth/login`,
+///     introduced in PR-A3 server-side). New deployments should land here.
+///   - [ApiMode.legacy] → [LegacyAuthService] (`POST /auth/start/` form
+///     redirect dance). Deprecated in v2.5; removed in v3.0.
+///   - [ApiMode.mock] → also returns [LegacyAuthService] but the mock
+///     code path skips the network call entirely so the choice doesn't
+///     matter — kept simple to avoid an extra branch.
 ///
 /// External providers (OIDC / SAML / Auth0 / Cognito / Firebase) are reached
 /// through the server's `/m/setup` browser flow rather than a per-provider
@@ -57,7 +65,7 @@ final serverAuthDiscoveryNotifierProvider =
 
 typedef _$ServerAuthDiscoveryNotifier =
     AutoDisposeNotifier<ServerAuthDiscovery>;
-String _$authStateNotifierHash() => r'66a0a803230c0e0fcc6d5266d3791ae8507bf437';
+String _$authStateNotifierHash() => r'afee084e4c5ed471a7eecb8194a9699cd63cee85';
 
 /// See also [AuthStateNotifier].
 @ProviderFor(AuthStateNotifier)

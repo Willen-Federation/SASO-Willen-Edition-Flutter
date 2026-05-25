@@ -31,7 +31,7 @@
 /.github/CODEOWNERS              @Willen-Federation/maintainers
 
 # Auth & security surfaces — always require maintainer review.
-/lib/core/auth/                  @Willen-Federation/maintainers
-/lib/core/network/url_validator.dart       @Willen-Federation/maintainers
-/lib/core/network/pinned_http_client.dart  @Willen-Federation/maintainers
-/lib/core/storage/secure_storage.dart      @Willen-Federation/maintainers
+/lib/core/auth/                  @Willen-Federation/security-reviewers
+/lib/core/network/url_validator.dart       @Willen-Federation/security-reviewers
+/lib/core/network/pinned_http_client.dart  @Willen-Federation/security-reviewers
+/lib/core/storage/secure_storage.dart      @Willen-Federation/security-reviewers
