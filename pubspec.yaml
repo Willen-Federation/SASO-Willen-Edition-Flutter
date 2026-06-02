@@ -143,7 +143,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
 
   # Native splash screen generation
-  flutter_native_splash: ^2.4.6
+  flutter_native_splash: ^2.4.8
 
   # Testing
   mocktail: ^1.0.4
