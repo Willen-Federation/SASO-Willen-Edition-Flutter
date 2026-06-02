@@ -25,10 +25,10 @@ dependencies:
   # which renames generated providers (`xxxNotifierProvider` →
   # `xxxProvider`) and reshapes the override API. Pinned to 2.x until
   # the codebase migration to Riverpod 3 is scheduled.
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
-  hooks_riverpod: ^2.6.1
-  flutter_hooks: ^0.20.5
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.0
+  hooks_riverpod: ^3.1.0
+  flutter_hooks: ^0.21.3+1
 
   # Navigation
   go_router: ^17.2.3
@@ -125,10 +125,10 @@ dev_dependencies:
   # with riverpod_generator 2.6.x. The newer freezed / json_serializable
   # majors are pulled back too so the build-runners stack stays
   # self-consistent until the Riverpod 3 migration.
-  build_runner: ^2.5.4
-  freezed: ^3.1.0
-  json_serializable: ^6.9.5
-  riverpod_generator: ^2.6.5
+  build_runner: ^2.15.0
+  freezed: ^3.2.3
+  json_serializable: ^6.11.2
+  riverpod_generator: ^4.0.0+1
 
   # Linting
   flutter_lints: ^6.0.0
@@ -136,8 +136,8 @@ dev_dependencies:
   # the analyzer ^7.0.0 that riverpod_lint 2.6.x needs. Hold custom_lint
   # at the 0.7.x line until the Riverpod 3 migration unsticks the lint
   # stack as a whole.
-  custom_lint: ^0.7.6
-  riverpod_lint: ^2.6.5
+  custom_lint: ^0.8.1
+  riverpod_lint: ^3.1.0
 
   # App icon generation
   flutter_launcher_icons: ^0.14.4
