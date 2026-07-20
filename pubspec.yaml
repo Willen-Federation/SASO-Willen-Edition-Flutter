@@ -99,7 +99,7 @@ dependencies:
   # `GoogleFonts.notoSansJpTextTheme` fetches the font on first use and
   # caches it to disk; offline boots fall back to the platform default,
   # matching the pre-#150 behaviour.
-  google_fonts: ^8.1.0
+  google_fonts: ^8.2.0
 
 # Pin transitive deps that break the build but aren't directly listed
 # above. Remove an entry as soon as the upstream issue resolves.
