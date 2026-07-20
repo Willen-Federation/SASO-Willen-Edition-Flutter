@@ -77,7 +77,7 @@ dependencies:
   amplify_auth_cognito: ^2.11.0
 
   # SAML SSO WebView fallback
-  webview_flutter: ^4.10.0
+  webview_flutter: ^4.14.1
 
   # UI
   cupertino_icons: ^1.0.9
