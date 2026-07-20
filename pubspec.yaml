@@ -90,7 +90,7 @@ dependencies:
   # 7.x requires Xcode 26.1.1 (calls `NWPath.isUltraConstrained`, which
   # isn't declared in the SDK headers shipped on the current `macos-15`
   # GitHub runner). Hold at 6.x until the runner catches up.
-  connectivity_plus: ^7.1.1
+  connectivity_plus: ^7.3.0
 
   # Internationalisation
   intl: any
