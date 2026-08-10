@@ -60,7 +60,7 @@ dependencies:
   # Firebase (Apache 2.0 — GPL compatible)
   firebase_core: ^4.9.0
   firebase_messaging: ^16.2.2
-  firebase_auth: ^6.5.1
+  firebase_auth: ^6.5.7
   firebase_remote_config: ^6.5.1
 
   # AWS Amplify / SNS Pinpoint (Apache 2.0 — GPL compatible) [ff_push_sns]
